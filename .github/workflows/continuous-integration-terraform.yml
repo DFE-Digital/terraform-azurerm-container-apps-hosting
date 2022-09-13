@@ -1,0 +1,60 @@
+name: Continuous integration
+
+on:
+  push:
+    branches: main
+  pull_request:
+
+jobs:
+  terraform-validate:
+    name: Terraform Validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Check for terraform version mismatch
+        run: |
+          DOTFILE_VERSION=$(cat .terraform-version)
+          TERRAFORM_IMAGE_REFERENCES=$(grep "uses: docker://hashicorp/terraform" .github/workflows/continuous-integration-terraform.yml | grep -v TERRAFORM_IMAGE_REFERENCES | wc -l | tr -d ' ')
+          if [ "$(grep "docker://hashicorp/terraform:${DOTFILE_VERSION}" .github/workflows/continuous-integration-terraform.yml | wc -l | tr -d ' ')" != "$TERRAFORM_IMAGE_REFERENCES" ]
+          then
+            echo -e "\033[1;31mError: terraform version in .terraform-version file does not match docker://hashicorp/terraform versions in .github/workflows/continuous-integration-terraform.yml"
+            exit 1
+          fi
+
+      - name: Run a Terraform init
+        uses: docker://hashicorp/terraform:1.2.9
+        with:
+          entrypoint: terraform
+          args: init
+
+      - name: Run a Terraform validate
+        uses: docker://hashicorp/terraform:1.2.9
+        with:
+          entrypoint: terraform
+          args: validate
+
+      - name: Run a Terraform format check
+        uses: docker://hashicorp/terraform:1.2.9
+        with:
+          entrypoint: terraform
+          args: fmt -check=true -diff=true
+  terraform-docs-validation:
+    name: Terraform Docs validation
+    needs: terraform-validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Generate Terraform docs
+        uses: terraform-docs/gh-actions@v1.0.0
+        with:
+          working-dir: .
+          config-file: .terraform-docs.yml
+          output-file: README.md
+          output-method: inject
+          fail-on-diff: true
