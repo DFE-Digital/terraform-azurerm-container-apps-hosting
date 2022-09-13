@@ -12,3 +12,9 @@ variable "azure_location" {
   description = "Azure location in which to launch resources."
   type        = string
 }
+
+variable "virtual_network_address_space" {
+  description = "Virtual Network address space CIDR"
+  type        = string
+  default     = "172.16.0.0/12"
+}
