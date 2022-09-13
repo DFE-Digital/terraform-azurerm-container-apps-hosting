@@ -18,3 +18,8 @@ variable "virtual_network_address_space" {
   type        = string
   default     = "172.16.0.0/12"
 }
+
+variable "enable_container_registry" {
+  description = "Set to true to create a container registry"
+  type        = bool
+}
