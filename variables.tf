@@ -42,6 +42,37 @@ variable "registry_password" {
   default     = ""
 }
 
+variable "enable_mssql_database" {
+  description = "Set to true to create an Azure SQL server/database, with a private endpoint within the virtual network"
+  type        = bool
+  default     = false
+}
+
+variable "mssql_server_admin_password" {
+  description = "The administrator password for the MSSQL server. Must be set if `enable_mssql_database` is true"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
+
+variable "mssql_sku_name" {
+  description = "Specifies the name of the SKU used by the database"
+  type        = string
+  default     = "Basic"
+}
+
+variable "mssql_max_size_gb" {
+  description = "The max size of the database in gigabytes"
+  type        = number
+  default     = 2
+}
+
+variable "mssql_database_name" {
+  description = "The name of the MSSQL database to create. Must be set if `enable_mssql_database` is true"
+  type        = string
+  default     = ""
+}
+
 variable "image_name" {
   description = "Image name"
   type        = string
