@@ -11,6 +11,18 @@ module "azure_container_apps_hosting" {
   environment    = "dev"
   project_name   = "myproject"
   azure_location = "uksouth"
+
+  enable_container_registry = true
+
+  image_name        = "myimage"
+  container_command = ["/bin/bash", "-c". "echo hello && sleep 86400"]
+  container_environment_variables = {
+    "FOO" = "bar"
+  }
+
+  enable_mssql_database       = true
+  mssql_server_admin_password = "S3crEt"
+  mssql_database_name         = "mydatabase"
 }
 ```
 
