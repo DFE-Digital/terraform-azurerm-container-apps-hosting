@@ -19,7 +19,12 @@ module "azure_container_apps_hosting" {
 
   image_name        = "myimage"
   container_command = ["/bin/bash", "-c". "echo hello && sleep 86400"]
-  container_environment_variables = {
+
+  # Note: It is recommended to use `container_secret_environment_variables` rather than `container_environment_variables`.
+  #       This ensures that environment variables are set as `secrets` within the container app revision.
+  #       If they are set directly as `env`, they can be exposed when running `az containerapp` commands, especially
+  #       if those commands are ran as part of CI/CD.
+  container_secret_environment_variables = {
     "FOO" = "bar"
   }
 
@@ -84,6 +89,7 @@ module "azure_container_apps_hosting" {
 | <a name="input_container_memory"></a> [container\_memory](#input\_container\_memory) | Container memory in GB | `number` | `2` | no |
 | <a name="input_container_min_replicas"></a> [container\_min\_replicas](#input\_container\_min\_replicas) | Container min replicas | `number` | `1` | no |
 | <a name="input_container_port"></a> [container\_port](#input\_container\_port) | Container port | `number` | `80` | no |
+| <a name="input_container_secret_environment_variables"></a> [container\_secret\_environment\_variables](#input\_container\_secret\_environment\_variables) | Container environment variables, which are defined as `secrets` within the container app configuration. This is to help reduce the risk of accidently exposing secrets. | `map(string)` | `{}` | no |
 | <a name="input_enable_container_registry"></a> [enable\_container\_registry](#input\_enable\_container\_registry) | Set to true to create a container registry | `bool` | n/a | yes |
 | <a name="input_enable_mssql_database"></a> [enable\_mssql\_database](#input\_enable\_mssql\_database) | Set to true to create an Azure SQL server/database, with a private endpoint within the virtual network | `bool` | `false` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name. Will be used along with `project_name` as a prefix for all resources. | `string` | n/a | yes |

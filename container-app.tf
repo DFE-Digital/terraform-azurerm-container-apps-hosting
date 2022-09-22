@@ -42,12 +42,18 @@ resource "azapi_resource" "default" {
           external   = true
           targetPort = local.container_port
         }
-        secrets = [
+        secrets = concat([
           {
             "name" : "acr-password",
             "value" : local.registry_password
           }
-        ]
+          ],
+          [
+            for env_name, env_value in local.container_secret_environment_variables : {
+              name  = lower(replace(env_name, "_", "-"))
+              value = env_value
+            }
+        ])
         registries = [
           {
             "server" : local.registry_server,
@@ -66,12 +72,18 @@ resource "azapi_resource" "default" {
               memory = "${local.container_memory}Gi"
             }
             command = local.container_command
-            env = [
+            env = concat([
               for env_name, env_value in local.container_environment_variables : {
                 name  = env_name
                 value = env_value
               }
-            ]
+              ],
+              [
+                for env_name, env_value in local.container_secret_environment_variables : {
+                  name      = env_name
+                  secretRef = lower(replace(env_name, "_", "-"))
+                }
+            ])
           }
         ]
         scale = {
