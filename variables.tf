@@ -125,3 +125,10 @@ variable "container_environment_variables" {
   type        = map(string)
   default     = {}
 }
+
+variable "container_secret_environment_variables" {
+  description = "Container environment variables, which are defined as `secrets` within the container app configuration. This is to help reduce the risk of accidently exposing secrets."
+  type        = map(string)
+  default     = {}
+  sensitive   = true
+}
