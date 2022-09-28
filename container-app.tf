@@ -4,6 +4,7 @@ resource "azurerm_log_analytics_workspace" "container_app" {
   location            = azurerm_resource_group.default.location
   sku                 = "PerGB2018"
   retention_in_days   = 30
+  tags                = local.tags
 }
 
 resource "azapi_resource" "container_app_env" {
@@ -27,6 +28,8 @@ resource "azapi_resource" "container_app_env" {
       }
     }
   })
+
+  tags = local.tags
 }
 
 resource "azapi_resource" "default" {
@@ -93,4 +96,5 @@ resource "azapi_resource" "default" {
       }
     }
   })
+  tags = local.tags
 }

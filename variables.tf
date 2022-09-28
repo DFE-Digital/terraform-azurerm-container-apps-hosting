@@ -13,6 +13,12 @@ variable "azure_location" {
   type        = string
 }
 
+variable "tags" {
+  description = "Tags to be applied to all resources"
+  type        = map(string)
+  default     = {}
+}
+
 variable "virtual_network_address_space" {
   description = "Virtual Network address space CIDR"
   type        = string
