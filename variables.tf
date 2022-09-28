@@ -19,6 +19,18 @@ variable "tags" {
   default     = {}
 }
 
+variable "existing_virtual_network" {
+  description = "Conditionally use an existing virtual network. The `virtual_network_address_space` must match an existing address space in the VNet. This also requires the resource group name."
+  type        = string
+  default     = ""
+}
+
+variable "existing_resource_group" {
+  description = "Conditionally launch resources into an exiting resource group. Specifying this will not reate a new resource group."
+  type        = string
+  default     = ""
+}
+
 variable "virtual_network_address_space" {
   description = "Virtual Network address space CIDR"
   type        = string

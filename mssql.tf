@@ -2,8 +2,8 @@ resource "azurerm_storage_account" "mssql_security_storage" {
   count = local.enable_mssql_database ? 1 : 0
 
   name                     = "${local.resource_prefix}mssqlsec"
-  resource_group_name      = azurerm_resource_group.default.name
-  location                 = azurerm_resource_group.default.location
+  resource_group_name      = local.resource_group.name
+  location                 = local.resource_group.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
   min_tls_version          = "TLS1_2"
@@ -14,8 +14,8 @@ resource "azurerm_mssql_server" "default" {
   count = local.enable_mssql_database ? 1 : 0
 
   name                          = local.resource_prefix
-  resource_group_name           = azurerm_resource_group.default.name
-  location                      = azurerm_resource_group.default.location
+  resource_group_name           = local.resource_group.name
+  location                      = local.resource_group.location
   version                       = "12.0"
   administrator_login           = "${local.resource_prefix}-admin"
   administrator_login_password  = local.mssql_server_admin_password
@@ -59,8 +59,8 @@ resource "azurerm_private_endpoint" "default_mssql" {
   count = local.enable_mssql_database ? 1 : 0
 
   name                = "${local.resource_prefix}defaultmssql"
-  location            = azurerm_resource_group.default.location
-  resource_group_name = azurerm_resource_group.default.name
+  location            = local.resource_group.location
+  resource_group_name = local.resource_group.name
   subnet_id           = azurerm_subnet.mssql_private_endpoint_subnet[0].id
 
   private_service_connection {
@@ -77,7 +77,7 @@ resource "azurerm_private_dns_a_record" "mssql_private_endpoint" {
 
   name                = "@"
   zone_name           = azurerm_private_dns_zone.mssql_private_link[0].name
-  resource_group_name = azurerm_resource_group.default.name
+  resource_group_name = local.resource_group.name
   ttl                 = 300
   records             = [azurerm_private_endpoint.default_mssql[0].private_service_connection.0.private_ip_address]
   tags                = local.tags
