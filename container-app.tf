@@ -1,7 +1,7 @@
 resource "azurerm_log_analytics_workspace" "container_app" {
   name                = "${local.resource_prefix}containerapp"
-  resource_group_name = azurerm_resource_group.default.name
-  location            = azurerm_resource_group.default.location
+  resource_group_name = local.resource_group.name
+  location            = local.resource_group.location
   sku                 = "PerGB2018"
   retention_in_days   = 30
   tags                = local.tags
@@ -9,8 +9,8 @@ resource "azurerm_log_analytics_workspace" "container_app" {
 
 resource "azapi_resource" "container_app_env" {
   type      = "Microsoft.App/managedEnvironments@2022-03-01"
-  parent_id = azurerm_resource_group.default.id
-  location  = azurerm_resource_group.default.location
+  parent_id = local.resource_group.id
+  location  = local.resource_group.location
   name      = "${local.resource_prefix}containerapp"
 
   body = jsonencode({
@@ -34,8 +34,8 @@ resource "azapi_resource" "container_app_env" {
 
 resource "azapi_resource" "default" {
   type      = "Microsoft.App/containerApps@2022-03-01"
-  parent_id = azurerm_resource_group.default.id
-  location  = azurerm_resource_group.default.location
+  parent_id = local.resource_group.id
+  location  = local.resource_group.location
   name      = "${local.resource_prefix}-${local.image_name}"
   body = jsonencode({
     properties : {
