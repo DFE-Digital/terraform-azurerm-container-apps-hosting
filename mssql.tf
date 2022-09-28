@@ -7,6 +7,7 @@ resource "azurerm_storage_account" "mssql_security_storage" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
   min_tls_version          = "TLS1_2"
+  tags                     = local.tags
 }
 
 resource "azurerm_mssql_server" "default" {
@@ -20,6 +21,7 @@ resource "azurerm_mssql_server" "default" {
   administrator_login_password  = local.mssql_server_admin_password
   public_network_access_enabled = false
   minimum_tls_version           = "1.2"
+  tags                          = local.tags
 }
 
 resource "azurerm_mssql_server_extended_auditing_policy" "default" {
@@ -40,6 +42,7 @@ resource "azurerm_mssql_database" "default" {
   collation   = "SQL_Latin1_General_CP1_CI_AS"
   sku_name    = local.mssql_sku_name
   max_size_gb = local.mssql_max_size_gb
+  tags        = local.tags
 }
 
 resource "azurerm_mssql_database_extended_auditing_policy" "default" {
@@ -66,6 +69,7 @@ resource "azurerm_private_endpoint" "default_mssql" {
     subresource_names              = ["sqlServer"]
     is_manual_connection           = false
   }
+  tags = local.tags
 }
 
 resource "azurerm_private_dns_a_record" "mssql_private_endpoint" {
@@ -76,4 +80,5 @@ resource "azurerm_private_dns_a_record" "mssql_private_endpoint" {
   resource_group_name = azurerm_resource_group.default.name
   ttl                 = 300
   records             = [azurerm_private_endpoint.default_mssql[0].private_service_connection.0.private_ip_address]
+  tags                = local.tags
 }

@@ -3,6 +3,7 @@ resource "azurerm_virtual_network" "default" {
   address_space       = [local.virtual_network_address_space]
   location            = azurerm_resource_group.default.location
   resource_group_name = azurerm_resource_group.default.name
+  tags                = local.tags
 }
 
 resource "azurerm_route_table" "default" {
@@ -10,6 +11,7 @@ resource "azurerm_route_table" "default" {
   location                      = azurerm_resource_group.default.location
   resource_group_name           = azurerm_resource_group.default.name
   disable_bgp_route_propagation = false
+  tags                          = local.tags
 }
 
 resource "azurerm_subnet" "container_apps_infra_subnet" {
@@ -46,6 +48,7 @@ resource "azurerm_private_dns_zone" "mssql_private_link" {
 
   name                = "${local.resource_prefix}.database.windows.net"
   resource_group_name = azurerm_resource_group.default.name
+  tags                = local.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "mssql_private_link" {
@@ -55,6 +58,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "mssql_private_link" {
   resource_group_name   = azurerm_resource_group.default.name
   private_dns_zone_name = azurerm_private_dns_zone.mssql_private_link[0].name
   virtual_network_id    = azurerm_virtual_network.default.id
+  tags                  = local.tags
 }
 
 resource "azurerm_subnet" "container_instances_subnet" {

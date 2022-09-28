@@ -6,4 +6,5 @@ resource "azurerm_container_registry" "acr" {
   location            = azurerm_resource_group.default.location
   sku                 = "Standard"
   admin_enabled       = true
+  tags                = local.tags
 }
