@@ -56,7 +56,9 @@ resource "azurerm_mssql_database_extended_auditing_policy" "default" {
 }
 
 resource "azurerm_private_endpoint" "default_mssql" {
-  count = local.enable_mssql_database ? 1 : 0
+  count = local.enable_mssql_database ? (
+    local.launch_in_vnet ? 1 : 0
+  ) : 0
 
   name                = "${local.resource_prefix}defaultmssql"
   location            = local.resource_group.location
@@ -73,7 +75,9 @@ resource "azurerm_private_endpoint" "default_mssql" {
 }
 
 resource "azurerm_private_dns_a_record" "mssql_private_endpoint" {
-  count = local.enable_mssql_database ? 1 : 0
+  count = local.enable_mssql_database ? (
+    local.launch_in_vnet ? 1 : 0
+  ) : 0
 
   name                = "@"
   zone_name           = azurerm_private_dns_zone.mssql_private_link[0].name

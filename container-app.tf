@@ -22,10 +22,10 @@ resource "azapi_resource" "container_app_env" {
           sharedKey  = azurerm_log_analytics_workspace.container_app.primary_shared_key
         }
       }
-      vnetConfiguration = {
-        infrastructureSubnetId = azurerm_subnet.container_apps_infra_subnet.id
+      vnetConfiguration = local.launch_in_vnet ? {
+        infrastructureSubnetId = azurerm_subnet.container_apps_infra_subnet[0].id
         internal               = false
-      }
+      } : null
     }
   })
 
