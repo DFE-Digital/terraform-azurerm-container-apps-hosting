@@ -4,6 +4,7 @@ locals {
   resource_prefix                        = "${local.environment}${local.project_name}"
   azure_location                         = var.azure_location
   tags                                   = var.tags
+  launch_in_vnet                         = var.launch_in_vnet
   existing_virtual_network               = var.existing_virtual_network
   existing_resource_group                = var.existing_resource_group
   virtual_network                        = local.existing_virtual_network == "" ? azurerm_virtual_network.default[0] : data.azurerm_virtual_network.existing_virtual_network[0]

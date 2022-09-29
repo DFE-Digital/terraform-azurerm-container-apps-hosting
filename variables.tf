@@ -19,6 +19,12 @@ variable "tags" {
   default     = {}
 }
 
+variable "launch_in_vnet" {
+  description = "Conditionally launch into a VNet"
+  type        = bool
+  default     = true
+}
+
 variable "existing_virtual_network" {
   description = "Conditionally use an existing virtual network. The `virtual_network_address_space` must match an existing address space in the VNet. This also requires the resource group name."
   type        = string
