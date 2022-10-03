@@ -40,8 +40,8 @@ module "azure_container_apps_hosting" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.2.9 |
-| <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | >= 0.5.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.20.0 |
+| <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | >= 0.6.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.24.0 |
 
 ## Providers
 
