@@ -97,6 +97,42 @@ variable "mssql_database_name" {
   default     = ""
 }
 
+variable "enable_redis_cache" {
+  description = "Set to true to create an Azure Redis Cache, with a private endpoint within the virtual network"
+  type        = bool
+  default     = false
+}
+
+variable "redis_cache_family" {
+  description = "Redis Cache family"
+  type        = string
+  default     = "C"
+}
+
+variable "redis_cache_sku" {
+  description = "Redis Cache SKU"
+  type        = string
+  default     = "Basic"
+}
+
+variable "redis_cache_capacity" {
+  description = "Redis Cache Capacity"
+  type        = number
+  default     = 0
+}
+
+variable "redis_cache_patch_schedule_day" {
+  description = "Redis Cache patch schedule day"
+  type        = string
+  default     = "Wednesday"
+}
+
+variable "redis_cache_patch_schedule_hour" {
+  description = "Redis Cache patch schedule hour"
+  type        = number
+  default     = 18
+}
+
 variable "image_name" {
   description = "Image name"
   type        = string
