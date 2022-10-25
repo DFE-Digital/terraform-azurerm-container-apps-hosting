@@ -29,10 +29,6 @@ resource "azapi_resource" "container_app_env" {
     }
   })
 
-  response_export_values = [
-    "properties.staticIp",
-  ]
-
   tags = local.tags
 }
 
@@ -100,5 +96,10 @@ resource "azapi_resource" "default" {
       }
     }
   })
+
+  response_export_values = [
+    "properties.outboundIpAddresses",
+  ]
+
   tags = local.tags
 }
