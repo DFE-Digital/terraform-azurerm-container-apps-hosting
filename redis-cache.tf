@@ -28,7 +28,7 @@ resource "azurerm_redis_cache" "default" {
   tags = local.tags
 }
 
-resource "azurerm_redis_firewall_rule" "container_app_env_static_ip" {
+resource "azurerm_redis_firewall_rule" "container_app_default_static_ip" {
   count = local.enable_redis_cache ? 1 : 0
 
   name                = "${replace(local.resource_prefix, "-", "")}containerapp"
@@ -36,6 +36,18 @@ resource "azurerm_redis_firewall_rule" "container_app_env_static_ip" {
   resource_group_name = local.resource_group.name
   start_ip            = jsondecode(azapi_resource.default.output).properties.outboundIpAddresses[0]
   end_ip              = jsondecode(azapi_resource.default.output).properties.outboundIpAddresses[0]
+}
+
+resource "azurerm_redis_firewall_rule" "container_app_worker_static_ip" {
+  count = local.enable_redis_cache ? (
+    local.enable_worker_container ? 1 : 0
+  ) : 0
+
+  name                = "${replace(local.resource_prefix, "-", "")}containerappworker"
+  redis_cache_name    = azurerm_redis_cache.default[0].name
+  resource_group_name = local.resource_group.name
+  start_ip            = jsondecode(azapi_resource.worker[0].output).properties.outboundIpAddresses[0]
+  end_ip              = jsondecode(azapi_resource.worker[0].output).properties.outboundIpAddresses[0]
 }
 
 resource "azurerm_private_endpoint" "default_redis_cache" {
