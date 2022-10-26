@@ -192,3 +192,15 @@ variable "container_secret_environment_variables" {
   default     = {}
   sensitive   = true
 }
+
+variable "enable_worker_container" {
+  description = "Conditionally launch a worker container. This container uses the same image and environment variables as a the default container app, but allows a different container commanmd to be ran. The worker container does not expose any ports."
+  type        = bool
+  default     = false
+}
+
+variable "worker_container_command" {
+  description = "Container command for the Worker container. `enable_worker_container` must be set to true for this to have any effect."
+  type        = list(string)
+  default     = []
+}
