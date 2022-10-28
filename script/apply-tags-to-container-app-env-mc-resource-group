@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# exit on failures
+set -e
+set -o pipefail
+
+usage() {
+  echo "Usage: $(basename "$0") [OPTIONS]" 1>&2
+  echo "  -h               - help"
+  echo "  -n               - container app environment name"
+  echo "  -r               - container app environment resource group name"
+  echo "  -t               - json encoded tags ({\"key\":\"value\")"
+  exit 1
+}
+
+# if there are no arguments passed exit with usage
+if [ $# -lt 1 ];
+then
+ usage
+fi
+
+while getopts "n:r:t:h" opt; do
+  case $opt in
+    n)
+      CONTAINER_APP_ENVIRONMENT_NAME=$OPTARG
+      ;;
+    r)
+      CONTAINER_APP_ENVIRONMENT_RESOURCE_GROUP_NAME=$OPTARG
+      ;;
+    t)
+      TAGS=$OPTARG
+      ;;
+    h)
+      usage
+      exit;;
+    *)
+      usage
+      exit;;
+  esac
+done
+
+if [[
+  -z "$CONTAINER_APP_ENVIRONMENT_NAME" ||
+  -z "$CONTAINER_APP_ENVIRONMENT_RESOURCE_GROUP_NAME" ||
+  -z "$TAGS"
+]]; then
+  usage
+fi
+
+CONTAINER_APP_PROVISIONING_STATE="InProgress"
+
+while [ "$CONTAINER_APP_PROVISIONING_STATE" == "InProgress" ]
+do
+  CONTAINER_APP=$(az containerapp env show --name "$CONTAINER_APP_ENVIRONMENT_NAME" --resource-group "$CONTAINER_APP_ENVIRONMENT_RESOURCE_GROUP_NAME")
+  CONTAINER_APP_PROVISIONING_STATE=$(echo "$CONTAINER_APP" | jq -r ".properties.provisioningState")
+  if [[
+    "$CONTAINER_APP_PROVISIONING_STATE" != "InProgress" &&
+    "$CONTAINER_APP_PROVISIONING_STATE" != "Succeeded"
+  ]]
+  then
+    echo "Failed to add tags. Container App Environment is '$CONTAINER_APP_PROVISIONING_STATE'"
+    exit 1
+  fi
+  if [ "$CONTAINER_APP_PROVISIONING_STATE" == "Succeeded" ]
+  then
+    break
+  fi
+  echo "Waiting for container app environment to be provisioned ..."
+  sleep 5
+done
+
+CONTAINER_APP_ENVIRONMENT_DEFAULT_DOMAIN=$(echo "$CONTAINER_APP" | jq -r ".properties.defaultDomain")
+CONTAINER_APP_ENVIRONMENT_LOCATION=$(echo "$CONTAINER_APP" | jq -r ".location")
+CONTAINER_APP_ENVIRONMENT_SLUG=$(echo "$CONTAINER_APP_ENVIRONMENT_DEFAULT_DOMAIN" | cut -d'.' -f1 )
+MC_RESOURCE_GROUP_NAME="MC_${CONTAINER_APP_ENVIRONMENT_SLUG}-rg_${CONTAINER_APP_ENVIRONMENT_SLUG}_${CONTAINER_APP_ENVIRONMENT_LOCATION}"
+MC_RESOURCE_GROUP="$(az group show --name "$MC_RESOURCE_GROUP_NAME")"
+MC_RESOURCE_GROUP_ID="$(echo "$MC_RESOURCE_GROUP" | jq -r ".id")"
+TAGS="$(echo "$TAGS" | jq -r 'keys[] as $k | "\($k)=\(.[$k])"')"
+
+echo "Adding tags to $MC_RESOURCE_GROUP_ID ..."
+while read -r TAG
+do
+  az tag update --operation "Merge" --resource-id "$MC_RESOURCE_GROUP_ID" --tags "$TAG"
+done <<< "$TAGS"

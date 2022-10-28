@@ -10,3 +10,5 @@ data "azurerm_resource_group" "existing_resource_group" {
 
   name = local.existing_resource_group
 }
+
+data "azurerm_subscription" "current" {}

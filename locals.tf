@@ -43,4 +43,5 @@ locals {
   container_secret_environment_variables   = var.container_secret_environment_variables
   enable_worker_container                  = var.enable_worker_container
   worker_container_command                 = var.worker_container_command
+  tagging_command                          = "timeout 15m ${path.module}/script/apply-tags-to-container-app-env-mc-resource-group -n \"${azapi_resource.container_app_env.name}\" -r \"${local.resource_group.name}\" -t \"${replace(jsonencode(local.tags), "\"", "\\\"")}\""
 }
