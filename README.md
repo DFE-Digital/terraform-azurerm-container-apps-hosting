@@ -56,6 +56,7 @@ module "azure_container_apps_hosting" {
 |------|---------|
 | <a name="provider_azapi"></a> [azapi](#provider\_azapi) | 1.0.0 |
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.25.0 |
+| <a name="provider_null"></a> [null](#provider\_null) | n/a |
 
 ## Resources
 
@@ -95,7 +96,9 @@ module "azure_container_apps_hosting" {
 | [azurerm_subnet_route_table_association.redis_cache_private_endpoint_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
 | [azurerm_subnet_route_table_association.redis_cache_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
 | [azurerm_virtual_network.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
+| [null_resource.tagging](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [azurerm_resource_group.existing_resource_group](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
+| [azurerm_subscription.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subscription) | data source |
 | [azurerm_virtual_network.existing_virtual_network](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/virtual_network) | data source |
 
 ## Inputs
