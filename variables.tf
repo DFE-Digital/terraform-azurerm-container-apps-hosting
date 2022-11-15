@@ -204,3 +204,21 @@ variable "worker_container_command" {
   type        = list(string)
   default     = []
 }
+
+variable "enable_dns_zone" {
+  description = "Conditionally create a DNS zone"
+  type        = bool
+  default     = false
+}
+
+variable "dns_zone_domain_name" {
+  description = "DNS zone domain name. If created, records will automatically be created to point to the CDN."
+  type        = string
+  default     = ""
+}
+
+variable "dns_zone_soa_record" {
+  description = "DNS zone SOA record block (https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_zone#soa_record)"
+  type        = map(string)
+  default     = {}
+}
