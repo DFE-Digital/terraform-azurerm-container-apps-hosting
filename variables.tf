@@ -222,3 +222,27 @@ variable "dns_zone_soa_record" {
   type        = map(string)
   default     = {}
 }
+
+variable "enable_cdn_frontdoor" {
+  description = "Enable Azure CDN FrontDoor. This will use the Container Apps endpoint as the origin."
+  type        = bool
+  default     = false
+}
+
+variable "cdn_frontdoor_sku" {
+  description = "Azure CDN FrontDoor SKU"
+  type        = string
+  default     = "Standard_AzureFrontDoor"
+}
+
+variable "cdn_frontdoor_response_timeout" {
+  description = "Azure CDN FrontDoor response timout in seconds"
+  type        = number
+  default     = 120
+}
+
+variable "cdn_frontdoor_custom_domains" {
+  description = "Azure CDN FrontDoor custom domains. If they are within the DNS zone (optionally created), the Validation TXT records and ALIAS/CNAME records will be created"
+  type        = list(string)
+  default     = []
+}

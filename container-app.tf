@@ -99,6 +99,7 @@ resource "azapi_resource" "default" {
 
   response_export_values = [
     "properties.outboundIpAddresses",
+    "properties.configuration.ingress.fqdn",
   ]
 
   tags = local.tags
