@@ -133,6 +133,12 @@ variable "redis_cache_patch_schedule_hour" {
   default     = 18
 }
 
+variable "redis_cache_version" {
+  description = "Redis Cache version"
+  type        = number
+  default     = 6
+}
+
 variable "image_name" {
   description = "Image name"
   type        = string
