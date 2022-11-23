@@ -51,6 +51,14 @@ module "azure_container_apps_hosting" {
     serial_number = "1"
     ttl           = "3600"
   }
+
+  enable_cdn_frontdoor           = true
+  cdn_frontdoor_sku              = "Standard_AzureFrontDoor"
+  cdn_frontdoor_response_timeout = 120
+  cdn_frontdoor_custom_domains   = [
+    "example.com",
+    "www.example.com"
+  ]
 }
 ```
 
@@ -61,15 +69,15 @@ module "azure_container_apps_hosting" {
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.2.9 |
 | <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | >= 1.0.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.25.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.32.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azapi"></a> [azapi](#provider\_azapi) | 1.0.0 |
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.25.0 |
-| <a name="provider_null"></a> [null](#provider\_null) | n/a |
+| <a name="provider_azapi"></a> [azapi](#provider\_azapi) | 1.1.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.32.0 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.2.1 |
 
 ## Resources
 
@@ -78,6 +86,13 @@ module "azure_container_apps_hosting" {
 | [azapi_resource.container_app_env](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource.default](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource.worker](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) | resource |
+| [azurerm_cdn_frontdoor_custom_domain.custom_domain](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_custom_domain) | resource |
+| [azurerm_cdn_frontdoor_custom_domain_association.custom_domain_association](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_custom_domain_association) | resource |
+| [azurerm_cdn_frontdoor_endpoint.endpoint](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_endpoint) | resource |
+| [azurerm_cdn_frontdoor_origin.origin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_origin) | resource |
+| [azurerm_cdn_frontdoor_origin_group.group](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_origin_group) | resource |
+| [azurerm_cdn_frontdoor_profile.cdn](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_profile) | resource |
+| [azurerm_cdn_frontdoor_route.route](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_route) | resource |
 | [azurerm_container_registry.acr](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry) | resource |
 | [azurerm_dns_zone.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_zone) | resource |
 | [azurerm_log_analytics_workspace.container_app](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) | resource |
@@ -120,6 +135,9 @@ module "azure_container_apps_hosting" {
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_azure_location"></a> [azure\_location](#input\_azure\_location) | Azure location in which to launch resources. | `string` | n/a | yes |
+| <a name="input_cdn_frontdoor_custom_domains"></a> [cdn\_frontdoor\_custom\_domains](#input\_cdn\_frontdoor\_custom\_domains) | Azure CDN FrontDoor custom domains. If they are within the DNS zone (optionally created), the Validation TXT records and ALIAS/CNAME records will be created | `list(string)` | `[]` | no |
+| <a name="input_cdn_frontdoor_response_timeout"></a> [cdn\_frontdoor\_response\_timeout](#input\_cdn\_frontdoor\_response\_timeout) | Azure CDN FrontDoor response timout in seconds | `number` | `120` | no |
+| <a name="input_cdn_frontdoor_sku"></a> [cdn\_frontdoor\_sku](#input\_cdn\_frontdoor\_sku) | Azure CDN FrontDoor SKU | `string` | `"Standard_AzureFrontDoor"` | no |
 | <a name="input_container_command"></a> [container\_command](#input\_container\_command) | Container command | `list(any)` | `[]` | no |
 | <a name="input_container_cpu"></a> [container\_cpu](#input\_container\_cpu) | Number of container CPU cores | `number` | `1` | no |
 | <a name="input_container_environment_variables"></a> [container\_environment\_variables](#input\_container\_environment\_variables) | Container environment variables | `map(string)` | `{}` | no |
@@ -130,6 +148,7 @@ module "azure_container_apps_hosting" {
 | <a name="input_container_secret_environment_variables"></a> [container\_secret\_environment\_variables](#input\_container\_secret\_environment\_variables) | Container environment variables, which are defined as `secrets` within the container app configuration. This is to help reduce the risk of accidently exposing secrets. | `map(string)` | `{}` | no |
 | <a name="input_dns_zone_domain_name"></a> [dns\_zone\_domain\_name](#input\_dns\_zone\_domain\_name) | DNS zone domain name. If created, records will automatically be created to point to the CDN. | `string` | `""` | no |
 | <a name="input_dns_zone_soa_record"></a> [dns\_zone\_soa\_record](#input\_dns\_zone\_soa\_record) | DNS zone SOA record block (https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_zone#soa_record) | `map(string)` | `{}` | no |
+| <a name="input_enable_cdn_frontdoor"></a> [enable\_cdn\_frontdoor](#input\_enable\_cdn\_frontdoor) | Enable Azure CDN FrontDoor. This will use the Container Apps endpoint as the origin. | `bool` | `false` | no |
 | <a name="input_enable_container_registry"></a> [enable\_container\_registry](#input\_enable\_container\_registry) | Set to true to create a container registry | `bool` | n/a | yes |
 | <a name="input_enable_dns_zone"></a> [enable\_dns\_zone](#input\_enable\_dns\_zone) | Conditionally create a DNS zone | `bool` | `false` | no |
 | <a name="input_enable_mssql_database"></a> [enable\_mssql\_database](#input\_enable\_mssql\_database) | Set to true to create an Azure SQL server/database, with a private endpoint within the virtual network | `bool` | `false` | no |

@@ -46,5 +46,9 @@ locals {
   enable_dns_zone                          = var.enable_dns_zone
   dns_zone_domain_name                     = var.dns_zone_domain_name
   dns_zone_soa_record                      = var.dns_zone_soa_record
+  enable_cdn_frontdoor                     = var.enable_cdn_frontdoor
+  cdn_frontdoor_sku                        = var.cdn_frontdoor_sku
+  cdn_frontdoor_response_timeout           = var.cdn_frontdoor_response_timeout
+  cdn_frontdoor_custom_domains             = var.cdn_frontdoor_custom_domains
   tagging_command                          = "timeout 15m ${path.module}/script/apply-tags-to-container-app-env-mc-resource-group -n \"${azapi_resource.container_app_env.name}\" -r \"${local.resource_group.name}\" -t \"${replace(jsonencode(local.tags), "\"", "\\\"")}\""
 }
