@@ -26,6 +26,7 @@ locals {
   mssql_max_size_gb                        = var.mssql_max_size_gb
   mssql_database_name                      = var.mssql_database_name
   enable_redis_cache                       = var.enable_redis_cache
+  redis_cache_version                      = var.redis_cache_version
   redis_cache_family                       = var.redis_cache_family
   redis_cache_sku                          = var.redis_cache_sku
   redis_cache_capacity                     = var.redis_cache_capacity
