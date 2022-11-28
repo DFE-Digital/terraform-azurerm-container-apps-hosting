@@ -32,7 +32,7 @@ variable "existing_virtual_network" {
 }
 
 variable "existing_resource_group" {
-  description = "Conditionally launch resources into an exiting resource group. Specifying this will not reate a new resource group."
+  description = "Conditionally launch resources into an existing resource group. Specifying this will NOT create a resource group."
   type        = string
   default     = ""
 }
@@ -193,14 +193,14 @@ variable "container_environment_variables" {
 }
 
 variable "container_secret_environment_variables" {
-  description = "Container environment variables, which are defined as `secrets` within the container app configuration. This is to help reduce the risk of accidently exposing secrets."
+  description = "Container environment variables, which are defined as `secrets` within the container app configuration. This is to help reduce the risk of accidentally exposing secrets."
   type        = map(string)
   default     = {}
   sensitive   = true
 }
 
 variable "enable_worker_container" {
-  description = "Conditionally launch a worker container. This container uses the same image and environment variables as a the default container app, but allows a different container commanmd to be ran. The worker container does not expose any ports."
+  description = "Conditionally launch a worker container. This container uses the same image and environment variables as the default container app, but allows a different container command to be run. The worker container does not expose any ports."
   type        = bool
   default     = false
 }
@@ -230,25 +230,25 @@ variable "dns_zone_soa_record" {
 }
 
 variable "enable_cdn_frontdoor" {
-  description = "Enable Azure CDN FrontDoor. This will use the Container Apps endpoint as the origin."
+  description = "Enable Azure CDN Front Door. This will use the Container Apps endpoint as the origin."
   type        = bool
   default     = false
 }
 
 variable "cdn_frontdoor_sku" {
-  description = "Azure CDN FrontDoor SKU"
+  description = "Azure CDN Front Door SKU"
   type        = string
   default     = "Standard_AzureFrontDoor"
 }
 
 variable "cdn_frontdoor_response_timeout" {
-  description = "Azure CDN FrontDoor response timout in seconds"
+  description = "Azure CDN Front Door response timeout in seconds"
   type        = number
   default     = 120
 }
 
 variable "cdn_frontdoor_custom_domains" {
-  description = "Azure CDN FrontDoor custom domains. If they are within the DNS zone (optionally created), the Validation TXT records and ALIAS/CNAME records will be created"
+  description = "Azure CDN Front Door custom domains. If they are within the DNS zone (optionally created), the Validation TXT records and ALIAS/CNAME records will be created"
   type        = list(string)
   default     = []
 }
