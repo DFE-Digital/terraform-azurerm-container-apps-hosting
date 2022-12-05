@@ -59,6 +59,7 @@ resource "azurerm_cdn_frontdoor_route" "route" {
   cdn_frontdoor_endpoint_id     = azurerm_cdn_frontdoor_endpoint.endpoint[0].id
   cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.group[0].id
   cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.origin[0].id]
+  cdn_frontdoor_rule_set_ids    = local.ruleset_ids
   enabled                       = true
 
   forwarding_protocol    = "HttpsOnly"
@@ -85,4 +86,39 @@ resource "azurerm_cdn_frontdoor_custom_domain_association" "custom_domain_associ
 
   cdn_frontdoor_custom_domain_id = azurerm_cdn_frontdoor_custom_domain.custom_domain[each.value].id
   cdn_frontdoor_route_ids        = [azurerm_cdn_frontdoor_route.route[0].id]
+}
+
+resource "azurerm_cdn_frontdoor_rule_set" "redirects" {
+  count = local.enable_cdn_frontdoor && length(local.cdn_frontdoor_host_redirects) > 0 ? 1 : 0
+
+  name                     = "${replace(local.resource_prefix, "-", "")}redirects"
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.cdn[0].id
+}
+
+resource "azurerm_cdn_frontdoor_rule" "redirect" {
+  for_each = local.enable_cdn_frontdoor ? { for index, host_redirect in local.cdn_frontdoor_host_redirects : index => { "from" : host_redirect.from, "to" : host_redirect.to } } : {}
+
+  depends_on = [azurerm_cdn_frontdoor_origin_group.group, azurerm_cdn_frontdoor_origin.origin]
+
+  name                      = "redirect${each.key}"
+  cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.redirects[0].id
+  order                     = each.key
+  behavior_on_match         = "Continue"
+
+  actions {
+    url_redirect_action {
+      redirect_type        = "Moved"
+      redirect_protocol    = "Https"
+      destination_hostname = each.value.to
+    }
+  }
+
+  conditions {
+    host_name_condition {
+      operator         = "Equal"
+      negate_condition = false
+      match_values     = [each.value.from]
+      transforms       = ["Lowercase", "Trim"]
+    }
+  }
 }

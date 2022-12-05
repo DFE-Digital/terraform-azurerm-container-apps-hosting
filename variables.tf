@@ -252,3 +252,9 @@ variable "cdn_frontdoor_custom_domains" {
   type        = list(string)
   default     = []
 }
+
+variable "cdn_frontdoor_host_redirects" {
+  description = "CDN FrontDoor host redirects `[{ \"from\" = \"example.com\", \"to\" = \"www.example.com\" }]`"
+  type        = list(map(string))
+  default     = []
+}
