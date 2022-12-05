@@ -39,7 +39,7 @@ resource "azurerm_cdn_frontdoor_endpoint" "endpoint" {
 }
 
 resource "azurerm_cdn_frontdoor_custom_domain" "custom_domain" {
-  for_each = local.enable_cdn_frontdoor ? [] : toset(local.cdn_frontdoor_custom_domains)
+  for_each = local.enable_cdn_frontdoor ? toset(local.cdn_frontdoor_custom_domains) : []
 
   name                     = "${local.resource_prefix}custom-domain${index(local.cdn_frontdoor_custom_domains, each.value)}"
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.cdn[0].id
@@ -66,8 +66,11 @@ resource "azurerm_cdn_frontdoor_route" "route" {
   patterns_to_match      = ["/*"]
   supported_protocols    = ["Http", "Https"]
 
-  cdn_frontdoor_custom_domain_ids = length(azurerm_cdn_frontdoor_custom_domain.custom_domain) == 0 ? [] : azurerm_cdn_frontdoor_custom_domain.custom_domain.*.id
-  link_to_default_domain          = true
+  cdn_frontdoor_custom_domain_ids = [
+    for custom_domain in azurerm_cdn_frontdoor_custom_domain.custom_domain : custom_domain.id
+  ]
+
+  link_to_default_domain = true
 
   cache {
     query_string_caching_behavior = "IgnoreSpecifiedQueryStrings"
