@@ -60,6 +60,12 @@ module "azure_container_apps_hosting" {
     "example.com",
     "www.example.com"
   ]
+  cdn_frontdoor_host_redirects = [
+    {
+      "from" = "example.com",
+      "to"   = "www.example.com",
+    }
+  ]
 }
 ```
 
