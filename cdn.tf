@@ -72,13 +72,6 @@ resource "azurerm_cdn_frontdoor_route" "route" {
   ]
 
   link_to_default_domain = true
-
-  cache {
-    query_string_caching_behavior = "IgnoreSpecifiedQueryStrings"
-    query_strings                 = ["account", "settings"]
-    compression_enabled           = true
-    content_types_to_compress     = ["text/html", "text/javascript", "text/xml"]
-  }
 }
 
 resource "azurerm_cdn_frontdoor_custom_domain_association" "custom_domain_association" {
