@@ -52,7 +52,10 @@ locals {
   cdn_frontdoor_response_timeout           = var.cdn_frontdoor_response_timeout
   cdn_frontdoor_custom_domains             = var.cdn_frontdoor_custom_domains
   cdn_frontdoor_host_redirects             = var.cdn_frontdoor_host_redirects
-  ruleset_redirects_id                     = length(local.cdn_frontdoor_host_redirects) > 0 ? [azurerm_cdn_frontdoor_rule_set.redirects[0].id] : []
-  ruleset_ids                              = local.ruleset_redirects_id
-  tagging_command                          = "timeout 15m ${path.module}/script/apply-tags-to-container-app-env-mc-resource-group -n \"${azapi_resource.container_app_env.name}\" -r \"${local.resource_group.name}\" -t \"${replace(jsonencode(local.tags), "\"", "\\\"")}\""
+  cdn_frontdoor_custom_domain_dns_names = local.enable_cdn_frontdoor && local.enable_dns_zone ? toset([
+    for domain in local.cdn_frontdoor_custom_domains : replace(domain, local.dns_zone_domain_name, "") if endswith(domain, local.dns_zone_domain_name)
+  ]) : []
+  ruleset_redirects_id = length(local.cdn_frontdoor_host_redirects) > 0 ? [azurerm_cdn_frontdoor_rule_set.redirects[0].id] : []
+  ruleset_ids          = local.ruleset_redirects_id
+  tagging_command      = "timeout 15m ${path.module}/script/apply-tags-to-container-app-env-mc-resource-group -n \"${azapi_resource.container_app_env.name}\" -r \"${local.resource_group.name}\" -t \"${replace(jsonencode(local.tags), "\"", "\\\"")}\""
 }
