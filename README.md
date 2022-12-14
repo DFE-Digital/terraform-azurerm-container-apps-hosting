@@ -74,16 +74,16 @@ module "azure_container_apps_hosting" {
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.2.9 |
-| <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | >= 1.0.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.32.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.6 |
+| <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | >= 1.1.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.35.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_azapi"></a> [azapi](#provider\_azapi) | 1.1.0 |
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.32.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.35.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | 3.2.1 |
 
 ## Resources
