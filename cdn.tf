@@ -115,3 +115,78 @@ resource "azurerm_cdn_frontdoor_rule" "redirect" {
     }
   }
 }
+
+resource "azurerm_cdn_frontdoor_firewall_policy" "waf" {
+  count = local.cdn_frontdoor_enable_waf ? 1 : 0
+
+  name                              = "${replace(local.resource_prefix, "-", "")}waf"
+  resource_group_name               = local.resource_group.name
+  sku_name                          = azurerm_cdn_frontdoor_profile.cdn[0].sku_name
+  enabled                           = true
+  mode                              = local.cdn_frontdoor_waf_mode
+  custom_block_response_status_code = 403
+  custom_block_response_body        = filebase64("${path.module}/html/waf-response.html")
+
+  dynamic "custom_rule" {
+    for_each = local.cdn_frontdoor_enable_rate_limiting ? [0] : []
+    content {
+      name                           = "RateLimiting"
+      enabled                        = true
+      priority                       = 1
+      rate_limit_duration_in_minutes = local.cdn_frontdoor_rate_limiting_duration_in_minutes
+      rate_limit_threshold           = local.cdn_frontdoor_rate_limiting_threshold
+      type                           = "RateLimitRule"
+      action                         = "Block"
+
+      dynamic "match_condition" {
+        for_each = length(local.cdn_frontdoor_rate_limiting_bypass_ip_list) > 0 ? [0] : []
+
+        content {
+          match_variable     = "RemoteAddr"
+          operator           = "IPMatch"
+          negation_condition = true
+          match_values       = local.cdn_frontdoor_rate_limiting_bypass_ip_list
+        }
+      }
+
+      match_condition {
+        match_variable     = "RequestUri"
+        operator           = "RegEx"
+        negation_condition = false
+        match_values       = ["/.*"]
+      }
+
+    }
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_cdn_frontdoor_security_policy" "waf" {
+  count = local.cdn_frontdoor_enable_waf ? 1 : 0
+
+  name                     = "${replace(local.resource_prefix, "-", "")}wafsecuritypolicy"
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.cdn[0].id
+
+  security_policies {
+    firewall {
+      cdn_frontdoor_firewall_policy_id = azurerm_cdn_frontdoor_firewall_policy.waf[0].id
+
+      association {
+        patterns_to_match = ["/*"]
+
+        domain {
+          cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_endpoint.endpoint[0].id
+        }
+
+        dynamic "domain" {
+          for_each = toset(local.cdn_frontdoor_custom_domains)
+
+          content {
+            cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_custom_domain.custom_domain[domain.value].id
+          }
+        }
+      }
+    }
+  }
+}
