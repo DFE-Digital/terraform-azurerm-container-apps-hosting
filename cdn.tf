@@ -190,3 +190,29 @@ resource "azurerm_cdn_frontdoor_security_policy" "waf" {
     }
   }
 }
+
+resource "azurerm_cdn_frontdoor_rule_set" "add_response_headers" {
+  count = local.enable_cdn_frontdoor && length(local.cdn_frontdoor_host_add_response_headers) > 0 ? 1 : 0
+
+  name                     = "${replace(local.resource_prefix, "-", "")}addresponseheaders"
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.cdn[0].id
+}
+
+resource "azurerm_cdn_frontdoor_rule" "add_response_headers" {
+  for_each = local.enable_cdn_frontdoor ? { for index, response_header in local.cdn_frontdoor_host_add_response_headers : index => { "name" : response_header.name, "value" : response_header.value } } : {}
+
+  depends_on = [azurerm_cdn_frontdoor_origin_group.group, azurerm_cdn_frontdoor_origin.origin]
+
+  name                      = "addresponseheaders${each.key}"
+  cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.add_response_headers[0].id
+  order                     = 0
+  behavior_on_match         = "Continue"
+
+  actions {
+    response_header_action {
+      header_action = "Overwrite"
+      header_name   = each.value.name
+      value         = each.value.value
+    }
+  }
+}
