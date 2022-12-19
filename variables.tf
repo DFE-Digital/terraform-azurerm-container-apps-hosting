@@ -258,3 +258,33 @@ variable "cdn_frontdoor_host_redirects" {
   type        = list(map(string))
   default     = []
 }
+
+variable "cdn_frontdoor_enable_rate_limiting" {
+  description = "Enable CDN Front Door Rate Limiting. This will create a WAF policy, and CDN security policy. For pricing reasons, there will only be one WAF policy created."
+  type        = bool
+  default     = false
+}
+
+variable "cdn_frontdoor_rate_limiting_duration_in_minutes" {
+  description = "CDN Front Door rate limiting duration in minutes"
+  type        = number
+  default     = 1
+}
+
+variable "cdn_frontdoor_rate_limiting_threshold" {
+  description = "CDN Front Door rate limiting duration in minutes"
+  type        = number
+  default     = 300
+}
+
+variable "cdn_frontdoor_rate_limiting_bypass_ip_list" {
+  description = "List if IP CIDRs to bypass CDN Front Door rate limiting"
+  type        = list(string)
+  default     = []
+}
+
+variable "cdn_frontdoor_waf_mode" {
+  description = "CDN Front Door waf mode"
+  type        = string
+  default     = "Prevention"
+}
