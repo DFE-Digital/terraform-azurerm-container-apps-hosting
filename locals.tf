@@ -53,6 +53,7 @@ locals {
   cdn_frontdoor_custom_domains             = var.cdn_frontdoor_custom_domains
   cdn_frontdoor_host_redirects             = var.cdn_frontdoor_host_redirects
   cdn_frontdoor_host_add_response_headers  = var.cdn_frontdoor_host_add_response_headers
+  cdn_frontdoor_remove_response_headers    = var.cdn_frontdoor_remove_response_headers
   cdn_frontdoor_custom_domain_dns_names = local.enable_cdn_frontdoor && local.enable_dns_zone ? toset([
     for domain in local.cdn_frontdoor_custom_domains : replace(domain, local.dns_zone_domain_name, "") if endswith(domain, local.dns_zone_domain_name)
   ]) : []

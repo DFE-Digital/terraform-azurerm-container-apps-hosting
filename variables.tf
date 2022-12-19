@@ -294,3 +294,9 @@ variable "cdn_frontdoor_host_add_response_headers" {
   type        = list(map(string))
   default     = []
 }
+
+variable "cdn_frontdoor_remove_response_headers" {
+  description = "List of response headers to remove at the CDN Front Door"
+  type        = list(string)
+  default     = []
+}
