@@ -76,6 +76,7 @@ module "azure_container_apps_hosting" {
       "name"  = "Strict-Transport-Security",
       "value" = "max-age=31536000",
     }
+  ]
   cdn_frontdoor_remove_response_headers = [
     "Server",
   ]
