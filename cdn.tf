@@ -203,7 +203,7 @@ resource "azurerm_cdn_frontdoor_rule" "add_response_headers" {
 
   depends_on = [azurerm_cdn_frontdoor_origin_group.group, azurerm_cdn_frontdoor_origin.origin]
 
-  name                      = "addresponseheaders${each.key}"
+  name                      = replace("addresponseheaders${each.key}", "-", "")
   cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.add_response_headers[0].id
   order                     = 0
   behavior_on_match         = "Continue"
@@ -229,8 +229,8 @@ resource "azurerm_cdn_frontdoor_rule" "remove_response_header" {
 
   depends_on = [azurerm_cdn_frontdoor_origin_group.group, azurerm_cdn_frontdoor_origin.origin]
 
-  name                      = "removeresponseheader${each.value}"
-  cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.redirects[0].id
+  name                      = replace("removeresponseheader${each.value}", "-", "")
+  cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.remove_response_headers[0].id
   order                     = 0
   behavior_on_match         = "Continue"
 
