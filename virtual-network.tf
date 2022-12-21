@@ -36,6 +36,35 @@ resource "azurerm_subnet_route_table_association" "container_apps_infra_subnet" 
   route_table_id = azurerm_route_table.default[0].id
 }
 
+resource "azurerm_network_security_group" "container_apps_infra_allow_frontdoor_inbound_only" {
+  count = local.launch_in_vnet && local.restrict_container_apps_to_cdn_inbound_only && local.enable_cdn_frontdoor ? 1 : 0
+
+  name                = "${local.resource_prefix}containerappsinfransg"
+  location            = local.resource_group.location
+  resource_group_name = local.resource_group.name
+
+  security_rule {
+    name                       = "AllowFrontdoor"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "*"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "AzureFrontDoor.Backend"
+    destination_address_prefix = "${jsondecode(azapi_resource.container_app_env.output).properties.staticIp}/32"
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_subnet_network_security_group_association" "container_apps_infra_allow_frontdoor_inbound_only" {
+  count = local.launch_in_vnet && local.restrict_container_apps_to_cdn_inbound_only && local.enable_cdn_frontdoor ? 1 : 0
+
+  subnet_id                 = azurerm_subnet.container_apps_infra_subnet[0].id
+  network_security_group_id = azurerm_network_security_group.container_apps_infra_allow_frontdoor_inbound_only[0].id
+}
+
 resource "azurerm_subnet" "redis_cache_subnet" {
   count = local.launch_in_vnet ? (
     local.redis_cache_sku == "Premium" ? 1 : 0
