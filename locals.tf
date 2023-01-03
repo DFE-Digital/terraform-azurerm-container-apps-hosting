@@ -72,5 +72,7 @@ locals {
   cdn_frontdoor_enable_waf                        = local.enable_cdn_frontdoor && local.cdn_frontdoor_enable_rate_limiting
   cdn_frontdoor_waf_mode                          = var.cdn_frontdoor_waf_mode
   cdn_frontdoor_rate_limiting_bypass_ip_list      = var.cdn_frontdoor_rate_limiting_bypass_ip_list
+  enable_event_hub                                = var.enable_event_hub
+  enable_logstash_consumer                        = var.enable_logstash_consumer
   tagging_command                                 = "timeout 15m ${path.module}/script/apply-tags-to-container-app-env-mc-resource-group -n \"${azapi_resource.container_app_env.name}\" -r \"${local.resource_group.name}\" -t \"${replace(jsonencode(local.tags), "\"", "\\\"")}\""
 }
