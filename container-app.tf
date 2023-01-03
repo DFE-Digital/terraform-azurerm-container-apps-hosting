@@ -1,12 +1,3 @@
-resource "azurerm_log_analytics_workspace" "container_app" {
-  name                = "${local.resource_prefix}containerapp"
-  resource_group_name = local.resource_group.name
-  location            = local.resource_group.location
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
-  tags                = local.tags
-}
-
 resource "azapi_resource" "container_app_env" {
   type      = "Microsoft.App/managedEnvironments@2022-03-01"
   parent_id = local.resource_group.id
