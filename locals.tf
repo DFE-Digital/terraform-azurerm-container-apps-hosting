@@ -66,13 +66,21 @@ locals {
     local.ruleset_add_response_headers_id,
     local.ruleset_remove_response_headers_id,
   )
-  cdn_frontdoor_enable_rate_limiting              = var.cdn_frontdoor_enable_rate_limiting
-  cdn_frontdoor_rate_limiting_duration_in_minutes = var.cdn_frontdoor_rate_limiting_duration_in_minutes
-  cdn_frontdoor_rate_limiting_threshold           = var.cdn_frontdoor_rate_limiting_threshold
-  cdn_frontdoor_enable_waf                        = local.enable_cdn_frontdoor && local.cdn_frontdoor_enable_rate_limiting
-  cdn_frontdoor_waf_mode                          = var.cdn_frontdoor_waf_mode
-  cdn_frontdoor_rate_limiting_bypass_ip_list      = var.cdn_frontdoor_rate_limiting_bypass_ip_list
-  enable_event_hub                                = var.enable_event_hub
-  enable_logstash_consumer                        = var.enable_logstash_consumer
-  tagging_command                                 = "timeout 15m ${path.module}/script/apply-tags-to-container-app-env-mc-resource-group -n \"${azapi_resource.container_app_env.name}\" -r \"${local.resource_group.name}\" -t \"${replace(jsonencode(local.tags), "\"", "\\\"")}\""
+  cdn_frontdoor_enable_rate_limiting                                          = var.cdn_frontdoor_enable_rate_limiting
+  cdn_frontdoor_rate_limiting_duration_in_minutes                             = var.cdn_frontdoor_rate_limiting_duration_in_minutes
+  cdn_frontdoor_rate_limiting_threshold                                       = var.cdn_frontdoor_rate_limiting_threshold
+  cdn_frontdoor_enable_waf                                                    = local.enable_cdn_frontdoor && local.cdn_frontdoor_enable_rate_limiting
+  cdn_frontdoor_waf_mode                                                      = var.cdn_frontdoor_waf_mode
+  cdn_frontdoor_rate_limiting_bypass_ip_list                                  = var.cdn_frontdoor_rate_limiting_bypass_ip_list
+  enable_event_hub                                                            = var.enable_event_hub
+  enable_logstash_consumer                                                    = var.enable_logstash_consumer
+  enable_network_watcher                                                      = var.enable_network_watcher
+  network_watcher_retention                                                   = var.network_watcher_retention
+  enable_network_watcher_traffic_analytics                                    = var.enable_network_watcher_traffic_analytics
+  network_watcher_traffic_analytics_interval                                  = var.network_watcher_traffic_analytics_interval
+  network_security_group_container_apps_infra_allow_frontdoor_inbound_only_id = local.launch_in_vnet && local.restrict_container_apps_to_cdn_inbound_only && local.enable_cdn_frontdoor ? azurerm_network_security_group.container_apps_infra_allow_frontdoor_inbound_only[0].id : []
+  network_security_group_ids = concat(
+    local.network_security_group_container_apps_infra_allow_frontdoor_inbound_only_id,
+  )
+  tagging_command = "timeout 15m ${path.module}/script/apply-tags-to-container-app-env-mc-resource-group -n \"${azapi_resource.container_app_env.name}\" -r \"${local.resource_group.name}\" -t \"${replace(jsonencode(local.tags), "\"", "\\\"")}\""
 }

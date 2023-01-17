@@ -318,3 +318,27 @@ variable "enable_logstash_consumer" {
   type        = bool
   default     = false
 }
+
+variable "enable_network_watcher" {
+  description = "Enable network watcher, with NSG Flow Logs"
+  type        = bool
+  default     = true
+}
+
+variable "network_watcher_retention" {
+  description = "Number of days to retain logs. Set to 0 to keep all logs."
+  type        = number
+  default     = 90
+}
+
+variable "enable_network_watcher_traffic_analytics" {
+  description = "Enable network watcher traffic analytics (Requires `enable_network_watcher` to be true)"
+  type        = bool
+  default     = true
+}
+
+variable "network_watcher_traffic_analytics_interval" {
+  description = "Interval in minutes for Traffic Analytics."
+  type        = number
+  default     = 60
+}
