@@ -16,13 +16,14 @@ resource "azurerm_monitor_action_group" "main" {
     }
   }
 
-  #   # webhook_receiver = local.monitor_webook_receiver ? {
-  #   #   name                    = "Webhook"
-  #   #   use_common_alert_schema = true
-  #   # } : {}
+  # todo: add support for multiple webhook endpoints
+  # webhook_receiver = local.monitor_webook_receiver ? {
+  #   name                    = "Webhook"
+  #   use_common_alert_schema = true
+  # } : {}
 
   dynamic "event_hub_receiver" {
-    for_each = local.enable_event_hub ? [1] : []
+    for_each = local.enable_event_hub ? [0] : null
 
     content {
       name                    = "Event Hub"
@@ -37,25 +38,24 @@ resource "azurerm_monitor_action_group" "main" {
 resource "azurerm_application_insights" "main" {
   count = local.enable_monitoring ? 1 : 0
 
-  name                       = "${local.resource_prefix}-container-insights"
-  location                   = local.resource_group.location
-  resource_group_name        = local.resource_group.name
-  application_type           = "web"
-  workspace_id               = azurerm_log_analytics_workspace.container_app.id
-  internet_ingestion_enabled = false
-  internet_query_enabled     = false
-  retention_in_days          = 30
-  tags                       = local.tags
+  name                = "${local.resource_prefix}-container-insights"
+  location            = local.resource_group.location
+  resource_group_name = local.resource_group.name
+  application_type    = "web"
+  workspace_id        = azurerm_log_analytics_workspace.container_app.id
+  retention_in_days   = 30
+  tags                = local.tags
 }
 
 resource "azurerm_application_insights_standard_web_test" "main" {
   count = local.enable_monitoring ? 1 : 0
 
-  name                    = "${local.resource_prefix}-web-test"
+  name                    = "${local.resource_prefix}-http-webcheck"
   resource_group_name     = local.resource_group.name
   location                = local.resource_group.location
   application_insights_id = azurerm_application_insights.main[0].id
-  timeout = 10
+  timeout                 = 10
+  enabled                 = true
 
   geo_locations = [
     "emea-se-sto-edge", # UK West
@@ -64,125 +64,53 @@ resource "azurerm_application_insights_standard_web_test" "main" {
   ]
 
   request {
-    url = local.enable_cdn_frontdoor ? azurerm_cdn_frontdoor_endpoint.endpoint[0].host_name : jsondecode(azapi_resource.default.output).properties.configuration.ingress.fqdn
+    url = local.enable_cdn_frontdoor ? "https://${azurerm_cdn_frontdoor_endpoint.endpoint[0].host_name}${local.monitor_endpoint_healthcheck}" : "https://${jsondecode(azapi_resource.default.output).properties.configuration.ingress.fqdn}${local.monitor_endpoint_healthcheck}"
   }
 
   tags = local.tags
 }
 
-# resource "azurerm_monitor_metric_alert" "connect-time" {
-#   count = local.enable_monitoring ? 1 : 0
 
-#   name                = "${local.resource_prefix}alert-conn"
-#   resource_group_name = local.resource_group.name
-#   scopes = [ azapi_resource.default.id ]
-#   description = "Action will be triggered when revision count is less than 1"
-#   window_size = "PT5M"
-#   frequency   = "PT1M"
+resource "azurerm_monitor_metric_alert" "cpu" {
+  name                = "${local.resource_prefix}-cpu-alarm"
+  resource_group_name = local.resource_group.name
+  scopes              = local.enable_worker_container ? [azapi_resource.default.id, azapi_resource.worker[0].id] : [azapi_resource.default.id]
+  description         = "Action will be triggered when CPU usage is higher than usual"
+  window_size         = "PT5M"
+  frequency           = "PT5M"
 
-#   criteria {
-#     metric_namespace = "Microsoft.App/containerApps"
-#     metric_name      = "ReplicaCount"
-#     aggregation      = "Count"
-#     operator         = "LessThan"
-#     threshold        = 1
-#   }
+  dynamic_criteria {
+    metric_namespace  = "microsoft.app/containerapps"
+    metric_name       = "UsageNanoCores"
+    aggregation       = "Total"
+    operator          = "GreaterThan"
+    alert_sensitivity = "Medium"
+  }
 
-#   action {
-#     action_group_id = azurerm_monitor_action_group.main.id
-#   }
+  action {
+    action_group_id = azurerm_monitor_action_group.main[0].id
+  }
 
-#   tags                = local.tags
-# }
+  tags = local.tags
+}
 
-# resource "azurerm_monitor_activity_log_alert" "health" {
-#   name                = var.alert_appgw_health[terraform.workspace]
-#   resource_group_name = data.azurerm_resource_group.rg.name
-#   # scopes              = [azurerm_application_gateway.appgw.id]
-#   description = "Action will be triggered when backend health is bad"
+resource "azurerm_monitor_metric_alert" "http" {
+  name                = "${local.resource_prefix}-http-alarm"
+  resource_group_name = local.resource_group.name
+  # Scope requires web test to come first
+  # https://github.com/hashicorp/terraform-provider-azurerm/issues/8551
+  scopes      = [azurerm_application_insights_standard_web_test.main[0].id, azurerm_application_insights.main[0].id]
+  description = "Action will be triggered when regional availability becomes impacted."
 
-#   criteria {
-#     category = "ResourceHealth"
+  application_insights_web_test_location_availability_criteria {
+    web_test_id           = azurerm_application_insights_standard_web_test.main[0].id
+    component_id          = azurerm_application_insights.main[0].id
+    failed_location_count = 2 # 2 out of 3 locations
+  }
 
-#     resource_health {
-#       current  = ["Degraded", "Unavailable"]
-#       previous = ["Available"]
-#       reason   = ["PlatformInitiated", "Unknown"]
-#     }
-#   }
+  action {
+    action_group_id = azurerm_monitor_action_group.main[0].id
+  }
 
-#   action {
-#     action_group_id = azurerm_monitor_action_group.main.id
-#   }
-
-#   tags = data.azurerm_resource_group.rg.tags
-# }
-
-# resource "azurerm_monitor_metric_alert" "container-cpu" {
-#   name                = var.alert_container_cpu[terraform.workspace]
-#   resource_group_name = data.azurerm_resource_group.rg.name
-#   # scopes              = [azurerm_service_plan.service-plan.id]
-#   description = "Action will be triggered when CPU percentage is greater than 50%"
-#   window_size = "PT5M"
-#   frequency   = "PT1M"
-
-#   # criteria {
-#   #   metric_namespace = "Microsoft.Web/serverfarms"
-#   #   metric_name      = "CpuPercentage"
-#   #   aggregation      = "Average"
-#   #   operator         = "GreaterThan"
-#   #   threshold        = 50
-#   # }
-
-#   action {
-#     action_group_id = azurerm_monitor_action_group.main.id
-#   }
-
-#   tags = data.azurerm_resource_group.rg.tags
-# }
-
-# resource "azurerm_monitor_metric_alert" "container-avg-resp-time" {
-#   name                = var.alert_container_avg_resp_time[terraform.workspace]
-#   resource_group_name = data.azurerm_resource_group.rg.name
-#   # scopes              = [azurerm_linux_web_app.linux-web-app.id]
-#   description = "Action will be triggered when container average response time is greater than 1000ms"
-#   window_size = "PT5M"
-#   frequency   = "PT1M"
-
-#   # criteria {
-#   #   metric_namespace = "Microsoft.Web/sites"
-#   #   metric_name      = "AverageResponseTime"
-#   #   aggregation      = "Average"
-#   #   operator         = "GreaterThan"
-#   #   threshold        = 1000
-#   # }
-
-#   action {
-#     action_group_id = azurerm_monitor_action_group.main.id
-#   }
-
-#   tags = data.azurerm_resource_group.rg.tags
-# }
-
-# resource "azurerm_monitor_metric_alert" "failed-requests" {
-#   name                = var.alert_failed_requests[terraform.workspace]
-#   resource_group_name = data.azurerm_resource_group.rg.name
-#   # scopes              = [data.azurerm_application_insights.appinsights.id]
-#   description = "Action will be triggered when failed requests is greater than 1"
-#   window_size = "PT5M"
-#   frequency   = "PT1M"
-
-#   # criteria {
-#   #   metric_namespace = "microsoft.insights/components"
-#   #   metric_name      = "requests/failed"
-#   #   aggregation      = "Count"
-#   #   operator         = "GreaterThan"
-#   #   threshold        = 1
-#   # }
-
-#   action {
-#     action_group_id = azurerm_monitor_action_group.main.id
-#   }
-
-#   tags = data.azurerm_resource_group.rg.tags
-# }
+  tags = local.tags
+}

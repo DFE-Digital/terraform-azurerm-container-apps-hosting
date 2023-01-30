@@ -77,4 +77,5 @@ locals {
   tagging_command                                 = "timeout 15m ${path.module}/script/apply-tags-to-container-app-env-mc-resource-group -n \"${azapi_resource.container_app_env.name}\" -r \"${local.resource_group.name}\" -t \"${replace(jsonencode(local.tags), "\"", "\\\"")}\""
   enable_monitoring                               = var.enable_monitoring
   monitor_email_receivers                         = var.monitor_email_receivers
+  monitor_endpoint_healthcheck                    = var.monitor_endpoint_healthcheck
 }
