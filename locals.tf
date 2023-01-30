@@ -75,4 +75,6 @@ locals {
   enable_event_hub                                = var.enable_event_hub
   enable_logstash_consumer                        = var.enable_logstash_consumer
   tagging_command                                 = "timeout 15m ${path.module}/script/apply-tags-to-container-app-env-mc-resource-group -n \"${azapi_resource.container_app_env.name}\" -r \"${local.resource_group.name}\" -t \"${replace(jsonencode(local.tags), "\"", "\\\"")}\""
+  enable_monitoring                               = var.enable_monitoring
+  monitor_email_receivers                         = var.monitor_email_receivers
 }

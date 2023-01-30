@@ -318,3 +318,15 @@ variable "enable_logstash_consumer" {
   type        = bool
   default     = false
 }
+
+variable "enable_monitoring" {
+  description = "Create an App Insights instance and notification group for the Container App"
+  type        = bool
+  default     = false
+}
+
+variable "monitor_email_receivers" {
+  description = "A list of email addresses that should be notified by monitoring alerts"
+  type        = list(string)
+  default     = []
+}
