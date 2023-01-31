@@ -71,6 +71,8 @@ resource "azurerm_application_insights_standard_web_test" "main" {
 }
 
 resource "azurerm_monitor_metric_alert" "cpu" {
+  count = local.enable_monitoring ? 1 : 0
+
   name                = "${local.resource_prefix}-cpu-alarm"
   resource_group_name = local.resource_group.name
   scopes              = local.enable_worker_container ? [azapi_resource.default.id, azapi_resource.worker[0].id] : [azapi_resource.default.id]
@@ -94,6 +96,8 @@ resource "azurerm_monitor_metric_alert" "cpu" {
   tags = local.tags
 }
 resource "azurerm_monitor_metric_alert" "memory" {
+  count = local.enable_monitoring ? 1 : 0
+
   name                = "${local.resource_prefix}-memory-alarm"
   resource_group_name = local.resource_group.name
   scopes              = local.enable_worker_container ? [azapi_resource.default.id, azapi_resource.worker[0].id] : [azapi_resource.default.id]
@@ -118,6 +122,8 @@ resource "azurerm_monitor_metric_alert" "memory" {
 }
 
 resource "azurerm_monitor_metric_alert" "http" {
+  count = local.enable_monitoring ? 1 : 0
+
   name                = "${local.resource_prefix}-http-alarm"
   resource_group_name = local.resource_group.name
   # Scope requires web test to come first
@@ -139,6 +145,8 @@ resource "azurerm_monitor_metric_alert" "http" {
 }
 
 resource "azurerm_monitor_metric_alert" "count" {
+  count = local.enable_monitoring ? 1 : 0
+
   name                = "${local.resource_prefix}-revision-count"
   resource_group_name = local.resource_group.name
   scopes              = local.enable_worker_container ? [azapi_resource.default.id, azapi_resource.worker[0].id] : [azapi_resource.default.id]
@@ -152,6 +160,32 @@ resource "azurerm_monitor_metric_alert" "count" {
     aggregation      = "Maximum"
     operator         = "LessThan"
     threshold        = 1
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.main[0].id
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_monitor_metric_alert" "redis-load" {
+  count = local.enable_redis_cache && local.enable_monitoring ? 1 : 0
+
+  name                = "${local.resource_prefix}-redis-load"
+  resource_group_name = local.resource_group.name
+  scopes              = [azurerm_redis_cache.default[0].id]
+  description         = "Action will be triggered when Redis Server Load is high"
+  window_size         = "PT5M"
+  frequency           = "PT1M"
+
+  criteria {
+    metric_namespace = "Microsoft.Cache/Redis"
+    metric_name      = "allserverLoad"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    # Number used as %
+    threshold = 80
   }
 
   action {
