@@ -319,6 +319,36 @@ variable "enable_logstash_consumer" {
   default     = false
 }
 
+variable "enable_monitoring" {
+  description = "Create an App Insights instance and notification group for the Container App"
+  type        = bool
+  default     = false
+}
+
+variable "monitor_email_receivers" {
+  description = "A list of email addresses that should be notified by monitoring alerts"
+  type        = list(string)
+  default     = []
+}
+
+variable "monitor_endpoint_healthcheck" {
+  description = "Specify a route that should be monitored for a 200 OK status"
+  type        = string
+  default     = "/"
+}
+
+variable "alarm_cpu_threshold_percentage" {
+  description = "Specify a number (%) which should be set as a threshold for a CPU usage monitoring alarm"
+  type        = number
+  default     = 80
+}
+
+variable "alarm_memory_threshold_percentage" {
+  description = "Specify a number (%) which should be set as a threshold for a memory usage monitoring alarm"
+  type        = number
+  default     = 80
+}
+
 variable "enable_network_watcher" {
   description = "Enable network watcher. Note: only 1 network watcher per subscription can be created."
   type        = bool

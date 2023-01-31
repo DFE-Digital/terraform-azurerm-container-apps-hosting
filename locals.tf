@@ -74,6 +74,11 @@ locals {
   cdn_frontdoor_rate_limiting_bypass_ip_list                                  = var.cdn_frontdoor_rate_limiting_bypass_ip_list
   enable_event_hub                                                            = var.enable_event_hub
   enable_logstash_consumer                                                    = var.enable_logstash_consumer
+  enable_monitoring                                                           = var.enable_monitoring
+  monitor_email_receivers                                                     = var.monitor_email_receivers
+  monitor_endpoint_healthcheck                                                = var.monitor_endpoint_healthcheck
+  alarm_cpu_threshold_percentage                                              = var.alarm_cpu_threshold_percentage
+  alarm_memory_threshold_percentage                                           = var.alarm_memory_threshold_percentage
   enable_network_watcher                                                      = var.enable_network_watcher
   existing_network_watcher_name                                               = var.existing_network_watcher_name
   existing_network_watcher_resource_group_name                                = var.existing_network_watcher_resource_group_name
