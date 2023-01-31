@@ -9,11 +9,11 @@ resource "azurerm_network_watcher" "default" {
 }
 
 resource "azurerm_storage_account" "default_network_watcher_nsg_flow_logs" {
-  count = local.enable_network_watcher ? 1 : 0
+  count = local.network_watcher_name != "" ? 1 : 0
 
-  name                      = "${local.resource_prefix}nwnsgdefault"
-  resource_group_name       = local.resource_group.location
-  location                  = local.resource_group.name
+  name                      = "${replace(local.resource_prefix, "-", "")}nwnsgd"
+  resource_group_name       = local.resource_group.name
+  location                  = local.resource_group.location
   account_tier              = "Standard"
   account_kind              = "StorageV2"
   account_replication_type  = "LRS"
@@ -24,7 +24,7 @@ resource "azurerm_storage_account" "default_network_watcher_nsg_flow_logs" {
 }
 
 resource "azurerm_log_analytics_workspace" "default_network_watcher_nsg_flow_logs" {
-  count = local.enable_network_watcher && local.enable_network_watcher_traffic_analytics ? 1 : 0
+  count = local.network_watcher_name != "" && local.enable_network_watcher_traffic_analytics ? 1 : 0
 
   name                = "${local.resource_prefix}nwnsgdefault"
   location            = local.resource_group.location
@@ -35,23 +35,23 @@ resource "azurerm_log_analytics_workspace" "default_network_watcher_nsg_flow_log
 }
 
 resource "azurerm_network_watcher_flow_log" "default_network_watcher_nsg" {
-  for_each = local.enable_network_watcher ? local.network_security_group_ids : []
+  for_each = local.network_watcher_name != "" ? local.network_security_group_ids : []
 
-  network_watcher_name = azurerm_network_watcher.default[0].name
-  resource_group_name  = azurerm_resource_group.default[0].name
-  name                 = "${local.resource_prefix}nsg${each.value}"
+  network_watcher_name = local.network_watcher_name
+  resource_group_name  = local.network_watcher_resource_group_name
+  name                 = "${local.resource_prefix}nsg${element(split("/", each.value), length(split("/", each.value)) - 1)}"
 
   network_security_group_id = each.value
   storage_account_id        = azurerm_storage_account.default_network_watcher_nsg_flow_logs[0].id
   enabled                   = true
 
   retention_policy {
-    enabled = local.network_watcher_retention == 0 ? false : true
-    days    = local.network_watcher_retention
+    enabled = local.network_watcher_flow_log_retention == 0 ? false : true
+    days    = local.network_watcher_flow_log_retention
   }
 
   dynamic "traffic_analytics" {
-    for_each = local.enable_network_watcher && local.enable_network_watcher_traffic_analytics ? [0] : []
+    for_each = local.network_watcher_name != "" && local.enable_network_watcher_traffic_analytics ? [0] : []
     content {
       enabled               = true
       workspace_id          = azurerm_log_analytics_workspace.default_network_watcher_nsg_flow_logs[0].workspace_id
