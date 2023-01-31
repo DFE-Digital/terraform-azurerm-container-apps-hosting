@@ -74,16 +74,40 @@ resource "azurerm_monitor_metric_alert" "cpu" {
   name                = "${local.resource_prefix}-cpu-alarm"
   resource_group_name = local.resource_group.name
   scopes              = local.enable_worker_container ? [azapi_resource.default.id, azapi_resource.worker[0].id] : [azapi_resource.default.id]
-  description         = "Action will be triggered when CPU usage is higher than usual"
+  description         = "Action will be triggered when CPU usage is higher than a defined threshold for longer than 5 minutes"
   window_size         = "PT5M"
   frequency           = "PT5M"
 
-  dynamic_criteria {
-    metric_namespace  = "microsoft.app/containerapps"
-    metric_name       = "UsageNanoCores"
-    aggregation       = "Total"
-    operator          = "GreaterThan"
-    alert_sensitivity = "Medium"
+  criteria {
+    metric_namespace = "microsoft.app/containerapps"
+    metric_name      = "UsageNanoCores"
+    aggregation      = "Total"
+    operator         = "GreaterThan"
+    # CPU usage in nanocores (1,000,000,000 nanocores = 1 core)
+    threshold = ((local.container_cpu * 10000000) * local.alarm_cpu_threshold_percentage)
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.main[0].id
+  }
+
+  tags = local.tags
+}
+resource "azurerm_monitor_metric_alert" "memory" {
+  name                = "${local.resource_prefix}-memory-alarm"
+  resource_group_name = local.resource_group.name
+  scopes              = local.enable_worker_container ? [azapi_resource.default.id, azapi_resource.worker[0].id] : [azapi_resource.default.id]
+  description         = "Action will be triggered when memory usage is higher than a defined threshold for longer than 5 minutes"
+  window_size         = "PT5M"
+  frequency           = "PT5M"
+
+  criteria {
+    metric_namespace = "microsoft.app/containerapps"
+    metric_name      = "WorkingSetBytes"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    # Memory usage in bytes (1,000,000,000 bytes = 1 GB)
+    threshold = ((local.container_memory * 10000000) * local.alarm_memory_threshold_percentage)
   }
 
   action {

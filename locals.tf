@@ -78,4 +78,6 @@ locals {
   enable_monitoring                               = var.enable_monitoring
   monitor_email_receivers                         = var.monitor_email_receivers
   monitor_endpoint_healthcheck                    = var.monitor_endpoint_healthcheck
+  alarm_cpu_threshold_percentage                  = var.alarm_cpu_threshold_percentage
+  alarm_memory_threshold_percentage               = var.alarm_memory_threshold_percentage
 }

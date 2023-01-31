@@ -336,3 +336,15 @@ variable "monitor_endpoint_healthcheck" {
   type        = string
   default     = "/"
 }
+
+variable "alarm_cpu_threshold_percentage" {
+  description = "Specify a number (%) which should be set as a threshold for a CPU usage monitoring alarm"
+  type        = number
+  default     = 80
+}
+
+variable "alarm_memory_threshold_percentage" {
+  description = "Specify a number (%) which should be set as a threshold for a memory usage monitoring alarm"
+  type        = number
+  default     = 80
+}
