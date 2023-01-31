@@ -70,7 +70,6 @@ resource "azurerm_application_insights_standard_web_test" "main" {
   tags = local.tags
 }
 
-
 resource "azurerm_monitor_metric_alert" "cpu" {
   name                = "${local.resource_prefix}-cpu-alarm"
   resource_group_name = local.resource_group.name
@@ -106,6 +105,29 @@ resource "azurerm_monitor_metric_alert" "http" {
     web_test_id           = azurerm_application_insights_standard_web_test.main[0].id
     component_id          = azurerm_application_insights.main[0].id
     failed_location_count = 2 # 2 out of 3 locations
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.main[0].id
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_monitor_metric_alert" "count" {
+  name                = "${local.resource_prefix}-revision-count"
+  resource_group_name = local.resource_group.name
+  scopes              = local.enable_worker_container ? [azapi_resource.default.id, azapi_resource.worker[0].id] : [azapi_resource.default.id]
+  description         = "Action will be triggered when container count is zero"
+  window_size         = "PT5M"
+  frequency           = "PT1M"
+
+  criteria {
+    metric_namespace = "microsoft.app/containerapps"
+    metric_name      = "Replicas"
+    aggregation      = "Maximum"
+    operator         = "LessThan"
+    threshold        = 1
   }
 
   action {
