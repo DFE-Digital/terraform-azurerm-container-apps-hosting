@@ -66,18 +66,32 @@ locals {
     local.ruleset_add_response_headers_id,
     local.ruleset_remove_response_headers_id,
   )
-  cdn_frontdoor_enable_rate_limiting              = var.cdn_frontdoor_enable_rate_limiting
-  cdn_frontdoor_rate_limiting_duration_in_minutes = var.cdn_frontdoor_rate_limiting_duration_in_minutes
-  cdn_frontdoor_rate_limiting_threshold           = var.cdn_frontdoor_rate_limiting_threshold
-  cdn_frontdoor_enable_waf                        = local.enable_cdn_frontdoor && local.cdn_frontdoor_enable_rate_limiting
-  cdn_frontdoor_waf_mode                          = var.cdn_frontdoor_waf_mode
-  cdn_frontdoor_rate_limiting_bypass_ip_list      = var.cdn_frontdoor_rate_limiting_bypass_ip_list
-  enable_event_hub                                = var.enable_event_hub
-  enable_logstash_consumer                        = var.enable_logstash_consumer
-  tagging_command                                 = "timeout 15m ${path.module}/script/apply-tags-to-container-app-env-mc-resource-group -n \"${azapi_resource.container_app_env.name}\" -r \"${local.resource_group.name}\" -t \"${replace(jsonencode(local.tags), "\"", "\\\"")}\""
-  enable_monitoring                               = var.enable_monitoring
-  monitor_email_receivers                         = var.monitor_email_receivers
-  monitor_endpoint_healthcheck                    = var.monitor_endpoint_healthcheck
-  alarm_cpu_threshold_percentage                  = var.alarm_cpu_threshold_percentage
-  alarm_memory_threshold_percentage               = var.alarm_memory_threshold_percentage
+  cdn_frontdoor_enable_rate_limiting                                          = var.cdn_frontdoor_enable_rate_limiting
+  cdn_frontdoor_rate_limiting_duration_in_minutes                             = var.cdn_frontdoor_rate_limiting_duration_in_minutes
+  cdn_frontdoor_rate_limiting_threshold                                       = var.cdn_frontdoor_rate_limiting_threshold
+  cdn_frontdoor_enable_waf                                                    = local.enable_cdn_frontdoor && local.cdn_frontdoor_enable_rate_limiting
+  cdn_frontdoor_waf_mode                                                      = var.cdn_frontdoor_waf_mode
+  cdn_frontdoor_rate_limiting_bypass_ip_list                                  = var.cdn_frontdoor_rate_limiting_bypass_ip_list
+  enable_event_hub                                                            = var.enable_event_hub
+  enable_logstash_consumer                                                    = var.enable_logstash_consumer
+  enable_monitoring                                                           = var.enable_monitoring
+  monitor_email_receivers                                                     = var.monitor_email_receivers
+  monitor_endpoint_healthcheck                                                = var.monitor_endpoint_healthcheck
+  alarm_cpu_threshold_percentage                                              = var.alarm_cpu_threshold_percentage
+  alarm_memory_threshold_percentage                                           = var.alarm_memory_threshold_percentage
+  enable_network_watcher                                                      = var.enable_network_watcher
+  existing_network_watcher_name                                               = var.existing_network_watcher_name
+  existing_network_watcher_resource_group_name                                = var.existing_network_watcher_resource_group_name
+  network_watcher_name                                                        = local.enable_network_watcher ? azurerm_network_watcher.default[0].name : local.existing_network_watcher_name
+  network_watcher_resource_group_name                                         = local.network_watcher_name != "" ? local.existing_network_watcher_resource_group_name : local.resource_group.name
+  network_watcher_flow_log_retention                                          = var.network_watcher_flow_log_retention
+  enable_network_watcher_traffic_analytics                                    = var.enable_network_watcher_traffic_analytics
+  network_watcher_traffic_analytics_interval                                  = var.network_watcher_traffic_analytics_interval
+  network_security_group_container_apps_infra_allow_frontdoor_inbound_only_id = local.launch_in_vnet && local.restrict_container_apps_to_cdn_inbound_only && local.enable_cdn_frontdoor ? [azurerm_network_security_group.container_apps_infra_allow_frontdoor_inbound_only[0].id] : []
+  network_security_group_ids = toset(
+    concat(
+      local.network_security_group_container_apps_infra_allow_frontdoor_inbound_only_id,
+    )
+  )
+  tagging_command = "timeout 15m ${path.module}/script/apply-tags-to-container-app-env-mc-resource-group -n \"${azapi_resource.container_app_env.name}\" -r \"${local.resource_group.name}\" -t \"${replace(jsonencode(local.tags), "\"", "\\\"")}\""
 }

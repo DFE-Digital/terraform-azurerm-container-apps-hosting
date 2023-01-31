@@ -348,3 +348,39 @@ variable "alarm_memory_threshold_percentage" {
   type        = number
   default     = 80
 }
+
+variable "enable_network_watcher" {
+  description = "Enable network watcher. Note: only 1 network watcher per subscription can be created."
+  type        = bool
+  default     = false
+}
+
+variable "existing_network_watcher_name" {
+  description = "Use an existing network watcher to add flow logs."
+  type        = string
+  default     = ""
+}
+
+variable "existing_network_watcher_resource_group_name" {
+  description = "Existing network watcher resource group."
+  type        = string
+  default     = ""
+}
+
+variable "network_watcher_flow_log_retention" {
+  description = "Number of days to retain flow logs. Set to 0 to keep all logs."
+  type        = number
+  default     = 90
+}
+
+variable "enable_network_watcher_traffic_analytics" {
+  description = "Enable network watcher traffic analytics (Requires `enable_network_watcher` to be true)"
+  type        = bool
+  default     = true
+}
+
+variable "network_watcher_traffic_analytics_interval" {
+  description = "Interval in minutes for Traffic Analytics."
+  type        = number
+  default     = 60
+}
