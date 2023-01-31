@@ -7,7 +7,7 @@ resource "azurerm_monitor_action_group" "main" {
   tags                = local.tags
 
   dynamic "email_receiver" {
-    for_each = local.monitor_email_receivers != [] ? local.monitor_email_receivers : []
+    for_each = local.monitor_email_receivers
 
     content {
       name                    = "Email ${email_receiver.value}"
@@ -15,12 +15,6 @@ resource "azurerm_monitor_action_group" "main" {
       use_common_alert_schema = true
     }
   }
-
-  # todo: add support for multiple webhook endpoints
-  # webhook_receiver = local.monitor_webook_receiver ? {
-  #   name                    = "Webhook"
-  #   use_common_alert_schema = true
-  # } : {}
 
   dynamic "event_hub_receiver" {
     for_each = local.enable_event_hub ? [0] : null
