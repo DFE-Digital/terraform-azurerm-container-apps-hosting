@@ -3,7 +3,7 @@ resource "azurerm_monitor_action_group" "main" {
 
   name                = "${local.resource_prefix}-actiongroup"
   resource_group_name = local.resource_group.name
-  short_name          = "${local.project_name}-monitor"
+  short_name          = local.project_name
   tags                = local.tags
 
   dynamic "email_receiver" {
