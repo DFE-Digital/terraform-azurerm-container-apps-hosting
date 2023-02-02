@@ -180,6 +180,24 @@ variable "container_port" {
   default     = 80
 }
 
+variable "enable_container_health_probe" {
+  description = "Enable liveness probes for the Container"
+  type        = bool
+  default     = true
+}
+
+variable "container_health_probe_interval" {
+  description = "How often in seconds to poll the Container to determine liveness"
+  type        = number
+  default     = 30
+}
+
+variable "container_health_probe_path" {
+  description = "Specifies the path that is used to determine the liveness of the Container"
+  type        = string
+  default     = "/"
+}
+
 variable "container_command" {
   description = "Container command"
   type        = list(any)
