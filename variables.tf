@@ -247,6 +247,24 @@ variable "cdn_frontdoor_sku" {
   default     = "Standard_AzureFrontDoor"
 }
 
+variable "enable_cdn_frontdoor_health_probe" {
+  description = "Enable CDN Front Door health probe"
+  type        = bool
+  default     = true
+}
+
+variable "cdn_frontdoor_health_probe_interval" {
+  description = "Specifies the number of seconds between health probes."
+  type        = number
+  default     = 30
+}
+
+variable "cdn_frontdoor_health_probe_path" {
+  description = "Specifies the path relative to the origin that is used to determine the health of the origin."
+  type        = string
+  default     = "/"
+}
+
 variable "cdn_frontdoor_response_timeout" {
   description = "Azure CDN Front Door response timeout in seconds"
   type        = number
