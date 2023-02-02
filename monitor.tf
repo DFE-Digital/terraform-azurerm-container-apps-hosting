@@ -17,7 +17,7 @@ resource "azurerm_monitor_action_group" "main" {
   }
 
   dynamic "event_hub_receiver" {
-    for_each = local.enable_event_hub ? [0] : null
+    for_each = local.enable_event_hub ? [0] : []
 
     content {
       name                    = "Event Hub"
