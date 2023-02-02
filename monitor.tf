@@ -73,11 +73,12 @@ resource "azurerm_monitor_metric_alert" "cpu" {
   description         = "Action will be triggered when CPU usage is higher than a defined threshold for longer than 5 minutes"
   window_size         = "PT5M"
   frequency           = "PT5M"
+  severity            = 2
 
   criteria {
     metric_namespace = "microsoft.app/containerapps"
     metric_name      = "UsageNanoCores"
-    aggregation      = "Total"
+    aggregation      = "Average"
     operator         = "GreaterThan"
     # CPU usage in nanocores (1,000,000,000 nanocores = 1 core)
     threshold = ((local.container_cpu * 10000000) * local.alarm_cpu_threshold_percentage)
@@ -98,6 +99,7 @@ resource "azurerm_monitor_metric_alert" "memory" {
   description         = "Action will be triggered when memory usage is higher than a defined threshold for longer than 5 minutes"
   window_size         = "PT5M"
   frequency           = "PT5M"
+  severity            = 2
 
   criteria {
     metric_namespace = "microsoft.app/containerapps"
@@ -124,6 +126,7 @@ resource "azurerm_monitor_metric_alert" "http" {
   # https://github.com/hashicorp/terraform-provider-azurerm/issues/8551
   scopes      = [azurerm_application_insights_standard_web_test.main[0].id, azurerm_application_insights.main[0].id]
   description = "Action will be triggered when regional availability becomes impacted."
+  severity    = 2
 
   application_insights_web_test_location_availability_criteria {
     web_test_id           = azurerm_application_insights_standard_web_test.main[0].id
@@ -147,6 +150,7 @@ resource "azurerm_monitor_metric_alert" "count" {
   description         = "Action will be triggered when container count is zero"
   window_size         = "PT5M"
   frequency           = "PT1M"
+  severity            = 1
 
   criteria {
     metric_namespace = "microsoft.app/containerapps"
@@ -172,6 +176,7 @@ resource "azurerm_monitor_metric_alert" "redis-load" {
   description         = "Action will be triggered when Redis Server Load is high"
   window_size         = "PT5M"
   frequency           = "PT1M"
+  severity            = 2
 
   criteria {
     metric_namespace = "Microsoft.Cache/Redis"
