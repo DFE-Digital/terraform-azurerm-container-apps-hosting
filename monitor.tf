@@ -32,7 +32,7 @@ resource "azurerm_monitor_action_group" "main" {
 resource "azurerm_application_insights" "main" {
   count = local.enable_monitoring ? 1 : 0
 
-  name                = "${local.resource_prefix}-container-insights"
+  name                = "${local.resource_prefix}-insights"
   location            = local.resource_group.location
   resource_group_name = local.resource_group.name
   application_type    = "web"
@@ -185,6 +185,33 @@ resource "azurerm_monitor_metric_alert" "redis-load" {
     operator         = "GreaterThan"
     # Number used as %
     threshold = 80
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.main[0].id
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_monitor_metric_alert" "latency" {
+  count = local.enable_cdn_frontdoor && local.enable_monitoring ? 1 : 0
+
+  name                = "${local.resource_prefix}-latency"
+  resource_group_name = local.resource_group.name
+  scopes              = [azurerm_cdn_frontdoor_profile.cdn[0].id]
+  description         = "Action will be triggered when Front Door latency is higher than 0.5s"
+  window_size         = "PT5M"
+  frequency           = "PT5M"
+  severity            = 2
+
+  criteria {
+    metric_namespace = "Microsoft.Cdn/profiles"
+    metric_name      = "TotalLatency"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    # 1,000ms = 1s
+    threshold = 500
   }
 
   action {
