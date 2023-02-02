@@ -15,6 +15,16 @@ resource "azurerm_cdn_frontdoor_origin_group" "group" {
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.cdn[0].id
 
   load_balancing {}
+
+  dynamic "health_probe" {
+    for_each = local.enable_cdn_frontdoor_health_probe ? [0] : []
+    content {
+      protocol            = "Https"
+      interval_in_seconds = local.cdn_frontdoor_health_probe_interval
+      request_type        = "GET"
+      path                = local.cdn_frontdoor_health_probe_path
+    }
+  }
 }
 
 resource "azurerm_cdn_frontdoor_origin" "origin" {
