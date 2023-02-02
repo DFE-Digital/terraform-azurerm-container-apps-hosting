@@ -85,6 +85,7 @@ locals {
   monitor_endpoint_healthcheck                                                = var.monitor_endpoint_healthcheck
   alarm_cpu_threshold_percentage                                              = var.alarm_cpu_threshold_percentage
   alarm_memory_threshold_percentage                                           = var.alarm_memory_threshold_percentage
+  alarm_latency_threshold_ms                                                  = var.alarm_latency_threshold_ms
   enable_network_watcher                                                      = var.enable_network_watcher
   existing_network_watcher_name                                               = var.existing_network_watcher_name
   existing_network_watcher_resource_group_name                                = var.existing_network_watcher_resource_group_name
