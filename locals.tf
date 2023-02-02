@@ -42,6 +42,9 @@ locals {
   container_command                           = var.container_command
   container_environment_variables             = var.container_environment_variables
   container_secret_environment_variables      = var.container_secret_environment_variables
+  enable_container_health_probe               = var.enable_container_health_probe
+  container_health_probe_interval             = var.container_health_probe_interval
+  container_health_probe_path                 = var.container_health_probe_path
   enable_worker_container                     = var.enable_worker_container
   worker_container_command                    = var.worker_container_command
   enable_dns_zone                             = var.enable_dns_zone
