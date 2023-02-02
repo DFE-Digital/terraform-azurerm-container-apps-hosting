@@ -211,7 +211,7 @@ resource "azurerm_monitor_metric_alert" "latency" {
     aggregation      = "Average"
     operator         = "GreaterThan"
     # 1,000ms = 1s
-    threshold = 500
+    threshold = local.alarm_latency_threshold_ms
   }
 
   action {

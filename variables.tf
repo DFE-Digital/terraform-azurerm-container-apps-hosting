@@ -385,6 +385,12 @@ variable "alarm_memory_threshold_percentage" {
   default     = 80
 }
 
+variable "alarm_latency_threshold_ms" {
+  description = "Specify a number in milliseconds which should be set as a threshold for a request latency monitoring alarm"
+  type        = number
+  default     = 1000
+}
+
 variable "enable_network_watcher" {
   description = "Enable network watcher. Note: only 1 network watcher per subscription can be created."
   type        = bool
