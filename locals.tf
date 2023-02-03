@@ -72,17 +72,25 @@ locals {
     local.ruleset_add_response_headers_id,
     local.ruleset_remove_response_headers_id,
   )
-  cdn_frontdoor_enable_rate_limiting                                          = var.cdn_frontdoor_enable_rate_limiting
-  cdn_frontdoor_rate_limiting_duration_in_minutes                             = var.cdn_frontdoor_rate_limiting_duration_in_minutes
-  cdn_frontdoor_rate_limiting_threshold                                       = var.cdn_frontdoor_rate_limiting_threshold
-  cdn_frontdoor_enable_waf                                                    = local.enable_cdn_frontdoor && local.cdn_frontdoor_enable_rate_limiting
-  cdn_frontdoor_waf_mode                                                      = var.cdn_frontdoor_waf_mode
-  cdn_frontdoor_rate_limiting_bypass_ip_list                                  = var.cdn_frontdoor_rate_limiting_bypass_ip_list
-  enable_event_hub                                                            = var.enable_event_hub
-  enable_logstash_consumer                                                    = var.enable_logstash_consumer
-  enable_monitoring                                                           = var.enable_monitoring
-  monitor_email_receivers                                                     = var.monitor_email_receivers
-  monitor_endpoint_healthcheck                                                = var.monitor_endpoint_healthcheck
+  cdn_frontdoor_enable_rate_limiting              = var.cdn_frontdoor_enable_rate_limiting
+  cdn_frontdoor_rate_limiting_duration_in_minutes = var.cdn_frontdoor_rate_limiting_duration_in_minutes
+  cdn_frontdoor_rate_limiting_threshold           = var.cdn_frontdoor_rate_limiting_threshold
+  cdn_frontdoor_enable_waf                        = local.enable_cdn_frontdoor && local.cdn_frontdoor_enable_rate_limiting
+  cdn_frontdoor_waf_mode                          = var.cdn_frontdoor_waf_mode
+  cdn_frontdoor_rate_limiting_bypass_ip_list      = var.cdn_frontdoor_rate_limiting_bypass_ip_list
+  enable_event_hub                                = var.enable_event_hub
+  enable_logstash_consumer                        = var.enable_logstash_consumer
+  enable_monitoring                               = var.enable_monitoring
+  monitor_email_receivers                         = var.monitor_email_receivers
+  monitor_endpoint_healthcheck                    = var.monitor_endpoint_healthcheck
+  monitor_default_container_id                    = [azapi_resource.default.id]
+  monitor_worker_container_id                     = local.enable_worker_container ? [azapi_resource.worker[0].id] : []
+  monitor_container_ids = toset(
+    concat(
+      local.monitor_default_container_id,
+      local.monitor_worker_container_id,
+    )
+  )
   alarm_cpu_threshold_percentage                                              = var.alarm_cpu_threshold_percentage
   alarm_memory_threshold_percentage                                           = var.alarm_memory_threshold_percentage
   alarm_latency_threshold_ms                                                  = var.alarm_latency_threshold_ms

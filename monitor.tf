@@ -9,12 +9,13 @@ resource "azurerm_application_insights" "main" {
 }
 
 resource "azurerm_application_insights_standard_web_test" "main" {
-  name                    = "${local.resource_prefix}-http-webcheck"
+  count = local.enable_monitoring ? 1 : 0
+
+  name                    = "${local.resource_prefix}-http"
   resource_group_name     = local.resource_group.name
   location                = local.resource_group.location
   application_insights_id = azurerm_application_insights.main.id
   timeout                 = 10
-  enabled                 = local.enable_monitoring
 
   geo_locations = [
     "emea-se-sto-edge", # UK West
@@ -61,16 +62,15 @@ resource "azurerm_monitor_action_group" "main" {
 }
 
 resource "azurerm_monitor_metric_alert" "cpu" {
-  for_each = toset(local.enable_worker_container ? [azapi_resource.default.name, azapi_resource.worker[0].name] : [azapi_resource.default.name])
+  for_each = local.enable_monitoring ? local.monitor_container_ids : []
 
-  name                = "${each.value}-cpu-alarm"
+  name                = "${element(split("/", each.value), length(split("/", each.value)) - 1)}-cpu"
   resource_group_name = local.resource_group.name
-  scopes              = endswith(each.value, "worker") ? [azapi_resource.worker[0].id] : [azapi_resource.default.id]
+  scopes              = [each.value]
   description         = "Action will be triggered when CPU usage is higher than a defined threshold for longer than 5 minutes"
   window_size         = "PT5M"
   frequency           = "PT5M"
   severity            = 2
-  enabled             = local.enable_monitoring
 
   criteria {
     metric_namespace = "microsoft.app/containerapps"
@@ -89,16 +89,15 @@ resource "azurerm_monitor_metric_alert" "cpu" {
 }
 
 resource "azurerm_monitor_metric_alert" "memory" {
-  for_each = toset(local.enable_worker_container ? [azapi_resource.default.name, azapi_resource.worker[0].name] : [azapi_resource.default.name])
+  for_each = local.enable_monitoring ? local.monitor_container_ids : []
 
-  name                = "${each.value}-cpu-alarm"
+  name                = "${element(split("/", each.value), length(split("/", each.value)) - 1)}-memory"
   resource_group_name = local.resource_group.name
-  scopes              = endswith(each.value, "worker") ? [azapi_resource.worker[0].id] : [azapi_resource.default.id]
+  scopes              = [each.value]
   description         = "Action will be triggered when memory usage is higher than a defined threshold for longer than 5 minutes"
   window_size         = "PT5M"
   frequency           = "PT5M"
   severity            = 2
-  enabled             = local.enable_monitoring
 
   criteria {
     metric_namespace = "microsoft.app/containerapps"
@@ -117,17 +116,18 @@ resource "azurerm_monitor_metric_alert" "memory" {
 }
 
 resource "azurerm_monitor_metric_alert" "http" {
-  name                = "${local.resource_prefix}-http-alarm"
+  count = local.enable_monitoring ? 1 : 0
+
+  name                = "${local.resource_prefix}-http"
   resource_group_name = local.resource_group.name
   # Scope requires web test to come first
   # https://github.com/hashicorp/terraform-provider-azurerm/issues/8551
-  scopes      = [azurerm_application_insights_standard_web_test.main.id, azurerm_application_insights.main.id]
+  scopes      = [azurerm_application_insights_standard_web_test.main[0].id, azurerm_application_insights.main.id]
   description = "Action will be triggered when regional availability becomes impacted."
   severity    = 2
-  enabled     = local.enable_monitoring
 
   application_insights_web_test_location_availability_criteria {
-    web_test_id           = azurerm_application_insights_standard_web_test.main.id
+    web_test_id           = azurerm_application_insights_standard_web_test.main[0].id
     component_id          = azurerm_application_insights.main.id
     failed_location_count = 2 # 2 out of 3 locations
   }
@@ -140,16 +140,15 @@ resource "azurerm_monitor_metric_alert" "http" {
 }
 
 resource "azurerm_monitor_metric_alert" "count" {
-  for_each = toset(local.enable_worker_container ? [azapi_resource.default.name, azapi_resource.worker[0].name] : [azapi_resource.default.name])
+  for_each = local.enable_monitoring ? local.monitor_container_ids : []
 
-  name                = "${each.value}-revision-count-alarm"
+  name                = "${element(split("/", each.value), length(split("/", each.value)) - 1)}-replicas"
   resource_group_name = local.resource_group.name
-  scopes              = endswith(each.value, "worker") ? [azapi_resource.worker[0].id] : [azapi_resource.default.id]
+  scopes              = [each.value]
   description         = "Action will be triggered when container count is zero"
   window_size         = "PT5M"
   frequency           = "PT1M"
   severity            = 1
-  enabled             = local.enable_monitoring
 
   criteria {
     metric_namespace = "microsoft.app/containerapps"
@@ -166,17 +165,16 @@ resource "azurerm_monitor_metric_alert" "count" {
   tags = local.tags
 }
 
-resource "azurerm_monitor_metric_alert" "redis-load" {
-  count = local.enable_redis_cache ? 1 : 0
+resource "azurerm_monitor_metric_alert" "redis" {
+  count = local.enable_monitoring && local.enable_redis_cache ? 1 : 0
 
-  name                = "${local.resource_prefix}-redis-load"
+  name                = "${azurerm_redis_cache.default[0].name}-cpu"
   resource_group_name = local.resource_group.name
   scopes              = [azurerm_redis_cache.default[0].id]
-  description         = "Action will be triggered when Redis Server Load is high"
+  description         = "Action will be triggered when Redis Server Load is higher than 80%"
   window_size         = "PT5M"
   frequency           = "PT1M"
   severity            = 2
-  enabled             = local.enable_monitoring
 
   criteria {
     metric_namespace = "Microsoft.Cache/Redis"
@@ -195,16 +193,15 @@ resource "azurerm_monitor_metric_alert" "redis-load" {
 }
 
 resource "azurerm_monitor_metric_alert" "latency" {
-  count = local.enable_cdn_frontdoor ? 1 : 0
+  count = local.enable_monitoring && local.enable_cdn_frontdoor ? 1 : 0
 
-  name                = "${local.resource_prefix}-latency"
+  name                = "${azurerm_cdn_frontdoor_profile.cdn[0].name}-latency"
   resource_group_name = local.resource_group.name
   scopes              = [azurerm_cdn_frontdoor_profile.cdn[0].id]
-  description         = "Action will be triggered when Front Door latency is higher than ${local.alarm_latency_threshold_ms}ms"
+  description         = "Action will be triggered when Origin latency is higher than ${local.alarm_latency_threshold_ms}ms"
   window_size         = "PT5M"
   frequency           = "PT5M"
   severity            = 2
-  enabled             = local.enable_monitoring
 
   criteria {
     metric_namespace = "Microsoft.Cdn/profiles"
