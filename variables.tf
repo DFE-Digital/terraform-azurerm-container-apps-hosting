@@ -397,6 +397,24 @@ variable "monitor_email_receivers" {
   default     = []
 }
 
+variable "monitor_enable_slack_webhook" {
+  description = "Enable slack webhooks to send monitoring notifications to a channel"
+  type        = bool
+  default     = false
+}
+
+variable "monitor_slack_webhook_receiver" {
+  description = "A Slack App webhook URL"
+  type        = string
+  default     = ""
+}
+
+variable "monitor_slack_channel" {
+  description = "Slack channel name/id to send messages to"
+  type        = string
+  default     = ""
+}
+
 variable "monitor_endpoint_healthcheck" {
   description = "Specify a route that should be monitored for a 200 OK status"
   type        = string

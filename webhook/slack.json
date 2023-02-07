@@ -1,0 +1,71 @@
+{
+  "channel": "${channel}",
+  "text": "@{triggerBody()?['data']?['essentials']?['alertRule']}: @{triggerBody()?['data']?['essentials']?['description']}",
+  "blocks": [
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "<!here>"
+      }
+    }
+  ],
+  "attachments": [
+    {
+      "color": "#FF0000",
+      "blocks": [
+        {
+          "type": "header",
+          "text": {
+            "type": "plain_text",
+            "text": "@{triggerBody()?['data']?['essentials']?['alertRule']}"
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "_@{triggerBody()?['data']?['essentials']?['description']}_"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Severity*"
+            },
+            {
+              "type": "plain_text",
+              "text": "@{triggerBody()?['data']?['essentials']?['severity']}"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Metric definition*"
+            },
+            {
+              "type": "plain_text",
+              "text": "@{triggerBody()?['data']?['alarmContext']?['condition']?['allOf']?[0]?['metricName']} @{triggerBody()?['data']?['alarmContext']?['condition']?['allOf']?[0]?['operator']} @{triggerBody()?['data']?['alarmContext']?['condition']?['allOf']?[0]?['threshold']}"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Metric value recorded*"
+            },
+            {
+              "type": "plain_text",
+              "text": "@{triggerBody()?['data']?['alarmContext']?['condition']?['allOf']?[0]?['metricValue']} "
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Alarm status*"
+            },
+            {
+              "type": "plain_text",
+              "text": "@{triggerBody()?['data']?['essentials']?['monitorCondition']} "
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
