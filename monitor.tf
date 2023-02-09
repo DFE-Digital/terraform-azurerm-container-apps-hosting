@@ -63,7 +63,7 @@ resource "azurerm_monitor_action_group" "main" {
 
 resource "azurerm_monitor_metric_alert" "cpu" {
   for_each = local.enable_monitoring ? (
-    length(local.monitor_container_ids) > 1 ? local.monitor_container_ids : local.monitor_default_container_id
+    length(local.monitor_container_ids) > 1 ? local.monitor_container_ids : toset(local.monitor_default_container_id)
   ) : []
 
   name                = "${element(split("/", each.value), length(split("/", each.value)) - 1)}-cpu"
@@ -92,7 +92,7 @@ resource "azurerm_monitor_metric_alert" "cpu" {
 
 resource "azurerm_monitor_metric_alert" "memory" {
   for_each = local.enable_monitoring ? (
-    length(local.monitor_container_ids) > 1 ? local.monitor_container_ids : local.monitor_default_container_id
+    length(local.monitor_container_ids) > 1 ? local.monitor_container_ids : toset(local.monitor_default_container_id)
   ) : []
 
   name                = "${element(split("/", each.value), length(split("/", each.value)) - 1)}-memory"
