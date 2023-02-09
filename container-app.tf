@@ -45,6 +45,14 @@ resource "azapi_resource" "default" {
           {
             "name" : "acr-password",
             "value" : local.registry_password
+          },
+          {
+            "name" : "applicationinsights--connectionstring",
+            "value" : azurerm_application_insights.main.connection_string
+          },
+          {
+            "name" : "applicationinsights--instrumentationkey",
+            "value" : azurerm_application_insights.main.instrumentation_key
           }
           ],
           [
@@ -81,11 +89,22 @@ resource "azapi_resource" "default" {
                 }
               }
             ] : []
-            env = concat([
-              for env_name, env_value in local.container_environment_variables : {
-                name  = env_name
-                value = env_value
-              }
+            env = concat(
+              [
+                {
+                  "name" : "ApplicationInsights__ConnectionString",
+                  "secretRef" : "applicationinsights--connectionstring"
+                },
+                {
+                  "name" : "ApplicationInsights__InstrumentationKey",
+                  "secretRef" : "applicationinsights--instrumentationkey"
+                }
+              ],
+              [
+                for env_name, env_value in local.container_environment_variables : {
+                  name  = env_name
+                  value = env_value
+                }
               ],
               [
                 for env_name, env_value in local.container_secret_environment_variables : {
