@@ -16,6 +16,8 @@ resource "azurerm_application_insights_standard_web_test" "main" {
   location                = local.resource_group.location
   application_insights_id = azurerm_application_insights.main.id
   timeout                 = 10
+  description             = "Regional HTTP availability check"
+  enabled                 = true
 
   geo_locations = [
     "emea-se-sto-edge", # UK West
