@@ -474,3 +474,9 @@ variable "network_watcher_traffic_analytics_interval" {
   type        = number
   default     = 60
 }
+
+variable "enable_container_app_blob_storage" {
+  description = "Create an Azure Storage Account and Storage Container to be used for this app"
+  type        = bool
+  default     = false
+}
