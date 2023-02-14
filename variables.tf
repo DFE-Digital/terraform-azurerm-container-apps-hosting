@@ -283,6 +283,12 @@ variable "cdn_frontdoor_health_probe_path" {
   default     = "/"
 }
 
+variable "cdn_frontdoor_health_probe_request_type" {
+  description = "Specifies the type of health probe request that is made."
+  type        = string
+  default     = "GET"
+}
+
 variable "cdn_frontdoor_response_timeout" {
   description = "Azure CDN Front Door response timeout in seconds"
   type        = number
