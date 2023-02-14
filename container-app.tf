@@ -116,6 +116,29 @@ resource "azapi_resource" "default" {
         scale = {
           minReplicas = local.container_min_replicas
           maxReplicas = local.container_max_replicas
+          rules = [
+            {
+              name = "Concurrent HTTP Requests",
+              http = {
+                metadata = {
+                  concurrentRequests = local.container_scale_rule_concurrent_request_count
+                }
+              }
+            },
+            local.container_scale_rule_scale_down_out_of_hours ?
+            {
+              name = "Outside of normal operating hours",
+              custom = {
+                type = "cron"
+                metadata = {
+                  timezone        = "Europe/London"
+                  start           = local.container_scale_rule_out_of_hours_start
+                  end             = local.container_scale_rule_out_of_hours_end
+                  desiredReplicas = local.container_min_replicas
+                }
+              }
+            } : null,
+          ]
         }
       }
     }

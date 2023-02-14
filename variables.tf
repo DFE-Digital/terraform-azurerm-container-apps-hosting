@@ -174,6 +174,30 @@ variable "container_max_replicas" {
   default     = 2
 }
 
+variable "container_scale_rule_concurrent_request_count" {
+  description = "Maximum number of concurrent HTTP requests before a new replica is created"
+  type        = number
+  default     = 10
+}
+
+variable "container_scale_rule_scale_down_out_of_hours" {
+  description = "Should the Container App scale down to the minReplicas outside of normal operating hours?"
+  type        = bool
+  default     = false
+}
+
+variable "container_scale_rule_out_of_hours_start" {
+  description = "Specify a time using Linux cron format that represents the start of the out-of-hours window. Defaults to 23:00"
+  type        = string
+  default     = "0 23 * * *"
+}
+
+variable "container_scale_rule_out_of_hours_end" {
+  description = "Specify a time using Linux cron format that represents the end of the out-of-hours window. Defaults to 06:00"
+  type        = string
+  default     = "0 6 * * *"
+}
+
 variable "container_port" {
   description = "Container port"
   type        = number
