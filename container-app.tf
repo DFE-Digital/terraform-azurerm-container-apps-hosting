@@ -36,7 +36,6 @@ resource "azapi_resource" "default" {
     properties : {
       managedEnvironmentId = azapi_resource.container_app_env.id
       configuration = {
-        activeRevisionsMode = local.container_min_replicas > 1 ? "Multiple" : "Single"
         ingress = {
           external   = true
           targetPort = local.container_port
