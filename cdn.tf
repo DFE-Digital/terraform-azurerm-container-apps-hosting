@@ -21,7 +21,7 @@ resource "azurerm_cdn_frontdoor_origin_group" "group" {
     content {
       protocol            = "Https"
       interval_in_seconds = local.cdn_frontdoor_health_probe_interval
-      request_type        = "GET"
+      request_type        = local.cdn_frontdoor_health_probe_request_type
       path                = local.cdn_frontdoor_health_probe_path
     }
   }

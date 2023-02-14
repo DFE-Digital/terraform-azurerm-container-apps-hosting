@@ -56,6 +56,7 @@ locals {
   enable_cdn_frontdoor_health_probe           = var.enable_cdn_frontdoor_health_probe
   cdn_frontdoor_health_probe_interval         = var.cdn_frontdoor_health_probe_interval
   cdn_frontdoor_health_probe_path             = var.cdn_frontdoor_health_probe_path
+  cdn_frontdoor_health_probe_request_type     = var.cdn_frontdoor_health_probe_request_type
   cdn_frontdoor_response_timeout              = var.cdn_frontdoor_response_timeout
   cdn_frontdoor_custom_domains                = var.cdn_frontdoor_custom_domains
   cdn_frontdoor_host_redirects                = var.cdn_frontdoor_host_redirects
