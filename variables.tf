@@ -298,7 +298,7 @@ variable "enable_cdn_frontdoor_health_probe" {
 variable "cdn_frontdoor_health_probe_interval" {
   description = "Specifies the number of seconds between health probes."
   type        = number
-  default     = 30
+  default     = 120
 }
 
 variable "cdn_frontdoor_health_probe_path" {
