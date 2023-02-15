@@ -83,6 +83,6 @@ resource "azurerm_private_dns_a_record" "redis_cache_private_endpoint" {
   zone_name           = azurerm_private_dns_zone.redis_cache_private_link[0].name
   resource_group_name = local.resource_group.name
   ttl                 = 300
-  records             = [azurerm_private_endpoint.default_redis_cache[0].private_service_connection.0.private_ip_address]
+  records             = [azurerm_private_endpoint.default_redis_cache[0].private_service_connection[0].private_ip_address]
   tags                = local.tags
 }
