@@ -38,7 +38,7 @@ locals {
   container_memory                              = var.container_memory
   container_min_replicas                        = var.container_min_replicas
   container_max_replicas                        = var.container_max_replicas
-  container_scale_rule_concurrent_request_count = var.container_scale_rule_concurrent_request_count
+  container_scale_rule_concurrent_request_count = tostring(var.container_scale_rule_concurrent_request_count)
   container_scale_rule_scale_down_out_of_hours  = var.container_scale_rule_scale_down_out_of_hours
   container_scale_rule_out_of_hours_start       = var.container_scale_rule_out_of_hours_start
   container_scale_rule_out_of_hours_end         = var.container_scale_rule_out_of_hours_end
