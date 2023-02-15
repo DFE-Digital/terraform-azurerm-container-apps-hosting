@@ -1,6 +1,7 @@
 # Azure Container Apps Hosting terraform module
 
 [![Terraform CI](https://github.com/DFE-Digital/terraform-azurerm-container-apps-hosting/actions/workflows/continuous-integration-terraform.yml/badge.svg?branch=main)](https://github.com/DFE-Digital/terraform-azurerm-container-apps-hosting/actions/workflows/continuous-integration-terraform.yml?branch=main)
+[![Tflint](https://github.com/DFE-Digital/terraform-azurerm-container-apps-hosting/actions/workflows/continuous-integration-tflint.yml/badge.svg?branch=main)](https://github.com/DFE-Digital/terraform-azurerm-container-apps-hosting/actions/workflows/continuous-integration-tflint.yml?branch=main)
 [![GitHub release](https://img.shields.io/github/release/DFE-Digital/terraform-azurerm-container-apps-hosting)](https://github.com/DFE-Digital/terraform-azurerm-container-apps-hosting/releases)
 
 This module creates and manages [Azure Container Apps][1], deployed within an [Azure Virtual Network][2].
