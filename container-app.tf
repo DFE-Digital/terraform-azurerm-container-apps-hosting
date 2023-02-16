@@ -118,7 +118,7 @@ resource "azapi_resource" "default" {
           maxReplicas = local.container_max_replicas
           rules = [
             {
-              name = "Concurrent HTTP Requests",
+              name = "concurrent-http-requests",
               http = {
                 metadata = {
                   concurrentRequests = local.container_scale_rule_concurrent_request_count
@@ -127,7 +127,7 @@ resource "azapi_resource" "default" {
             },
             local.container_scale_rule_scale_down_out_of_hours ?
             {
-              name = "Outside of normal operating hours",
+              name = "outside-of-normal-operating-hours",
               custom = {
                 type = "cron"
                 metadata = {
