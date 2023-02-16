@@ -93,7 +93,7 @@ module "azure_container_apps_hosting" {
   # Container App: CPU usage, Memory usage, Revision count, HTTP regional availability
   # Redis (if enabled): Server Load Average
   enable_monitoring = true
-  monitor_email_receivers = [ "list@email.com ]
+  monitor_email_receivers = [ "list@email.com" ]
   monitor_endpoint_healthcheck = "/healthcheck"
   alarm_cpu_threshold_percentage = 80
   alarm_memory_threshold_percentage = 80
