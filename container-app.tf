@@ -207,6 +207,9 @@ resource "azapi_resource" "worker" {
             ])
           }
         ]
+        scale = {
+          minReplicas = 1
+        }
       }
     }
   })
