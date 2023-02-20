@@ -1,0 +1,64 @@
+{
+  "properties": {
+    "data": {
+      "properties": {
+        "alertContext": {
+          "properties": {},
+          "type": "object"
+        },
+        "essentials": {
+          "properties": {
+            "alertContextVersion": {
+              "type": "string"
+            },
+            "alertId": {
+              "type": "string"
+            },
+            "alertRule": {
+              "type": "string"
+            },
+            "alertTargetIDs": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "description": {
+              "type": "string"
+            },
+            "essentialsVersion": {
+              "type": "string"
+            },
+            "firedDateTime": {
+              "type": "string"
+            },
+            "monitorCondition": {
+              "type": "string"
+            },
+            "monitoringService": {
+              "type": "string"
+            },
+            "originAlertId": {
+              "type": "string"
+            },
+            "resolvedDateTime": {
+              "type": "string"
+            },
+            "severity": {
+              "type": "string"
+            },
+            "signalType": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "schemaId": {
+      "type": "string"
+    }
+  },
+  "type": "object"
+}

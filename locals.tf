@@ -96,6 +96,9 @@ locals {
       local.monitor_worker_container_id,
     )
   )
+  monitor_enable_slack_webhook                                                = var.monitor_enable_slack_webhook
+  monitor_slack_webhook_receiver                                              = var.monitor_slack_webhook_receiver
+  monitor_slack_channel                                                       = var.monitor_slack_channel
   alarm_cpu_threshold_percentage                                              = var.alarm_cpu_threshold_percentage
   alarm_memory_threshold_percentage                                           = var.alarm_memory_threshold_percentage
   alarm_latency_threshold_ms                                                  = var.alarm_latency_threshold_ms

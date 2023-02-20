@@ -64,6 +64,17 @@ resource "azurerm_monitor_action_group" "main" {
       use_common_alert_schema = true
     }
   }
+
+  dynamic "logic_app_receiver" {
+    for_each = length(azurerm_logic_app_workflow.webhook[0].id) > 0 ? [0] : []
+
+    content {
+      name                    = "Logic App"
+      resource_id             = azurerm_logic_app_workflow.webhook[0].id
+      callback_url            = azurerm_logic_app_trigger_http_request.webhook.callback_url
+      use_common_alert_schema = true
+    }
+  }
 }
 
 resource "azurerm_monitor_metric_alert" "cpu" {

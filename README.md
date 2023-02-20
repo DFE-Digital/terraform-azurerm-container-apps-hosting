@@ -92,10 +92,13 @@ module "azure_container_apps_hosting" {
   # Monitoring is disabled by default. If enabled, the following metrics will be monitored:
   # Container App: CPU usage, Memory usage, Revision count, HTTP regional availability
   # Redis (if enabled): Server Load Average
-  enable_monitoring = true
-  monitor_email_receivers = [ "list@email.com" ]
-  monitor_endpoint_healthcheck = "/healthcheck"
-  alarm_cpu_threshold_percentage = 80
+  enable_monitoring                 = true
+  monitor_email_receivers           = [ "list@email.com" ]
+  monitor_endpoint_healthcheck      = "/healthcheck"
+  monitor_enable_slack_webhook      = true
+  monitor_slack_webhook_receiver    = "https://hooks.slack.com/services/xxx/xxx/xxx"
+  monitor_slack_channel             = "channel-name-or-id"
+  alarm_cpu_threshold_percentage    = 80
   alarm_memory_threshold_percentage = 80
 
   # Note that only 1 network watcher can be created within a subscription
@@ -163,6 +166,9 @@ module "azure_container_apps_hosting" {
 | [azurerm_log_analytics_data_export_rule.container_app](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_data_export_rule) | resource |
 | [azurerm_log_analytics_workspace.container_app](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) | resource |
 | [azurerm_log_analytics_workspace.default_network_watcher_nsg_flow_logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) | resource |
+| [azurerm_logic_app_action_http.slack](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/logic_app_action_http) | resource |
+| [azurerm_logic_app_trigger_http_request.webhook](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/logic_app_trigger_http_request) | resource |
+| [azurerm_logic_app_workflow.webhook](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/logic_app_workflow) | resource |
 | [azurerm_monitor_action_group.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_action_group) | resource |
 | [azurerm_monitor_metric_alert.count](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_monitor_metric_alert.cpu](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
@@ -269,7 +275,10 @@ module "azure_container_apps_hosting" {
 | <a name="input_image_tag"></a> [image\_tag](#input\_image\_tag) | Image tag | `string` | `"latest"` | no |
 | <a name="input_launch_in_vnet"></a> [launch\_in\_vnet](#input\_launch\_in\_vnet) | Conditionally launch into a VNet | `bool` | `true` | no |
 | <a name="input_monitor_email_receivers"></a> [monitor\_email\_receivers](#input\_monitor\_email\_receivers) | A list of email addresses that should be notified by monitoring alerts | `list(string)` | `[]` | no |
+| <a name="input_monitor_enable_slack_webhook"></a> [monitor\_enable\_slack\_webhook](#input\_monitor\_enable\_slack\_webhook) | Enable slack webhooks to send monitoring notifications to a channel | `bool` | `false` | no |
 | <a name="input_monitor_endpoint_healthcheck"></a> [monitor\_endpoint\_healthcheck](#input\_monitor\_endpoint\_healthcheck) | Specify a route that should be monitored for a 200 OK status | `string` | `"/"` | no |
+| <a name="input_monitor_slack_channel"></a> [monitor\_slack\_channel](#input\_monitor\_slack\_channel) | Slack channel name/id to send messages to | `string` | `""` | no |
+| <a name="input_monitor_slack_webhook_receiver"></a> [monitor\_slack\_webhook\_receiver](#input\_monitor\_slack\_webhook\_receiver) | A Slack App webhook URL | `string` | `""` | no |
 | <a name="input_mssql_database_name"></a> [mssql\_database\_name](#input\_mssql\_database\_name) | The name of the MSSQL database to create. Must be set if `enable_mssql_database` is true | `string` | `""` | no |
 | <a name="input_mssql_max_size_gb"></a> [mssql\_max\_size\_gb](#input\_mssql\_max\_size\_gb) | The max size of the database in gigabytes | `number` | `2` | no |
 | <a name="input_mssql_server_admin_password"></a> [mssql\_server\_admin\_password](#input\_mssql\_server\_admin\_password) | The administrator password for the MSSQL server. Must be set if `enable_mssql_database` is true | `string` | `""` | no |
