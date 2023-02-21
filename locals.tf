@@ -88,13 +88,11 @@ locals {
   enable_monitoring                               = var.enable_monitoring
   monitor_email_receivers                         = var.monitor_email_receivers
   monitor_endpoint_healthcheck                    = var.monitor_endpoint_healthcheck
-  monitor_default_container_id                    = [azapi_resource.default.id]
-  monitor_worker_container_id                     = local.enable_worker_container ? [azapi_resource.worker[0].id] : []
-  monitor_container_ids = toset(
-    concat(
-      local.monitor_default_container_id,
-      local.monitor_worker_container_id,
-    )
+  monitor_default_container_id                    = { "default_id" = azapi_resource.default.id }
+  monitor_worker_container_id                     = local.enable_worker_container ? { "worker_id" = azapi_resource.worker[0].id } : {}
+  monitor_container_ids = merge(
+    local.monitor_default_container_id,
+    local.monitor_worker_container_id,
   )
   monitor_enable_slack_webhook                                                = var.monitor_enable_slack_webhook
   monitor_slack_webhook_receiver                                              = var.monitor_slack_webhook_receiver
