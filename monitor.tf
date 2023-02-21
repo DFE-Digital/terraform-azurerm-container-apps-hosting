@@ -78,9 +78,7 @@ resource "azurerm_monitor_action_group" "main" {
 }
 
 resource "azurerm_monitor_metric_alert" "cpu" {
-  for_each = local.enable_monitoring ? (
-    length(local.monitor_container_ids) > 1 ? local.monitor_container_ids : toset(local.monitor_default_container_id)
-  ) : []
+  for_each = local.enable_monitoring ? local.monitor_container_ids : {}
 
   name                = "${element(split("/", each.value), length(split("/", each.value)) - 1)}-cpu"
   resource_group_name = local.resource_group.name
@@ -107,9 +105,7 @@ resource "azurerm_monitor_metric_alert" "cpu" {
 }
 
 resource "azurerm_monitor_metric_alert" "memory" {
-  for_each = local.enable_monitoring ? (
-    length(local.monitor_container_ids) > 1 ? local.monitor_container_ids : toset(local.monitor_default_container_id)
-  ) : []
+  for_each = local.enable_monitoring ? local.monitor_container_ids : {}
 
   name                = "${element(split("/", each.value), length(split("/", each.value)) - 1)}-memory"
   resource_group_name = local.resource_group.name
@@ -160,7 +156,7 @@ resource "azurerm_monitor_metric_alert" "http" {
 }
 
 resource "azurerm_monitor_metric_alert" "count" {
-  for_each = local.enable_monitoring ? local.monitor_container_ids : []
+  for_each = local.enable_monitoring ? local.monitor_container_ids : {}
 
   name                = "${element(split("/", each.value), length(split("/", each.value)) - 1)}-replicas"
   resource_group_name = local.resource_group.name
