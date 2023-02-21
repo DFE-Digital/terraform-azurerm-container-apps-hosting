@@ -71,7 +71,7 @@ resource "azurerm_monitor_action_group" "main" {
     content {
       name                    = "Logic App"
       resource_id             = azurerm_logic_app_workflow.webhook[0].id
-      callback_url            = azurerm_logic_app_trigger_http_request.webhook.callback_url
+      callback_url            = azurerm_logic_app_trigger_http_request.webhook[0].callback_url
       use_common_alert_schema = true
     }
   }
