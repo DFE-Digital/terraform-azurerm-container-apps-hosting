@@ -29,6 +29,8 @@ module "azure_container_apps_hosting" {
     "FOO" = "bar"
   }
 
+  enable_container_app_blob_storage = true
+
   enable_mssql_database       = true
   mssql_server_admin_password = "S3crEt"
   mssql_database_name         = "mydatabase"
