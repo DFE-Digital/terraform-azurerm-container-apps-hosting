@@ -9,6 +9,8 @@ resource "azurerm_logic_app_workflow" "webhook" {
 }
 
 resource "azurerm_logic_app_trigger_http_request" "webhook" {
+  count = local.enable_monitoring ? 1 : 0
+
   depends_on = [
     azurerm_logic_app_workflow.webhook[0]
   ]
@@ -20,7 +22,7 @@ resource "azurerm_logic_app_trigger_http_request" "webhook" {
 }
 
 resource "azurerm_logic_app_action_http" "slack" {
-  count = local.monitor_enable_slack_webhook && length(local.monitor_slack_webhook_receiver) > 0 ? 1 : 0
+  count = local.enable_monitoring && local.monitor_enable_slack_webhook && length(local.monitor_slack_webhook_receiver) > 0 ? 1 : 0
 
   depends_on = [
     azurerm_logic_app_workflow.webhook[0]
