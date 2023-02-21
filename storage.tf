@@ -12,6 +12,8 @@ resource "azurerm_storage_account" "container_app" {
 }
 
 resource "azurerm_storage_container" "container_app" {
+  count = local.enable_container_app_blob_storage ? 1 : 0
+
   depends_on = [
     azurerm_storage_account.container_app[0]
   ]
@@ -22,13 +24,15 @@ resource "azurerm_storage_container" "container_app" {
 }
 
 data "azurerm_storage_account_blob_container_sas" "container_app" {
+  count = local.enable_container_app_blob_storage ? 1 : 0
+
   depends_on = [
     azurerm_storage_account.container_app[0],
-    azurerm_storage_container.container_app
+    azurerm_storage_container.container_app[0]
   ]
 
   connection_string = azurerm_storage_account.container_app[0].primary_connection_string
-  container_name    = azurerm_storage_container.container_app.name
+  container_name    = azurerm_storage_container.container_app[0].name
   https_only        = true
 
   start  = formatdate("YYYY-MM-DD'T'hh:mm:ssZ", timestamp())
