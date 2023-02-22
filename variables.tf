@@ -253,6 +253,18 @@ variable "worker_container_command" {
   default     = []
 }
 
+variable "worker_container_min_replicas" {
+  description = "Worker container min replicas"
+  type        = number
+  default     = 1
+}
+
+variable "worker_container_max_replicas" {
+  description = "Worker ontainer max replicas"
+  type        = number
+  default     = 2
+}
+
 variable "enable_dns_zone" {
   description = "Conditionally create a DNS zone"
   type        = bool
