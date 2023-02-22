@@ -35,7 +35,7 @@ resource "azurerm_log_analytics_workspace" "default_network_watcher_nsg_flow_log
 }
 
 resource "azurerm_network_watcher_flow_log" "default_network_watcher_nsg" {
-  for_each = local.network_watcher_name != "" ? local.network_security_group_ids : []
+  for_each = local.network_watcher_name != "" ? local.network_security_group_ids : {}
 
   network_watcher_name = local.network_watcher_name
   resource_group_name  = local.network_watcher_resource_group_name
