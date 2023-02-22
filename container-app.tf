@@ -218,7 +218,8 @@ resource "azapi_resource" "worker" {
           }
         ]
         scale = {
-          minReplicas = 1
+          minReplicas = local.worker_container_min_replicas
+          maxReplicas = local.worker_container_max_replicas
         }
       }
     }

@@ -51,6 +51,8 @@ locals {
   container_health_probe_path                   = var.container_health_probe_path
   enable_worker_container                       = var.enable_worker_container
   worker_container_command                      = var.worker_container_command
+  worker_container_min_replicas                 = var.worker_container_min_replicas
+  worker_container_max_replicas                 = var.worker_container_max_replicas
   enable_dns_zone                               = var.enable_dns_zone
   dns_zone_domain_name                          = var.dns_zone_domain_name
   dns_zone_soa_record                           = var.dns_zone_soa_record
