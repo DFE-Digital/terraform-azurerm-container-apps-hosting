@@ -53,11 +53,8 @@ resource "azapi_resource" "default" {
             "name" : "applicationinsights--instrumentationkey",
             "value" : azurerm_application_insights.main.instrumentation_key
           },
-          {
-            "name" : "connectionstrings--blobstorage",
-            "value" : local.enable_container_app_blob_storage ? "${azurerm_storage_account.container_app[0].primary_blob_endpoint}${azurerm_storage_container.container_app[0].name}${data.azurerm_storage_account_blob_container_sas.container_app[0].sas}" : ""
-          }
           ],
+          local.container_app_blob_storage_sas_secret,
           [
             for env_name, env_value in local.container_secret_environment_variables : {
               name  = lower(replace(env_name, "_", "-"))
@@ -103,12 +100,13 @@ resource "azapi_resource" "default" {
                   "secretRef" : "applicationinsights--instrumentationkey"
                 }
               ],
+              local.enable_container_app_blob_storage ?
               [
                 {
                   "name" : "ConnectionStrings__BlobStorage",
                   "secretRef" : "connectionstrings--blobstorage"
                 }
-              ],
+              ] : [],
               [
                 for env_name, env_value in local.container_environment_variables : {
                   name  = env_name
