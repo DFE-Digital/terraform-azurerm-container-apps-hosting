@@ -114,6 +114,12 @@ locals {
   network_security_group_ids = merge(
     local.network_security_group_container_apps_infra_allow_frontdoor_inbound_only_id,
   )
-  tagging_command                   = "timeout 15m ${path.module}/script/apply-tags-to-container-app-env-mc-resource-group -n \"${azapi_resource.container_app_env.name}\" -r \"${local.resource_group.name}\" -t \"${replace(jsonencode(local.tags), "\"", "\\\"")}\""
   enable_container_app_blob_storage = var.enable_container_app_blob_storage
+  container_app_blob_storage_sas_secret = local.enable_container_app_blob_storage ? [
+    {
+      name  = "connectionstrings--blobstorage",
+      value = "${azurerm_storage_account.container_app[0].primary_blob_endpoint}${azurerm_storage_container.container_app[0].name}${data.azurerm_storage_account_blob_container_sas.container_app[0].sas}"
+    }
+  ] : []
+  tagging_command = "timeout 15m ${path.module}/script/apply-tags-to-container-app-env-mc-resource-group -n \"${azapi_resource.container_app_env.name}\" -r \"${local.resource_group.name}\" -t \"${replace(jsonencode(local.tags), "\"", "\\\"")}\""
 }
