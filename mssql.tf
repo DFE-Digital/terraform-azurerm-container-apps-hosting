@@ -1,7 +1,7 @@
 resource "azurerm_storage_account" "mssql_security_storage" {
   count = local.enable_mssql_database ? 1 : 0
 
-  name                     = "${local.resource_prefix}mssqlsec"
+  name                     = "${replace(local.resource_prefix, "-", "")}mssqlsec"
   resource_group_name      = local.resource_group.name
   location                 = local.resource_group.location
   account_tier             = "Standard"
