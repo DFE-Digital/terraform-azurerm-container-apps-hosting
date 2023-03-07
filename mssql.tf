@@ -42,7 +42,16 @@ resource "azurerm_mssql_database" "default" {
   collation   = "SQL_Latin1_General_CP1_CI_AS"
   sku_name    = local.mssql_sku_name
   max_size_gb = local.mssql_max_size_gb
-  tags        = local.tags
+
+  threat_detection_policy {
+    state                      = "Enabled"
+    email_account_admins       = true
+    retention_days             = 90
+    storage_endpoint           = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
+    storage_account_access_key = azurerm_storage_account.mssql_security_storage[0].primary_access_key
+  }
+
+  tags = local.tags
 }
 
 resource "azurerm_mssql_database_extended_auditing_policy" "default" {
