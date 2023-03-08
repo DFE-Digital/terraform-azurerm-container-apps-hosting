@@ -313,7 +313,9 @@ module "azure_container_apps_hosting" {
 
 | Name | Description |
 |------|-------------|
-| <a name="output_azurerm_resource_group_default"></a> [azurerm\_resource\_group\_default](#output\_azurerm\_resource\_group\_default) | n/a |
+| <a name="output_azurerm_eventhub_container_app"></a> [azurerm\_eventhub\_container\_app](#output\_azurerm\_eventhub\_container\_app) | Container App Event Hub |
+| <a name="output_azurerm_log_analytics_workspace_container_app"></a> [azurerm\_log\_analytics\_workspace\_container\_app](#output\_azurerm\_log\_analytics\_workspace\_container\_app) | Container App Log Analytics Workspace |
+| <a name="output_azurerm_resource_group_default"></a> [azurerm\_resource\_group\_default](#output\_azurerm\_resource\_group\_default) | Default Azure Resource Group |
 <!-- END_TF_DOCS -->
 
 [1]: https://azure.microsoft.com/en-us/services/container-apps
