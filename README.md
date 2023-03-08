@@ -130,7 +130,7 @@ module "azure_container_apps_hosting" {
 | Name | Version |
 |------|---------|
 | <a name="provider_azapi"></a> [azapi](#provider\_azapi) | 1.3.0 |
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.41.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.46.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | 3.2.1 |
 
 ## Resources
