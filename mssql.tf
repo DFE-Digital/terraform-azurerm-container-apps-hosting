@@ -45,7 +45,7 @@ resource "azurerm_mssql_database" "default" {
 
   threat_detection_policy {
     state                      = "Enabled"
-    email_account_admins       = true
+    email_account_admins       = "Enabled"
     retention_days             = 90
     storage_endpoint           = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
     storage_account_access_key = azurerm_storage_account.mssql_security_storage[0].primary_access_key
