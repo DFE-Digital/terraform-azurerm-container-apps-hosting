@@ -1,0 +1,218 @@
+name: Build, Push and Deploy Container App to an Environment
+
+on:
+  workflow_call:
+    inputs:
+      docker-image-name:
+        required: true
+        type: string
+      docker-build-file-name:
+        default: "Dockerfile"
+        required: false
+        type: string
+      docker-build-context:
+        default: "."
+        required: false
+        type: string
+      cypress-tests-enabled:
+        default: false
+        required: false
+        type: boolean
+      cypress-tests-working-directory:
+        default: "./"
+        required: false
+        type: string
+      cypress-tests-screenshot-path:
+        default: "./"
+        required: false
+        type: string
+      cypress-tests-node-version:
+        default: "18.x"
+        required: false
+        type: string
+      environment-name-development:
+        default: "development"
+        required: false
+        type: string
+      environment-name-staging:
+        default: "staging"
+        required: false
+        type: string
+      environment-name-prod:
+        default: "prod"
+        required: false
+        type: string
+    secrets:
+      azure-acr-client-id:
+        required: true
+        type: string
+      azure-acr-secret:
+        required: true
+        type: string
+      azure-acr-url:
+        required: true
+        type: string
+      azure-aca-credentials:
+        required: true
+        type: string
+      azure-aca-name:
+        required: true
+        type: string
+      azure-aca-resource-group:
+        required: true
+        type: string
+      cypress-tests-development-run-command:
+        default: "npm run cy:run -- --env foo='bar'"
+        required: false
+        type: string
+      cypress-tests-staging-run-command:
+        default: "npm run cy:run -- --env foo='bar'"
+        required: false
+        type: string
+
+jobs:
+  set-env:
+    name: Set environment variables
+    runs-on: ubuntu-22.04
+    steps:
+      - id: var
+        run: |
+          GIT_REF=${{ github.ref }}
+          GIT_BRANCH=${GIT_REF##*/}
+          INPUT_ENVIRONMENT=${{ inputs.environment }}
+          ENVIRONMENT=${INPUT_ENVIRONMENT}
+          RELEASE=${ENVIRONMENT,,}-`date +%Y-%m-%d`.${{ github.run_number }}
+          CHECKED_OUT_SHA="$(git log -1 '--format=format:%H')"
+          echo "environment=${ENVIRONMENT,,}" >> $GITHUB_OUTPUT
+          echo "branch=$GIT_BRANCH" >> $GITHUB_OUTPUT
+          echo "release=${RELEASE}" >> $GITHUB_OUTPUT
+          echo "checked-out-sha=${CHECKED_OUT_SHA}" >> $GITHUB_OUTPUT
+    outputs:
+      environment: ${{ steps.var.outputs.environment }}
+      branch: ${{ steps.var.outputs.branch }}
+      release: ${{ steps.var.outputs.release }}
+      checked-out-sha: ${{ steps.var.outputs.checked-out-sha }}
+
+  build-and-push-image:
+    name: Build and push to ACR
+    needs: set-env
+    runs-on: ubuntu-22.04
+    environment: ${{ needs.set-env.outputs.environment }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Azure Container Registry login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.azure-acr-client-id }}
+          password: ${{ secrets.azure-acr-secret }}
+          registry: ${{ secrets.azure-acr-url }}
+
+      - name: Build and push docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: ${{ inputs.docker-build-context }}
+          file: ${{ inputs.docker-build-file-name }}
+          build-args: COMMIT_SHA=${{ needs.set-env.outputs.checked-out-sha }}
+          tags: |
+            ${{ secrets.azure-acr-url }}/${{ inputs.docker-image-name }}:${{ needs.set-env.outputs.branch }}
+            ${{ secrets.azure-acr-url }}/${{ inputs.docker-image-name }}:${{ needs.set-env.outputs.release }}
+            ${{ secrets.azure-acr-url }}/${{ inputs.docker-image-name }}:sha-${{ needs.set-env.outputs.checked-out-sha }}
+            ${{ secrets.azure-acr-url }}/${{ inputs.docker-image-name }}:latest
+          push: true
+
+  create-tag:
+    name: Tag and release
+    needs: set-env
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Create tag
+        run: |
+          git tag ${{ needs.set-env.outputs.release }}
+          git push origin ${{ needs.set-env.outputs.release }}
+
+      - name: Create release
+        uses: "actions/github-script@v6"
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          script: |
+            try {
+              await github.rest.repos.createRelease({
+                draft: ${{ needs.set-env.outputs.environment == inputs.environment-name-staging || needs.set-env.outputs.environment == inputs.environment-name-development}},
+                generate_release_notes: true,
+                name: "${{ needs.set-env.outputs.release }}",
+                owner: context.repo.owner,
+                prerelease: ${{ needs.set-env.outputs.environment == inputs.environment-name-staging || needs.set-env.outputs.environment == inputs.environment-name-development }},
+                repo: context.repo.repo,
+                tag_name: "${{ needs.set-env.outputs.release }}",
+              });
+            } catch (error) {
+              core.setFailed(error.message);
+            }
+
+  deploy-image:
+    name: Deploy to ${{ needs.set-env.outputs.environment }}
+    needs: [ build-and-push-image, set-env ]
+    runs-on: ubuntu-22.04
+    environment: ${{ needs.set-env.outputs.environment }}
+    steps:
+      - name: Azure login with ACA credentials
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.azure-aca-credentials }}
+
+      - name: Update Azure Container Apps Revision
+        uses: azure/CLI@v1
+        id: azure
+        with:
+          azcliversion: 2.45.0
+          inlineScript: |
+            az config set extension.use_dynamic_install=yes_without_prompt
+            az containerapp update \
+              --name ${{ secrets.azure-aca-name }} \
+              --resource-group ${{ secrets.azure-aca-resource-group }} \
+              --image ${{ secrets.azure-acr-url }}/${{ inputs.docker-image-name }}:${{ needs.set-env.outputs.release }} \
+              --output none
+
+  cypress-tests:
+    name: Run Cypress Tests
+    if: ( needs.set-env.outputs.environment == inputs.environment-name-development || needs.set-env.outputs.environment == inputs.environment-name-staging ) && inputs.cypress-tests-enabled == true
+    needs: [ deploy-image, set-env ]
+    runs-on: ubuntu-22.04
+    environment: ${{ needs.set-env.outputs.environment }}
+    defaults:
+      run:
+        working-directory: ${{ inputs.cypress-tests-working-directory }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Setup node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.cypress-tests-node-version }}
+
+      - name: Npm install
+        run: npm install
+
+      - name: Run development cypress tests
+        if: ${{ needs.set-env.outputs.environment == inputs.environment-name-development }}
+        run: ${{ secrets.cypress-tests-development-run-command }}
+
+      - name: Run staging cypress tests
+        if: ${{ needs.set-env.outputs.environment == inputs.environment-name-staging }}
+        run: ${{ secrets.cypress-tests-staging-run-command }}
+
+      - name: Upload screenshots
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v1
+        with:
+          name: screenshots-${{ needs.set-env.outputs.environment }}
+          path: ${{ inputs.cypress-tests-screenshot-path }}
