@@ -10,7 +10,7 @@ This module creates and manages [Azure Container Apps][1], deployed within an [A
 
 ```hcl
 module "azure_container_apps_hosting" {
-  source = "github.com/DFE-Digital/terraform-azurerm-container-apps-hosting?ref=v0.14.6"
+  source = "github.com/DFE-Digital/terraform-azurerm-container-apps-hosting?ref=v0.15.0"
 
   environment    = "dev"
   project_name   = "myproject"
