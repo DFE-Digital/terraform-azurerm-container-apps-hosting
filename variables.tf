@@ -283,6 +283,134 @@ variable "dns_zone_soa_record" {
   default     = {}
 }
 
+variable "dns_a_records" {
+  description = "DNS A records to add to the DNS Zone"
+  type = map(
+    object({
+      ttl : optional(number, 300),
+      records : list(string)
+    })
+  )
+  default = {}
+}
+
+variable "dns_alias_records" {
+  description = "DNS ALIAS records to add to the DNS Zone"
+  type = map(
+    object({
+      ttl : optional(number, 300),
+      target_resource_id : string
+    })
+  )
+  default = {}
+}
+
+variable "dns_aaaa_records" {
+  description = "DNS AAAA records to add to the DNS Zone"
+  type = map(
+    object({
+      ttl : optional(number, 300),
+      records : list(string)
+    })
+  )
+  default = {}
+}
+
+variable "dns_caa_records" {
+  description = "DNS CAA records to add to the DNS Zone"
+  type = map(
+    object({
+      ttl : optional(number, 300),
+      records : list(
+        object({
+          flags : number,
+          tag : string,
+          value : string
+        })
+      )
+    })
+  )
+  default = {}
+}
+
+variable "dns_cname_records" {
+  description = "DNS CNAME records to add to the DNS Zone"
+  type = map(
+    object({
+      ttl : optional(number, 300),
+      record : string
+    })
+  )
+  default = {}
+}
+
+variable "dns_mx_records" {
+  description = "DNS MX records to add to the DNS Zone"
+  type = map(
+    object({
+      ttl : optional(number, 300),
+      records : list(
+        object({
+          preference : number,
+          exchange : string
+        })
+      )
+    })
+  )
+  default = {}
+}
+
+variable "dns_ns_records" {
+  description = "DNS NS records to add to the DNS Zone"
+  type = map(
+    object({
+      ttl : optional(number, 300),
+      records : list(string)
+    })
+  )
+  default = {}
+}
+
+variable "dns_ptr_records" {
+  description = "DNS PTR records to add to the DNS Zone"
+  type = map(
+    object({
+      ttl : optional(number, 300),
+      records : list(string)
+    })
+  )
+  default = {}
+}
+
+variable "dns_srv_records" {
+  description = "DNS SRV records to add to the DNS Zone"
+  type = map(
+    object({
+      ttl : optional(number, 300),
+      records : list(
+        object({
+          priority : number,
+          weight : number,
+          port : number,
+          target : string
+        })
+      )
+    })
+  )
+  default = {}
+}
+
+variable "dns_txt_records" {
+  description = "DNS TXT records to add to the DNS Zone"
+  type = map(
+    object({
+      ttl : optional(number, 300),
+      records : list(string)
+    })
+  )
+  default = {}
+}
+
 variable "enable_cdn_frontdoor" {
   description = "Enable Azure CDN Front Door. This will use the Container Apps endpoint as the origin."
   type        = bool

@@ -55,6 +55,110 @@ module "azure_container_apps_hosting" {
     serial_number = "1"
     ttl           = "3600"
   }
+  dns_a_records = {
+    "example" = {
+      ttl = 300,
+      records = [
+        "1.2.3.4",
+        "5.6.7.8",
+      ]
+    }
+  }
+  dns_alias_records = {
+    "alias-example" = {
+      ttl = 300,
+      target_resource_id = "azure_resource_id",
+    }
+  }
+  dns_aaaa_records = {
+    "aaaa-example" = {
+      ttl = 300,
+      records = [
+        "2001:db8::1:0:0:1",
+        "2606:2800:220:1:248:1893:25c8:1946",
+      ]
+    }
+  }
+  dns_caa_records = {
+    "caa-example" = {
+      ttl = 300,
+      records = [
+        {
+          flags = 0,
+          tag   = "issue",
+          value = "example.com"
+        },
+        {
+          flags = 0
+          tag   = "issuewild"
+          value = ";"
+        },
+        {
+          flags = 0
+          tag   = "iodef"
+          value = "mailto:caa@example.com"
+        }
+      ]
+    }
+  }
+  dns_cname_records = {
+    "cname-example" = {
+      ttl    = 300,
+      record = "example.com",
+    }
+  }
+  dns_mx_records = {
+    "mx-example" = {
+      ttl = 300,
+      records = [
+        {
+          preference = 10,
+          exchange   = "mail.example.com"
+        }
+      ]
+    }
+  }
+  dns_ns_records = {
+    "ns-example" = {
+      ttl = 300,
+      records = [
+        "ns-1.net",
+        "ns-1.com",
+        "ns-1.org",
+        "ns-1.info"
+      ]
+    }
+  }
+  dns_ptr_records = {
+    "ptr-example" = {
+      ttl = 300,
+      records = [
+        "example.com",
+      ]
+    }
+  }
+  dns_srv_records = {
+    "srv-example" = {
+      ttl = 300,
+      records = [
+        {
+          priority = 1,
+          weight   = 5,
+          port     = 8080
+          target   = target.example.com
+        }
+      ]
+    }
+  }
+  dns_txt_records = {
+    "txt-example" = {
+      ttl = 300,
+      records = [
+        "google-site-authenticator",
+        "more site information here"
+      ]
+    }
+  }
 
   enable_cdn_frontdoor                = true
   cdn_frontdoor_sku                   = "Standard_AzureFrontDoor"
@@ -208,7 +312,17 @@ jobs:
 | [azurerm_cdn_frontdoor_rule_set.remove_response_headers](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_rule_set) | resource |
 | [azurerm_cdn_frontdoor_security_policy.waf](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_security_policy) | resource |
 | [azurerm_container_registry.acr](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry) | resource |
+| [azurerm_dns_a_record.dns_a_records](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
+| [azurerm_dns_a_record.dns_alias_records](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
 | [azurerm_dns_a_record.frontdoor_custom_domain](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
+| [azurerm_dns_aaaa_record.dns_aaaa_records](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_aaaa_record) | resource |
+| [azurerm_dns_caa_record.dns_caa_records](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_caa_record) | resource |
+| [azurerm_dns_cname_record.dns_cname_records](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_cname_record) | resource |
+| [azurerm_dns_mx_record.dns_mx_records](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_mx_record) | resource |
+| [azurerm_dns_ns_record.dns_ns_records](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_ns_record) | resource |
+| [azurerm_dns_ptr_record.dns_ptr_records](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_ptr_record) | resource |
+| [azurerm_dns_srv_record.dns_srv_records](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_srv_record) | resource |
+| [azurerm_dns_txt_record.dns_txt_records](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_txt_record) | resource |
 | [azurerm_dns_txt_record.frontdoor_custom_domain](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_txt_record) | resource |
 | [azurerm_dns_zone.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_zone) | resource |
 | [azurerm_eventhub.container_app](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/eventhub) | resource |
@@ -308,6 +422,16 @@ jobs:
 | <a name="input_container_scale_rule_out_of_hours_start"></a> [container\_scale\_rule\_out\_of\_hours\_start](#input\_container\_scale\_rule\_out\_of\_hours\_start) | Specify a time using Linux cron format that represents the start of the out-of-hours window. Defaults to 23:00 | `string` | `"0 23 * * *"` | no |
 | <a name="input_container_scale_rule_scale_down_out_of_hours"></a> [container\_scale\_rule\_scale\_down\_out\_of\_hours](#input\_container\_scale\_rule\_scale\_down\_out\_of\_hours) | Should the Container App scale down to the minReplicas outside of normal operating hours? | `bool` | `false` | no |
 | <a name="input_container_secret_environment_variables"></a> [container\_secret\_environment\_variables](#input\_container\_secret\_environment\_variables) | Container environment variables, which are defined as `secrets` within the container app configuration. This is to help reduce the risk of accidentally exposing secrets. | `map(string)` | `{}` | no |
+| <a name="input_dns_a_records"></a> [dns\_a\_records](#input\_dns\_a\_records) | DNS A records to add to the DNS Zone | <pre>map(<br>    object({<br>      ttl : optional(number, 300),<br>      records : list(string)<br>    })<br>  )</pre> | `{}` | no |
+| <a name="input_dns_aaaa_records"></a> [dns\_aaaa\_records](#input\_dns\_aaaa\_records) | DNS AAAA records to add to the DNS Zone | <pre>map(<br>    object({<br>      ttl : optional(number, 300),<br>      records : list(string)<br>    })<br>  )</pre> | `{}` | no |
+| <a name="input_dns_alias_records"></a> [dns\_alias\_records](#input\_dns\_alias\_records) | DNS ALIAS records to add to the DNS Zone | <pre>map(<br>    object({<br>      ttl : optional(number, 300),<br>      target_resource_id : string<br>    })<br>  )</pre> | `{}` | no |
+| <a name="input_dns_caa_records"></a> [dns\_caa\_records](#input\_dns\_caa\_records) | DNS CAA records to add to the DNS Zone | <pre>map(<br>    object({<br>      ttl : optional(number, 300),<br>      records : list(<br>        object({<br>          flags : number,<br>          tag : string,<br>          value : string<br>        })<br>      )<br>    })<br>  )</pre> | `{}` | no |
+| <a name="input_dns_cname_records"></a> [dns\_cname\_records](#input\_dns\_cname\_records) | DNS CNAME records to add to the DNS Zone | <pre>map(<br>    object({<br>      ttl : optional(number, 300),<br>      record : string<br>    })<br>  )</pre> | `{}` | no |
+| <a name="input_dns_mx_records"></a> [dns\_mx\_records](#input\_dns\_mx\_records) | DNS MX records to add to the DNS Zone | <pre>map(<br>    object({<br>      ttl : optional(number, 300),<br>      records : list(<br>        object({<br>          preference : number,<br>          exchange : string<br>        })<br>      )<br>    })<br>  )</pre> | `{}` | no |
+| <a name="input_dns_ns_records"></a> [dns\_ns\_records](#input\_dns\_ns\_records) | DNS NS records to add to the DNS Zone | <pre>map(<br>    object({<br>      ttl : optional(number, 300),<br>      records : list(string)<br>    })<br>  )</pre> | `{}` | no |
+| <a name="input_dns_ptr_records"></a> [dns\_ptr\_records](#input\_dns\_ptr\_records) | DNS PTR records to add to the DNS Zone | <pre>map(<br>    object({<br>      ttl : optional(number, 300),<br>      records : list(string)<br>    })<br>  )</pre> | `{}` | no |
+| <a name="input_dns_srv_records"></a> [dns\_srv\_records](#input\_dns\_srv\_records) | DNS SRV records to add to the DNS Zone | <pre>map(<br>    object({<br>      ttl : optional(number, 300),<br>      records : list(<br>        object({<br>          priority : number,<br>          weight : number,<br>          port : number,<br>          target : string<br>        })<br>      )<br>    })<br>  )</pre> | `{}` | no |
+| <a name="input_dns_txt_records"></a> [dns\_txt\_records](#input\_dns\_txt\_records) | DNS TXT records to add to the DNS Zone | <pre>map(<br>    object({<br>      ttl : optional(number, 300),<br>      records : list(string)<br>    })<br>  )</pre> | `{}` | no |
 | <a name="input_dns_zone_domain_name"></a> [dns\_zone\_domain\_name](#input\_dns\_zone\_domain\_name) | DNS zone domain name. If created, records will automatically be created to point to the CDN. | `string` | `""` | no |
 | <a name="input_dns_zone_soa_record"></a> [dns\_zone\_soa\_record](#input\_dns\_zone\_soa\_record) | DNS zone SOA record block (https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_zone#soa_record) | `map(string)` | `{}` | no |
 | <a name="input_enable_cdn_frontdoor"></a> [enable\_cdn\_frontdoor](#input\_enable\_cdn\_frontdoor) | Enable Azure CDN Front Door. This will use the Container Apps endpoint as the origin. | `bool` | `false` | no |

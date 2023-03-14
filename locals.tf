@@ -56,6 +56,16 @@ locals {
   enable_dns_zone                               = var.enable_dns_zone
   dns_zone_domain_name                          = var.dns_zone_domain_name
   dns_zone_soa_record                           = var.dns_zone_soa_record
+  dns_a_records                                 = var.dns_a_records
+  dns_alias_records                             = var.dns_alias_records
+  dns_aaaa_records                              = var.dns_aaaa_records
+  dns_caa_records                               = var.dns_caa_records
+  dns_cname_records                             = var.dns_cname_records
+  dns_mx_records                                = var.dns_mx_records
+  dns_ns_records                                = var.dns_ns_records
+  dns_ptr_records                               = var.dns_ptr_records
+  dns_srv_records                               = var.dns_srv_records
+  dns_txt_records                               = var.dns_txt_records
   enable_cdn_frontdoor                          = var.enable_cdn_frontdoor
   restrict_container_apps_to_cdn_inbound_only   = var.restrict_container_apps_to_cdn_inbound_only
   cdn_frontdoor_sku                             = var.cdn_frontdoor_sku
