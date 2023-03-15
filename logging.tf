@@ -17,6 +17,13 @@ resource "azurerm_log_analytics_data_export_rule" "container_app" {
   enabled                 = true
 }
 
+resource "azurerm_log_analytics_query_pack" "container_app" {
+  name                = "${local.resource_prefix}containerapp"
+  resource_group_name = local.resource_group.name
+  location            = local.resource_group.location
+  tags                = local.tags
+}
+
 resource "azurerm_eventhub_namespace" "container_app" {
   count               = local.enable_event_hub ? 1 : 0
   name                = "${local.resource_prefix}eventhubnamespace"
