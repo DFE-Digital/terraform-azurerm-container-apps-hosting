@@ -49,35 +49,60 @@ locals {
   enable_container_health_probe                 = var.enable_container_health_probe
   container_health_probe_interval               = var.container_health_probe_interval
   container_health_probe_path                   = var.container_health_probe_path
-  enable_worker_container                       = var.enable_worker_container
-  worker_container_command                      = var.worker_container_command
-  worker_container_min_replicas                 = var.worker_container_min_replicas
-  worker_container_max_replicas                 = var.worker_container_max_replicas
-  enable_dns_zone                               = var.enable_dns_zone
-  dns_zone_domain_name                          = var.dns_zone_domain_name
-  dns_zone_soa_record                           = var.dns_zone_soa_record
-  dns_a_records                                 = var.dns_a_records
-  dns_alias_records                             = var.dns_alias_records
-  dns_aaaa_records                              = var.dns_aaaa_records
-  dns_caa_records                               = var.dns_caa_records
-  dns_cname_records                             = var.dns_cname_records
-  dns_mx_records                                = var.dns_mx_records
-  dns_ns_records                                = var.dns_ns_records
-  dns_ptr_records                               = var.dns_ptr_records
-  dns_srv_records                               = var.dns_srv_records
-  dns_txt_records                               = var.dns_txt_records
-  enable_cdn_frontdoor                          = var.enable_cdn_frontdoor
-  restrict_container_apps_to_cdn_inbound_only   = var.restrict_container_apps_to_cdn_inbound_only
-  cdn_frontdoor_sku                             = var.cdn_frontdoor_sku
-  enable_cdn_frontdoor_health_probe             = var.enable_cdn_frontdoor_health_probe
-  cdn_frontdoor_health_probe_interval           = var.cdn_frontdoor_health_probe_interval
-  cdn_frontdoor_health_probe_path               = var.cdn_frontdoor_health_probe_path
-  cdn_frontdoor_health_probe_request_type       = var.cdn_frontdoor_health_probe_request_type
-  cdn_frontdoor_response_timeout                = var.cdn_frontdoor_response_timeout
-  cdn_frontdoor_custom_domains                  = var.cdn_frontdoor_custom_domains
-  cdn_frontdoor_host_redirects                  = var.cdn_frontdoor_host_redirects
-  cdn_frontdoor_host_add_response_headers       = var.cdn_frontdoor_host_add_response_headers
-  cdn_frontdoor_remove_response_headers         = var.cdn_frontdoor_remove_response_headers
+  container_health_probe_protocol               = var.container_health_probe_protocol
+  container_health_tcp_probe = [
+    {
+      type          = "Liveness"
+      periodSeconds = local.container_health_probe_interval
+      tcpSocket = {
+        port = local.container_port
+      }
+    }
+  ]
+  container_health_https_probe = [
+    {
+      type          = "Liveness"
+      periodSeconds = local.container_health_probe_interval
+      httpGet = {
+        path = local.container_health_probe_path
+        port = local.container_port
+      }
+    }
+  ]
+  container_health_probes = {
+    "tcp" : local.container_health_tcp_probe
+    "https" : local.container_health_https_probe
+  }
+  container_health_probe                      = lookup(local.container_health_probes, local.container_health_probe_protocol, null)
+  enable_worker_container                     = var.enable_worker_container
+  worker_container_command                    = var.worker_container_command
+  worker_container_min_replicas               = var.worker_container_min_replicas
+  worker_container_max_replicas               = var.worker_container_max_replicas
+  enable_dns_zone                             = var.enable_dns_zone
+  dns_zone_domain_name                        = var.dns_zone_domain_name
+  dns_zone_soa_record                         = var.dns_zone_soa_record
+  dns_a_records                               = var.dns_a_records
+  dns_alias_records                           = var.dns_alias_records
+  dns_aaaa_records                            = var.dns_aaaa_records
+  dns_caa_records                             = var.dns_caa_records
+  dns_cname_records                           = var.dns_cname_records
+  dns_mx_records                              = var.dns_mx_records
+  dns_ns_records                              = var.dns_ns_records
+  dns_ptr_records                             = var.dns_ptr_records
+  dns_srv_records                             = var.dns_srv_records
+  dns_txt_records                             = var.dns_txt_records
+  enable_cdn_frontdoor                        = var.enable_cdn_frontdoor
+  restrict_container_apps_to_cdn_inbound_only = var.restrict_container_apps_to_cdn_inbound_only
+  cdn_frontdoor_sku                           = var.cdn_frontdoor_sku
+  enable_cdn_frontdoor_health_probe           = var.enable_cdn_frontdoor_health_probe
+  cdn_frontdoor_health_probe_interval         = var.cdn_frontdoor_health_probe_interval
+  cdn_frontdoor_health_probe_path             = var.cdn_frontdoor_health_probe_path
+  cdn_frontdoor_health_probe_request_type     = var.cdn_frontdoor_health_probe_request_type
+  cdn_frontdoor_response_timeout              = var.cdn_frontdoor_response_timeout
+  cdn_frontdoor_custom_domains                = var.cdn_frontdoor_custom_domains
+  cdn_frontdoor_host_redirects                = var.cdn_frontdoor_host_redirects
+  cdn_frontdoor_host_add_response_headers     = var.cdn_frontdoor_host_add_response_headers
+  cdn_frontdoor_remove_response_headers       = var.cdn_frontdoor_remove_response_headers
   cdn_frontdoor_custom_domain_dns_names = local.enable_cdn_frontdoor && local.enable_dns_zone ? toset([
     for domain in local.cdn_frontdoor_custom_domains : replace(domain, local.dns_zone_domain_name, "") if endswith(domain, local.dns_zone_domain_name)
   ]) : []
