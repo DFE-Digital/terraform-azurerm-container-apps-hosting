@@ -86,3 +86,35 @@ resource "azurerm_private_dns_a_record" "redis_cache_private_endpoint" {
   records             = [azurerm_private_endpoint.default_redis_cache[0].private_service_connection[0].private_ip_address]
   tags                = local.tags
 }
+
+resource "azurerm_monitor_diagnostic_setting" "default_redis_cache" {
+  count = local.enable_monitoring ? (
+    local.enable_redis_cache ? 1 : 0
+  ) : 0
+
+  name               = "${local.resource_prefix}-default-redis-diag"
+  target_resource_id = azurerm_redis_cache.default[0].id
+
+  log_analytics_workspace_id     = azurerm_log_analytics_workspace.container_app.id
+  log_analytics_destination_type = "Dedicated"
+
+  eventhub_name = local.enable_event_hub ? azurerm_eventhub.container_app[0].name : null
+
+  enabled_log {
+    category = "ConnectedClientList"
+
+    retention_policy {
+      enabled = true
+      days    = 7
+    }
+  }
+
+  metric {
+    category = "AllMetrics"
+
+    retention_policy {
+      enabled = true
+      days    = 7
+    }
+  }
+}
