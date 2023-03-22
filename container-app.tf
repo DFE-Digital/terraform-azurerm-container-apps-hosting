@@ -79,16 +79,7 @@ resource "azapi_resource" "default" {
               memory = "${local.container_memory}Gi"
             }
             command = local.container_command
-            probes = local.enable_container_health_probe ? [
-              {
-                type          = "Liveness"
-                periodSeconds = local.container_health_probe_interval
-                httpGet = {
-                  path = local.container_health_probe_path
-                  port = local.container_port
-                }
-              }
-            ] : []
+            probes  = local.enable_container_health_probe ? local.container_health_probe : null
             env = concat(
               [
                 {
