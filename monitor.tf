@@ -26,7 +26,7 @@ resource "azurerm_application_insights_standard_web_test" "main" {
   ]
 
   request {
-    url = local.enable_cdn_frontdoor ? "https://${azurerm_cdn_frontdoor_endpoint.endpoint[0].host_name}${local.monitor_endpoint_healthcheck}" : "https://${jsondecode(azapi_resource.default.output).properties.configuration.ingress.fqdn}${local.monitor_endpoint_healthcheck}"
+    url = local.monitor_http_availability_url
   }
 
   tags = merge(
