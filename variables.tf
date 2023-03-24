@@ -37,6 +37,12 @@ variable "existing_resource_group" {
   default     = ""
 }
 
+variable "enable_resource_group_lock" {
+  description = "Enabling this will add a Resource Lock to the Resource Group preventing any resources from being deleted."
+  type        = bool
+  default     = false
+}
+
 variable "virtual_network_address_space" {
   description = "Virtual Network address space CIDR"
   type        = string
