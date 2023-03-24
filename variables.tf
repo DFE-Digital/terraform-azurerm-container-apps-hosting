@@ -632,3 +632,9 @@ variable "enable_container_app_blob_storage" {
   type        = bool
   default     = false
 }
+
+variable "blob_storage_public_access_enabled" {
+  description = "Should the Azure Storage Account have Public visibility?"
+  type        = bool
+  default     = false
+}

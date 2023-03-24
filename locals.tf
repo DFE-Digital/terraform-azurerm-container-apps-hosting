@@ -154,7 +154,8 @@ locals {
   network_security_group_ids = merge(
     local.network_security_group_container_apps_infra_allow_frontdoor_inbound_only_id,
   )
-  enable_container_app_blob_storage = var.enable_container_app_blob_storage
+  enable_container_app_blob_storage  = var.enable_container_app_blob_storage
+  blob_storage_public_access_enabled = var.blob_storage_public_access_enabled
   container_app_blob_storage_sas_secret = local.enable_container_app_blob_storage ? [
     {
       name  = "connectionstrings--blobstorage",
