@@ -336,6 +336,7 @@ jobs:
 | [azurerm_logic_app_action_http.slack](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/logic_app_action_http) | resource |
 | [azurerm_logic_app_trigger_http_request.webhook](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/logic_app_trigger_http_request) | resource |
 | [azurerm_logic_app_workflow.webhook](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/logic_app_workflow) | resource |
+| [azurerm_management_lock.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) | resource |
 | [azurerm_monitor_action_group.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_action_group) | resource |
 | [azurerm_monitor_diagnostic_setting.container_app](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_monitor_diagnostic_setting.default_network_watcher_nsg_flow_logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
@@ -451,6 +452,7 @@ jobs:
 | <a name="input_enable_network_watcher"></a> [enable\_network\_watcher](#input\_enable\_network\_watcher) | Enable network watcher. Note: only 1 network watcher per subscription can be created. | `bool` | `false` | no |
 | <a name="input_enable_network_watcher_traffic_analytics"></a> [enable\_network\_watcher\_traffic\_analytics](#input\_enable\_network\_watcher\_traffic\_analytics) | Enable network watcher traffic analytics (Requires `enable_network_watcher` to be true) | `bool` | `true` | no |
 | <a name="input_enable_redis_cache"></a> [enable\_redis\_cache](#input\_enable\_redis\_cache) | Set to true to create an Azure Redis Cache, with a private endpoint within the virtual network | `bool` | `false` | no |
+| <a name="input_enable_resource_group_lock"></a> [enable\_resource\_group\_lock](#input\_enable\_resource\_group\_lock) | Enabling this will add a Resource Lock to the Resource Group preventing any resources from being deleted. | `bool` | `false` | no |
 | <a name="input_enable_worker_container"></a> [enable\_worker\_container](#input\_enable\_worker\_container) | Conditionally launch a worker container. This container uses the same image and environment variables as the default container app, but allows a different container command to be run. The worker container does not expose any ports. | `bool` | `false` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name. Will be used along with `project_name` as a prefix for all resources. | `string` | n/a | yes |
 | <a name="input_existing_network_watcher_name"></a> [existing\_network\_watcher\_name](#input\_existing\_network\_watcher\_name) | Use an existing network watcher to add flow logs. | `string` | `""` | no |
