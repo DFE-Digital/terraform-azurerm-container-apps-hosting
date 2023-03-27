@@ -8,6 +8,8 @@ This module creates and manages [Azure Container Apps][1], deployed within an [A
 
 ## Usage
 
+### Terraform
+
 ```hcl
 module "azure_container_apps_hosting" {
   source = "github.com/DFE-Digital/terraform-azurerm-container-apps-hosting?ref=v0.16.1"
@@ -16,218 +18,339 @@ module "azure_container_apps_hosting" {
   project_name   = "myproject"
   azure_location = "uksouth"
 
+  ## Set launch_in_vnet to false to prevent deploying a new Virtual Network
+  # launch_in_vnet = false
+
+  ## Specify the name of an existing Virtual Network if you want to use that instead of creating a new one
+  # existing_virtual_network = "my-vnet-example-name"
+
+  ## Specify the name of an existing Resource Group to deploy resources into
+  # existing_resource_group = "my-existing-resource-group"
+
+  # Set the default IP Range that will be assigned to the Virtual Network used by the Container Apps
+  virtual_network_address_space = "172.32.10.0/24"
+
+  # Create an Azure Container Registry and connect it to the Container App Environment
   enable_container_registry = true
 
-  image_name        = "myimage"
-  container_command = ["/bin/bash", "-c". "echo hello && sleep 86400"]
+  ## Specify the connection details for an existing Container Registry if 'enable_container_registry' is false
+  # registry_server   = ""
+  # registry_username = ""
+  # registry_password = ""
 
-  # Note: It is recommended to use `container_secret_environment_variables` rather than `container_environment_variables`.
-  #       This ensures that environment variables are set as `secrets` within the container app revision.
-  #       If they are set directly as `env`, they can be exposed when running `az containerapp` commands, especially
-  #       if those commands are ran as part of CI/CD.
-  container_secret_environment_variables = {
-    "FOO" = "bar"
-  }
+  # Specify the Container Image and Tag that will get pulled from the Container Registry
+  image_name = "my-app"
+  image_tag  = "latest"
 
-  enable_container_app_blob_storage = true
+  ## Deploy an Azure SQL Server and create an initial database
+  # enable_mssql_database       = true
+  # mssql_server_admin_password = "ZE8r6uY9&o4&1xaR0BCBkCIVxA6Mal£w"
+  # mssql_sku_name              = "Basic"
+  # mssql_max_size_gb           = 2
+  # mssql_database_name         = "my-database"
 
-  enable_mssql_database       = true
-  mssql_server_admin_password = "S3crEt"
-  mssql_database_name         = "mydatabase"
+  ## Deploy an Azure Cache for Redis instance
+  # enable_redis_cache              = true
+  # redis_cache_version             = 6
+  # redis_cache_family              = "C"
+  # redis_cache_sku                 = "Basic"
+  # redis_cache_capacity            = 1
+  # redis_cache_patch_schedule_day  = "Sunday"
+  # redis_cache_patch_schedule_hour = 23
 
-  enable_redis_cache              = true
-  redis_cache_version             = 6
-  redis_cache_family              = "C"
-  redis_cache_sku                 = "Basic"
-  redis_cache_capacity            = 0
-  redis_cache_patch_schedule_day  = "Wednesday"
-  redis_cache_patch_schedule_hour = 18
+  ## Increase the hardware resources given to each Container
+  # container_cpu    = 1 # core count
+  # container_memory = 2 # gigabyte
 
+  # Change the Port number that the Container is listening on
+  # container_port = 80
+
+  # Change the number of replicas (commonly called 'instances') for the Container.
+  # Setting 'container_max_replicas' to 1 will prevent scaling
+  container_min_replicas = 2
+  container_max_replicas = 10
+
+  # Maximum number of concurrent HTTP requests before a new replica is created
+  container_scale_rule_concurrent_request_count = 100
+
+  ## Enable out-of-hours scale down to reduce resource usage
+  # container_scale_rule_scale_down_out_of_hours = false
+  # container_scale_rule_out_of_hours_start      = "0 23 * * *" # Must be a valid cron time
+  # container_scale_rule_out_of_hours_end        = "0 6 * * *" # Must be a valid cron time
+
+  # Enable a Liveness probe that checks to ensure the Container is responding. If this fails, the Container is restarted
+  enable_container_health_probe   = true
+  container_health_probe_interval = 60 # seconds
+  container_health_probe_protocol = "https" # or "tcp"
+  container_health_probe_path     = "/" # relative url to your status page (e.g. /healthcheck, /health, /status)
+
+  # What command should be used to start your Container
+  container_command = [ "/bin/bash", "-c", "echo hello && sleep 86400" ]
+
+  ## Set environment variables that are passed to the Container at runtime. (See note below)
+  ## It is strongly recommended not to include any sensitive or secret values here
+  # container_environment_variables = {
+  #   "Environment" = "Development"
+  # }
+
+  ## Note: It is recommended to use `container_secret_environment_variables` rather than `container_environment_variables`.
+  ##       This ensures that environment variables are set as `secrets` within the container app revision.
+  ##       If they are set directly as `env`, they can be exposed when running `az containerapp` commands, especially
+  ##       if those commands are ran as part of CI/CD.
+  # container_secret_environment_variables = {
+  #   "RedirectUri" = "https://www.example.com/signin"
+  # }
+
+  ## If your app requires a worker container, you can enable it by setting 'enable_worker_container' to true
+  # enable_worker_container       = false
+  # worker_container_command      = [ "/bin/bash", "-c", "echo hello && sleep 86400" ]
+  # worker_container_min_replicas = 1
+  # worker_container_max_replicas = 1
+
+  # Create a DNS Zone, associate a primary domain and map different DNS Records as you require.
   enable_dns_zone      = true
   dns_zone_domain_name = "example.com"
-  dns_zone_soa_record  = {
-    email         = "hello.example.com"
-    host_name     = "ns1-03.azure-dns.com."
-    expire_time   = "2419200"
-    minimum_ttl   = "300"
-    refresh_time  = "3600"
-    retry_time    = "300"
-    serial_number = "1"
-    ttl           = "3600"
-  }
-  dns_a_records = {
-    "example" = {
-      ttl = 300,
-      records = [
-        "1.2.3.4",
-        "5.6.7.8",
-      ]
-    }
-  }
-  dns_alias_records = {
-    "alias-example" = {
-      ttl = 300,
-      target_resource_id = "azure_resource_id",
-    }
-  }
-  dns_aaaa_records = {
-    "aaaa-example" = {
-      ttl = 300,
-      records = [
-        "2001:db8::1:0:0:1",
-        "2606:2800:220:1:248:1893:25c8:1946",
-      ]
-    }
-  }
-  dns_caa_records = {
-    "caa-example" = {
-      ttl = 300,
-      records = [
-        {
-          flags = 0,
-          tag   = "issue",
-          value = "example.com"
-        },
-        {
-          flags = 0
-          tag   = "issuewild"
-          value = ";"
-        },
-        {
-          flags = 0
-          tag   = "iodef"
-          value = "mailto:caa@example.com"
-        }
-      ]
-    }
-  }
-  dns_cname_records = {
-    "cname-example" = {
-      ttl    = 300,
-      record = "example.com",
-    }
-  }
-  dns_mx_records = {
-    "mx-example" = {
-      ttl = 300,
-      records = [
-        {
-          preference = 10,
-          exchange   = "mail.example.com"
-        }
-      ]
-    }
-  }
-  dns_ns_records = {
-    "ns-example" = {
-      ttl = 300,
-      records = [
-        "ns-1.net",
-        "ns-1.com",
-        "ns-1.org",
-        "ns-1.info"
-      ]
-    }
-  }
-  dns_ptr_records = {
-    "ptr-example" = {
-      ttl = 300,
-      records = [
-        "example.com",
-      ]
-    }
-  }
-  dns_srv_records = {
-    "srv-example" = {
-      ttl = 300,
-      records = [
-        {
-          priority = 1,
-          weight   = 5,
-          port     = 8080
-          target   = target.example.com
-        }
-      ]
-    }
-  }
-  dns_txt_records = {
-    "txt-example" = {
-      ttl = 300,
-      records = [
-        "google-site-authenticator",
-        "more site information here"
-      ]
-    }
-  }
 
-  enable_cdn_frontdoor                = true
-  cdn_frontdoor_sku                   = "Standard_AzureFrontDoor"
-  cdn_frontdoor_health_probe_interval = 30
-  cdn_frontdoor_health_probe_path     = "/"
-  cdn_frontdoor_response_timeout      = 120
+  ## The SOA record contains important information about a domain and who is responsible for it
+  # dns_zone_soa_record  = {
+  #   email         = "hello.example.com"
+  #   host_name     = "ns1-03.azure-dns.com."
+  #   expire_time   = "2419200"
+  #   minimum_ttl   = "300"
+  #   refresh_time  = "3600"
+  #   retry_time    = "300"
+  #   serial_number = "1"
+  #   ttl           = "3600"
+  # }
+
+  ## An A record maps a domain to the physical IP address of the computer hosting that domain
+  # dns_a_records = {
+  #   "example" = {
+  #     ttl = 300,
+  #     records = [
+  #       "1.2.3.4",
+  #       "5.6.7.8",
+  #     ]
+  #   }
+  # }
+
+  ## An ALIAS record is a virtual record type DNSimple created to provide CNAME-like behavior on apex domains
+  # dns_alias_records = {
+  #   "alias-example" = {
+  #     ttl = 300,
+  #     target_resource_id = "azure_resource_id",
+  #   }
+  # }
+
+  ## An AAAA record type is a foundational DNS record when IPv6 addresses are used
+  # dns_aaaa_records = {
+  #   "aaaa-example" = {
+  #     ttl = 300,
+  #     records = [
+  #       "2001:db8::1:0:0:1",
+  #       "2606:2800:220:1:248:1893:25c8:1946",
+  #     ]
+  #   }
+  # }
+
+  # A CAA record is used to specify which certificate authorities (CAs) are allowed to issue certificates for a domain
+  # dns_caa_records = {
+  #   "caa-example" = {
+  #     ttl = 300,
+  #     records = [
+  #       {
+  #         flags = 0,
+  #         tag   = "issue",
+  #         value = "example.com"
+  #       },
+  #       {
+  #         flags = 0
+  #         tag   = "issuewild"
+  #         value = ";"
+  #       },
+  #       {
+  #         flags = 0
+  #         tag   = "iodef"
+  #         value = "mailto:caa@example.com"
+  #       }
+  #     ]
+  #   }
+  # }
+
+  ## A CNAME record provides an alias for another domain
+  # dns_cname_records = {
+  #   "cname-example" = {
+  #     ttl    = 300,
+  #     record = "example.com",
+  #   }
+  # }
+
+  ## A MX record directs email to a mail server
+  # dns_mx_records = {
+  #   "mx-example" = {
+  #     ttl = 300,
+  #     records = [
+  #       {
+  #         preference = 10,
+  #         exchange   = "mail.example.com"
+  #       }
+  #     ]
+  #   }
+  # }
+
+  ## An NS record contains the name of the authoritative name server within the DNS zone
+  # dns_ns_records = {
+  #   "ns-example" = {
+  #     ttl = 300,
+  #     records = [
+  #       "ns-1.net",
+  #       "ns-1.com",
+  #       "ns-1.org",
+  #       "ns-1.info"
+  #     ]
+  #   }
+  # }
+
+  ## A PTR record is used for reverse DNS lookups, and it matches domain names with IP addresses
+  # dns_ptr_records = {
+  #   "ptr-example" = {
+  #     ttl = 300,
+  #     records = [
+  #       "example.com",
+  #     ]
+  #   }
+  # }
+
+  ## A SRV record specifies a host and port for specific services such as voice over IP (VoIP), instant messaging etc
+  # dns_srv_records = {
+  #   "srv-example" = {
+  #     ttl = 300,
+  #     records = [
+  #       {
+  #         priority = 1,
+  #         weight   = 5,
+  #         port     = 8080
+  #         target   = target.example.com
+  #       }
+  #     ]
+  #   }
+  # }
+
+  ## A TXT record stores text notes on a DNS server
+  # dns_txt_records = {
+  #   "txt-example" = {
+  #     ttl = 300,
+  #     records = [
+  #       "google-site-authenticator",
+  #       "more site information here"
+  #     ]
+  #   }
+  # }
+
+  # Deploy an Azure Front Door CDN. This will be configured as the entrypoint for all traffic accessing your Containers
+  enable_cdn_frontdoor           = true
+  # cdn_frontdoor_sku            = "Standard_AzureFrontDoor"
+  cdn_frontdoor_response_timeout = 300 # seconds
+
+  # Any domains defined here will be associated to the Front Door as acceptable hosts
   cdn_frontdoor_custom_domains = [
     "example.com",
     "www.example.com"
   ]
+
+  # If you want to set up specific domain redirects, you can specify them with 'cdn_frontdoor_host_redirects'
   cdn_frontdoor_host_redirects = [
     {
       "from" = "example.com",
       "to"   = "www.example.com",
     }
   ]
-  cdn_frontdoor_enable_rate_limiting              = true
-  cdn_frontdoor_rate_limiting_duration_in_minutes = 1
-  cdn_frontdoor_rate_limiting_threshold           = 300
-  cdn_frontdoor_rate_limiting_bypass_ip_list      = ["8.8.8.8/32"]
-  cdn_frontdoor_waf_mode                          = "Prevention"
+
+  # Add additional HTTP Response Headers to include on every response
   cdn_frontdoor_host_add_response_headers = [
     {
       "name"  = "Strict-Transport-Security",
       "value" = "max-age=31536000",
     }
   ]
+
+  # Remove any surplus HTTP Response Headers that you might not want to include
   cdn_frontdoor_remove_response_headers = [
     "Server",
   ]
 
-  # Logs are by default exported to a Log Analytics Workspace so enabling these two values are only necessary if you
-  # want to ingest the logs using a 3rd party service (e.g. logit.io)
-  enable_event_hub = true
-  enable_logstash_consumer = true
+  # Deploy an Azure Front Door WAF Rate Limiting Policy
+  cdn_frontdoor_enable_rate_limiting              = true
+
+  ## Available options are "Prevention" for blocking any matching traffic, or "Detection" just to report on it
+  # cdn_frontdoor_waf_mode                        = "Prevention"
+
+  ## Number of minutes to block the requester's IP Address
+  cdn_frontdoor_rate_limiting_duration_in_minutes = 5
+
+  ## How many requests can a single IP make in a minute before the WAF policy gets applied
+  # cdn_frontdoor_rate_limiting_threshold         = 300
+
+  ## Provide a list of IP Addresses or Ranges that should be exempt from the WAF Policy
+  # cdn_frontdoor_rate_limiting_bypass_ip_list    = [ "8.8.8.8/32" ]
+
+  # Prevent traffic from accessing the Container Apps directly
+  restrict_container_apps_to_cdn_inbound_only     = true
+
+  ## Should the CDN keep monitoring the backend pool to ensure traffic can be routed?
+  enable_cdn_frontdoor_health_probe       = true
+  cdn_frontdoor_health_probe_interval     = 300 # seconds
+  cdn_frontdoor_health_probe_path         = "/" # relative url to your status page (e.g. /healthcheck, /health, /status)
+  cdn_frontdoor_health_probe_request_type = "GET" # HTTP Method (e.g. GET, POST, HEAD etc)
+
+  ## Logs are by default exported to a Log Analytics Workspace so enabling these two values are only necessary if you
+  ## want to ingest the logs using a 3rd party service (e.g. logit.io)
+  # enable_event_hub = true
+  # enable_logstash_consumer = true
 
   # Monitoring is disabled by default. If enabled, the following metrics will be monitored:
-  # Container App: CPU usage, Memory usage, Revision count, HTTP regional availability
+  # Container App: CPU usage, Memory usage, Latency, Revision count, HTTP regional availability
   # Redis (if enabled): Server Load Average
   enable_monitoring                 = true
   monitor_email_receivers           = [ "list@email.com" ]
-  monitor_endpoint_healthcheck      = "/healthcheck"
+  monitor_endpoint_healthcheck      = "/"
   monitor_enable_slack_webhook      = true
   monitor_slack_webhook_receiver    = "https://hooks.slack.com/services/xxx/xxx/xxx"
   monitor_slack_channel             = "channel-name-or-id"
   alarm_cpu_threshold_percentage    = 80
   alarm_memory_threshold_percentage = 80
+  alarm_latency_threshold_ms        = 1000
 
-  # Note that only 1 network watcher can be created within a subscription
-  # It would probably be advisable to create a Network Watcher outside of this module, as it
-  # may need to be used by other things
-  enable_network_watcher                       = false
+  # Note: that only 1 network watcher can be created within an Azure Subscription
+  #     It would probably be advisable to create a Network Watcher outside of this module, as it
+  #     may need to be used by other things
+
+  ## Deploy an Azure Network Watcher
+  # enable_network_watcher                     = true
   existing_network_watcher_name                = "MyNetworkWatcher"
   existing_network_watcher_resource_group_name = "NetworkWatcherRG"
-  network_watcher_retention                    = 90
-  enable_network_watcher_traffic_analytics     = true
-  network_watcher_traffic_analytics_interval   = 60
+  # network_watcher_flow_log_retention         = 90 # Days
+  # enable_network_watcher_traffic_analytics   = true
+  # network_watcher_traffic_analytics_interval = 60
+
+  # (optional) Tags are applied to every resource deployed by this module
+  # Include them as Key:Value pairs
+  tags = {
+    "Environment"   = "Dev",
+    "My Custom Tag" = "My Value"
+  }
 }
 ```
 
-## GitHub workflow usage
+### GitHub Action
 
-You can optinally add a GitHub workflow rto your project, using the Reusable GitHub worklow within this repo.
+You can optinally add a GitHub workflow into your project, using the Reusable GitHub worklow within this repo.
 
 This workflow will build a Docker image, and push it to ACR, then restart the Container app.
 
 You can also conditionally run Cypress tests
 
-```
+```yml
 name: Deploy To Environment
 
 on:
