@@ -151,6 +151,12 @@ variable "redis_cache_version" {
   default     = 6
 }
 
+variable "redis_firewall_ipv4_allow_list" {
+  description = "A list of IPv4 address that require remote access to the Redis server"
+  type        = list(string)
+  default     = []
+}
+
 variable "image_name" {
   description = "Image name"
   type        = string
