@@ -88,7 +88,8 @@ resource "azurerm_storage_account_network_rules" "default_network_watcher_nsg_fl
   count = local.network_watcher_name != "" ? 1 : 0
 
   storage_account_id = azurerm_storage_account.default_network_watcher_nsg_flow_logs[0].id
-  default_action     = "Allow"
+  default_action     = "Deny"
+  bypass             = "AzureServices"
 
   dynamic "private_link_access" {
     for_each = azurerm_network_watcher_flow_log.default_network_watcher_nsg
