@@ -130,7 +130,7 @@ variable "redis_cache_capacity" {
 variable "redis_cache_patch_schedule_day" {
   description = "Redis Cache patch schedule day"
   type        = string
-  default     = "Wednesday"
+  default     = "Sunday"
 }
 
 variable "redis_cache_patch_schedule_hour" {

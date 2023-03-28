@@ -476,7 +476,7 @@ jobs:
 | <a name="input_project_name"></a> [project\_name](#input\_project\_name) | Project name. Will be used along with `environment` as a prefix for all resources. | `string` | n/a | yes |
 | <a name="input_redis_cache_capacity"></a> [redis\_cache\_capacity](#input\_redis\_cache\_capacity) | Redis Cache Capacity | `number` | `0` | no |
 | <a name="input_redis_cache_family"></a> [redis\_cache\_family](#input\_redis\_cache\_family) | Redis Cache family | `string` | `"C"` | no |
-| <a name="input_redis_cache_patch_schedule_day"></a> [redis\_cache\_patch\_schedule\_day](#input\_redis\_cache\_patch\_schedule\_day) | Redis Cache patch schedule day | `string` | `"Wednesday"` | no |
+| <a name="input_redis_cache_patch_schedule_day"></a> [redis\_cache\_patch\_schedule\_day](#input\_redis\_cache\_patch\_schedule\_day) | Redis Cache patch schedule day | `string` | `"Sunday"` | no |
 | <a name="input_redis_cache_patch_schedule_hour"></a> [redis\_cache\_patch\_schedule\_hour](#input\_redis\_cache\_patch\_schedule\_hour) | Redis Cache patch schedule hour | `number` | `18` | no |
 | <a name="input_redis_cache_sku"></a> [redis\_cache\_sku](#input\_redis\_cache\_sku) | Redis Cache SKU | `string` | `"Basic"` | no |
 | <a name="input_redis_cache_version"></a> [redis\_cache\_version](#input\_redis\_cache\_version) | Redis Cache version | `number` | `6` | no |
