@@ -43,20 +43,28 @@ module "azure_container_apps_hosting" {
   image_tag  = "latest"
 
   ## Deploy an Azure SQL Server and create an initial database
-  # enable_mssql_database       = true
-  # mssql_server_admin_password = "ZE8r6uY9&o4&1xaR0BCBkCIVxA6Mal£w"
-  # mssql_sku_name              = "Basic"
-  # mssql_max_size_gb           = 2
-  # mssql_database_name         = "my-database"
+  # enable_mssql_database          = true
+  # mssql_server_admin_password    = "ZE8r6uY9&o4&1xaR0BCBkCIVxA6Mal£w"
+  # mssql_sku_name                 = "Basic"
+  # mssql_max_size_gb              = 2
+  # mssql_database_name            = "my-database"
+  # mssql_firewall_ipv4_allow_list = [ "8.8.8.8", "1.1.1.1" ]
 
   ## Deploy an Azure Cache for Redis instance
-  # enable_redis_cache              = true
-  # redis_cache_version             = 6
-  # redis_cache_family              = "C"
-  # redis_cache_sku                 = "Basic"
-  # redis_cache_capacity            = 1
-  # redis_cache_patch_schedule_day  = "Sunday"
-  # redis_cache_patch_schedule_hour = 23
+  # enable_redis_cache                   = true
+  # redis_cache_version                  = 6
+  # redis_cache_family                   = "C"
+  # redis_cache_sku                      = "Basic"
+  # redis_cache_capacity                 = 1
+  # redis_cache_patch_schedule_day       = "Sunday"
+  # redis_cache_patch_schedule_hour      = 23
+  # redis_cache_firewall_ipv4_allow_list = [ "8.8.8.8", "1.1.1.1" ]
+
+  ## Deploy an Azure Storage Account and connect it to the Container App
+  ## This will expose a 'ConnectionStrings__BlobStorage' environment var to the Container App
+  # enable_container_app_blob_storage                = false
+  # container_app_blob_storage_public_access_enabled = false
+  # container_app_blob_storage_ipv4_allow_list       = [ "8.8.8.8", "1.1.1.1" ]
 
   ## Increase the hardware resources given to each Container
   # container_cpu    = 1 # core count
@@ -333,7 +341,7 @@ module "azure_container_apps_hosting" {
   # enable_network_watcher_traffic_analytics   = true
   # network_watcher_traffic_analytics_interval = 60
 
-  # (optional) Tags are applied to every resource deployed by this module
+  # Tags are applied to every resource deployed by this module
   # Include them as Key:Value pairs
   tags = {
     "Environment"   = "Dev",
@@ -605,11 +613,11 @@ jobs:
 | <a name="input_project_name"></a> [project\_name](#input\_project\_name) | Project name. Will be used along with `environment` as a prefix for all resources. | `string` | n/a | yes |
 | <a name="input_redis_cache_capacity"></a> [redis\_cache\_capacity](#input\_redis\_cache\_capacity) | Redis Cache Capacity | `number` | `0` | no |
 | <a name="input_redis_cache_family"></a> [redis\_cache\_family](#input\_redis\_cache\_family) | Redis Cache family | `string` | `"C"` | no |
+| <a name="input_redis_cache_firewall_ipv4_allow_list"></a> [redis\_cache\_firewall\_ipv4\_allow\_list](#input\_redis\_cache\_firewall\_ipv4\_allow\_list) | A list of IPv4 address that require remote access to the Redis server | `list(string)` | `[]` | no |
 | <a name="input_redis_cache_patch_schedule_day"></a> [redis\_cache\_patch\_schedule\_day](#input\_redis\_cache\_patch\_schedule\_day) | Redis Cache patch schedule day | `string` | `"Sunday"` | no |
 | <a name="input_redis_cache_patch_schedule_hour"></a> [redis\_cache\_patch\_schedule\_hour](#input\_redis\_cache\_patch\_schedule\_hour) | Redis Cache patch schedule hour | `number` | `18` | no |
 | <a name="input_redis_cache_sku"></a> [redis\_cache\_sku](#input\_redis\_cache\_sku) | Redis Cache SKU | `string` | `"Basic"` | no |
 | <a name="input_redis_cache_version"></a> [redis\_cache\_version](#input\_redis\_cache\_version) | Redis Cache version | `number` | `6` | no |
-| <a name="input_redis_firewall_ipv4_allow_list"></a> [redis\_firewall\_ipv4\_allow\_list](#input\_redis\_firewall\_ipv4\_allow\_list) | A list of IPv4 address that require remote access to the Redis server | `list(string)` | `[]` | no |
 | <a name="input_registry_password"></a> [registry\_password](#input\_registry\_password) | Container registry password (required if `enable_container_registry` is false) | `string` | `""` | no |
 | <a name="input_registry_server"></a> [registry\_server](#input\_registry\_server) | Container registry server (required if `enable_container_registry` is false) | `string` | `""` | no |
 | <a name="input_registry_username"></a> [registry\_username](#input\_registry\_username) | Container registry username (required if `enable_container_registry` is false) | `string` | `""` | no |

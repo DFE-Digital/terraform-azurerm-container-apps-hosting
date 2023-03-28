@@ -34,7 +34,7 @@ locals {
   redis_cache_capacity                          = var.redis_cache_capacity
   redis_cache_patch_schedule_day                = var.redis_cache_patch_schedule_day
   redis_cache_patch_schedule_hour               = var.redis_cache_patch_schedule_hour
-  redis_firewall_ipv4_allow_list                = var.redis_firewall_ipv4_allow_list
+  redis_cache_firewall_ipv4_allow_list          = var.redis_cache_firewall_ipv4_allow_list
   image_name                                    = var.image_name
   image_tag                                     = var.image_tag
   container_cpu                                 = var.container_cpu
