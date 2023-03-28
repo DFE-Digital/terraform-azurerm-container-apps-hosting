@@ -10,18 +10,21 @@ resource "azurerm_storage_account" "container_app" {
   enable_https_traffic_only     = true
   public_network_access_enabled = local.container_app_blob_storage_public_access_enabled
 
-  network_rules {
-    default_action             = "Deny"
-    bypass                     = "AzureServices"
-    ip_rules                   = local.container_app_blob_storage_ipv4_allow_list
-    virtual_network_subnet_ids = [local.virtual_network.id]
-
-    private_link_access {
-      endpoint_resource_id = azapi_resource.default.id
-    }
-  }
-
   tags = local.tags
+}
+
+resource "azurerm_storage_account_network_rules" "container_app" {
+  count = local.enable_container_app_blob_storage ? 1 : 0
+
+  storage_account_id         = azurerm_storage_account.container_app[0].id
+  default_action             = "Deny"
+  bypass                     = ["AzureServices"]
+  ip_rules                   = local.container_app_blob_storage_ipv4_allow_list
+  virtual_network_subnet_ids = [local.virtual_network.id]
+
+  private_link_access {
+    endpoint_resource_id = azapi_resource.default.id
+  }
 }
 
 resource "azurerm_storage_container" "container_app" {

@@ -88,7 +88,7 @@ resource "azurerm_mssql_firewall_rule" "default_mssql" {
   for_each = local.mssql_firewall_ipv4_allow_list
 
   name             = "${replace(local.resource_prefix, "-", "")}fw${each.key}"
-  server_id        = azurerm_mssql_server.default.id
+  server_id        = azurerm_mssql_server.default[0].id
   start_ip_address = each.value
   end_ip_address   = each.value
 }
