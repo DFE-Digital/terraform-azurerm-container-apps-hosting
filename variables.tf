@@ -645,8 +645,14 @@ variable "enable_container_app_blob_storage" {
   default     = false
 }
 
-variable "blob_storage_public_access_enabled" {
+variable "container_app_blob_storage_public_access_enabled" {
   description = "Should the Azure Storage Account have Public visibility?"
   type        = bool
   default     = false
+}
+
+variable "container_app_blob_storage_ipv4_allow_list" {
+  description = "A list of public IPv4 address to grant access to the Blob Storage Account"
+  type        = list(string)
+  default     = []
 }
