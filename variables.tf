@@ -103,6 +103,12 @@ variable "mssql_database_name" {
   default     = ""
 }
 
+variable "mssql_firewall_ipv4_allow_list" {
+  description = "A list of IPv4 Addresses that require remote access to the MSSQL Server"
+  type        = list(string)
+  default     = []
+}
+
 variable "enable_redis_cache" {
   description = "Set to true to create an Azure Redis Cache, with a private endpoint within the virtual network"
   type        = bool

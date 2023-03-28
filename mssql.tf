@@ -80,7 +80,17 @@ resource "azurerm_private_endpoint" "default_mssql" {
     subresource_names              = ["sqlServer"]
     is_manual_connection           = false
   }
+
   tags = local.tags
+}
+
+resource "azurerm_mssql_firewall_rule" "default_mssql" {
+  for_each = local.mssql_firewall_ipv4_allow_list
+
+  name             = "${replace(local.resource_prefix, "-", "")}fw${each.key}"
+  server_id        = azurerm_mssql_server.default.id
+  start_ip_address = each.value
+  end_ip_address   = each.value
 }
 
 resource "azurerm_private_dns_a_record" "mssql_private_endpoint" {
