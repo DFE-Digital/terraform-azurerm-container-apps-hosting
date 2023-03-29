@@ -26,6 +26,7 @@ locals {
   mssql_sku_name                                = var.mssql_sku_name
   mssql_max_size_gb                             = var.mssql_max_size_gb
   mssql_database_name                           = var.mssql_database_name
+  mssql_firewall_ipv4_allow_list                = var.mssql_firewall_ipv4_allow_list
   enable_redis_cache                            = var.enable_redis_cache
   redis_cache_version                           = var.redis_cache_version
   redis_cache_family                            = var.redis_cache_family
@@ -33,6 +34,7 @@ locals {
   redis_cache_capacity                          = var.redis_cache_capacity
   redis_cache_patch_schedule_day                = var.redis_cache_patch_schedule_day
   redis_cache_patch_schedule_hour               = var.redis_cache_patch_schedule_hour
+  redis_cache_firewall_ipv4_allow_list          = var.redis_cache_firewall_ipv4_allow_list
   image_name                                    = var.image_name
   image_tag                                     = var.image_tag
   container_cpu                                 = var.container_cpu
@@ -154,7 +156,9 @@ locals {
   network_security_group_ids = merge(
     local.network_security_group_container_apps_infra_allow_frontdoor_inbound_only_id,
   )
-  enable_container_app_blob_storage = var.enable_container_app_blob_storage
+  enable_container_app_blob_storage                = var.enable_container_app_blob_storage
+  container_app_blob_storage_public_access_enabled = var.container_app_blob_storage_public_access_enabled
+  container_app_blob_storage_ipv4_allow_list       = var.container_app_blob_storage_ipv4_allow_list
   container_app_blob_storage_sas_secret = local.enable_container_app_blob_storage ? [
     {
       name  = "connectionstrings--blobstorage",

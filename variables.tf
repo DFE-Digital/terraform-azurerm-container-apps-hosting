@@ -103,6 +103,12 @@ variable "mssql_database_name" {
   default     = ""
 }
 
+variable "mssql_firewall_ipv4_allow_list" {
+  description = "A list of IPv4 Addresses that require remote access to the MSSQL Server"
+  type        = list(string)
+  default     = []
+}
+
 variable "enable_redis_cache" {
   description = "Set to true to create an Azure Redis Cache, with a private endpoint within the virtual network"
   type        = bool
@@ -143,6 +149,12 @@ variable "redis_cache_version" {
   description = "Redis Cache version"
   type        = number
   default     = 6
+}
+
+variable "redis_cache_firewall_ipv4_allow_list" {
+  description = "A list of IPv4 address that require remote access to the Redis server"
+  type        = list(string)
+  default     = []
 }
 
 variable "image_name" {
@@ -631,4 +643,16 @@ variable "enable_container_app_blob_storage" {
   description = "Create an Azure Storage Account and Storage Container to be used for this app"
   type        = bool
   default     = false
+}
+
+variable "container_app_blob_storage_public_access_enabled" {
+  description = "Should the Azure Storage Account have Public visibility?"
+  type        = bool
+  default     = false
+}
+
+variable "container_app_blob_storage_ipv4_allow_list" {
+  description = "A list of public IPv4 address to grant access to the Blob Storage Account"
+  type        = list(string)
+  default     = []
 }

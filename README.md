@@ -43,20 +43,28 @@ module "azure_container_apps_hosting" {
   image_tag  = "latest"
 
   ## Deploy an Azure SQL Server and create an initial database
-  # enable_mssql_database       = true
-  # mssql_server_admin_password = "ZE8r6uY9&o4&1xaR0BCBkCIVxA6Mal£w"
-  # mssql_sku_name              = "Basic"
-  # mssql_max_size_gb           = 2
-  # mssql_database_name         = "my-database"
+  # enable_mssql_database          = true
+  # mssql_server_admin_password    = "ZE8r6uY9&o4&1xaR0BCBkCIVxA6Mal£w"
+  # mssql_sku_name                 = "Basic"
+  # mssql_max_size_gb              = 2
+  # mssql_database_name            = "my-database"
+  # mssql_firewall_ipv4_allow_list = [ "8.8.8.8", "1.1.1.1" ]
 
   ## Deploy an Azure Cache for Redis instance
-  # enable_redis_cache              = true
-  # redis_cache_version             = 6
-  # redis_cache_family              = "C"
-  # redis_cache_sku                 = "Basic"
-  # redis_cache_capacity            = 1
-  # redis_cache_patch_schedule_day  = "Sunday"
-  # redis_cache_patch_schedule_hour = 23
+  # enable_redis_cache                   = true
+  # redis_cache_version                  = 6
+  # redis_cache_family                   = "C"
+  # redis_cache_sku                      = "Basic"
+  # redis_cache_capacity                 = 1
+  # redis_cache_patch_schedule_day       = "Sunday"
+  # redis_cache_patch_schedule_hour      = 23
+  # redis_cache_firewall_ipv4_allow_list = [ "8.8.8.8", "1.1.1.1" ]
+
+  ## Deploy an Azure Storage Account and connect it to the Container App
+  ## This will expose a 'ConnectionStrings__BlobStorage' environment var to the Container App
+  # enable_container_app_blob_storage                = false
+  # container_app_blob_storage_public_access_enabled = false
+  # container_app_blob_storage_ipv4_allow_list       = [ "8.8.8.8", "1.1.1.1" ]
 
   ## Increase the hardware resources given to each Container
   # container_cpu    = 1 # core count
@@ -333,7 +341,7 @@ module "azure_container_apps_hosting" {
   # enable_network_watcher_traffic_analytics   = true
   # network_watcher_traffic_analytics_interval = 60
 
-  # (optional) Tags are applied to every resource deployed by this module
+  # Tags are applied to every resource deployed by this module
   # Include them as Key:Value pairs
   tags = {
     "Environment"   = "Dev",
@@ -473,6 +481,7 @@ jobs:
 | [azurerm_monitor_metric_alert.redis](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_mssql_database.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database) | resource |
 | [azurerm_mssql_database_extended_auditing_policy.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database_extended_auditing_policy) | resource |
+| [azurerm_mssql_firewall_rule.default_mssql](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_firewall_rule) | resource |
 | [azurerm_mssql_server.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server) | resource |
 | [azurerm_mssql_server_extended_auditing_policy.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_server_extended_auditing_policy) | resource |
 | [azurerm_network_security_group.container_apps_infra_allow_frontdoor_inbound_only](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
@@ -489,11 +498,13 @@ jobs:
 | [azurerm_redis_cache.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/redis_cache) | resource |
 | [azurerm_redis_firewall_rule.container_app_default_static_ip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/redis_firewall_rule) | resource |
 | [azurerm_redis_firewall_rule.container_app_worker_static_ip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/redis_firewall_rule) | resource |
+| [azurerm_redis_firewall_rule.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/redis_firewall_rule) | resource |
 | [azurerm_resource_group.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
 | [azurerm_route_table.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/route_table) | resource |
 | [azurerm_storage_account.container_app](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
 | [azurerm_storage_account.default_network_watcher_nsg_flow_logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
 | [azurerm_storage_account.mssql_security_storage](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
+| [azurerm_storage_account_network_rules.default_network_watcher_nsg_flow_logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account_network_rules) | resource |
 | [azurerm_storage_container.container_app](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_container) | resource |
 | [azurerm_subnet.container_apps_infra_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
 | [azurerm_subnet.container_instances_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
@@ -535,6 +546,8 @@ jobs:
 | <a name="input_cdn_frontdoor_response_timeout"></a> [cdn\_frontdoor\_response\_timeout](#input\_cdn\_frontdoor\_response\_timeout) | Azure CDN Front Door response timeout in seconds | `number` | `120` | no |
 | <a name="input_cdn_frontdoor_sku"></a> [cdn\_frontdoor\_sku](#input\_cdn\_frontdoor\_sku) | Azure CDN Front Door SKU | `string` | `"Standard_AzureFrontDoor"` | no |
 | <a name="input_cdn_frontdoor_waf_mode"></a> [cdn\_frontdoor\_waf\_mode](#input\_cdn\_frontdoor\_waf\_mode) | CDN Front Door waf mode | `string` | `"Prevention"` | no |
+| <a name="input_container_app_blob_storage_ipv4_allow_list"></a> [container\_app\_blob\_storage\_ipv4\_allow\_list](#input\_container\_app\_blob\_storage\_ipv4\_allow\_list) | A list of public IPv4 address to grant access to the Blob Storage Account | `list(string)` | `[]` | no |
+| <a name="input_container_app_blob_storage_public_access_enabled"></a> [container\_app\_blob\_storage\_public\_access\_enabled](#input\_container\_app\_blob\_storage\_public\_access\_enabled) | Should the Azure Storage Account have Public visibility? | `bool` | `false` | no |
 | <a name="input_container_command"></a> [container\_command](#input\_container\_command) | Container command | `list(any)` | `[]` | no |
 | <a name="input_container_cpu"></a> [container\_cpu](#input\_container\_cpu) | Number of container CPU cores | `number` | `1` | no |
 | <a name="input_container_environment_variables"></a> [container\_environment\_variables](#input\_container\_environment\_variables) | Container environment variables | `map(string)` | `{}` | no |
@@ -591,6 +604,7 @@ jobs:
 | <a name="input_monitor_slack_channel"></a> [monitor\_slack\_channel](#input\_monitor\_slack\_channel) | Slack channel name/id to send messages to | `string` | `""` | no |
 | <a name="input_monitor_slack_webhook_receiver"></a> [monitor\_slack\_webhook\_receiver](#input\_monitor\_slack\_webhook\_receiver) | A Slack App webhook URL | `string` | `""` | no |
 | <a name="input_mssql_database_name"></a> [mssql\_database\_name](#input\_mssql\_database\_name) | The name of the MSSQL database to create. Must be set if `enable_mssql_database` is true | `string` | `""` | no |
+| <a name="input_mssql_firewall_ipv4_allow_list"></a> [mssql\_firewall\_ipv4\_allow\_list](#input\_mssql\_firewall\_ipv4\_allow\_list) | A list of IPv4 Addresses that require remote access to the MSSQL Server | `list(string)` | `[]` | no |
 | <a name="input_mssql_max_size_gb"></a> [mssql\_max\_size\_gb](#input\_mssql\_max\_size\_gb) | The max size of the database in gigabytes | `number` | `2` | no |
 | <a name="input_mssql_server_admin_password"></a> [mssql\_server\_admin\_password](#input\_mssql\_server\_admin\_password) | The administrator password for the MSSQL server. Must be set if `enable_mssql_database` is true | `string` | `""` | no |
 | <a name="input_mssql_sku_name"></a> [mssql\_sku\_name](#input\_mssql\_sku\_name) | Specifies the name of the SKU used by the database | `string` | `"Basic"` | no |
@@ -599,6 +613,7 @@ jobs:
 | <a name="input_project_name"></a> [project\_name](#input\_project\_name) | Project name. Will be used along with `environment` as a prefix for all resources. | `string` | n/a | yes |
 | <a name="input_redis_cache_capacity"></a> [redis\_cache\_capacity](#input\_redis\_cache\_capacity) | Redis Cache Capacity | `number` | `0` | no |
 | <a name="input_redis_cache_family"></a> [redis\_cache\_family](#input\_redis\_cache\_family) | Redis Cache family | `string` | `"C"` | no |
+| <a name="input_redis_cache_firewall_ipv4_allow_list"></a> [redis\_cache\_firewall\_ipv4\_allow\_list](#input\_redis\_cache\_firewall\_ipv4\_allow\_list) | A list of IPv4 address that require remote access to the Redis server | `list(string)` | `[]` | no |
 | <a name="input_redis_cache_patch_schedule_day"></a> [redis\_cache\_patch\_schedule\_day](#input\_redis\_cache\_patch\_schedule\_day) | Redis Cache patch schedule day | `string` | `"Sunday"` | no |
 | <a name="input_redis_cache_patch_schedule_hour"></a> [redis\_cache\_patch\_schedule\_hour](#input\_redis\_cache\_patch\_schedule\_hour) | Redis Cache patch schedule hour | `number` | `18` | no |
 | <a name="input_redis_cache_sku"></a> [redis\_cache\_sku](#input\_redis\_cache\_sku) | Redis Cache SKU | `string` | `"Basic"` | no |

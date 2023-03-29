@@ -51,6 +51,16 @@ resource "azurerm_redis_firewall_rule" "container_app_worker_static_ip" {
   end_ip              = jsondecode(azapi_resource.worker[0].output).properties.outboundIpAddresses[0]
 }
 
+resource "azurerm_redis_firewall_rule" "default" {
+  for_each = local.redis_cache_firewall_ipv4_allow_list
+
+  name                = "${replace(local.resource_prefix, "-", "")}fw${each.key}"
+  redis_cache_name    = azurerm_redis_cache.default[0].name
+  resource_group_name = local.resource_group.name
+  start_ip            = each.value
+  end_ip              = each.value
+}
+
 resource "azurerm_private_endpoint" "default_redis_cache" {
   count = local.enable_redis_cache ? (
     local.launch_in_vnet ? (
