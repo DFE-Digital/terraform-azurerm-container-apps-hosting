@@ -52,7 +52,7 @@ resource "azurerm_redis_firewall_rule" "container_app_worker_static_ip" {
 }
 
 resource "azurerm_redis_firewall_rule" "default" {
-  for_each = local.redis_cache_firewall_ipv4_allow_list
+  for_each = local.enable_redis_cache ? toset(local.redis_cache_firewall_ipv4_allow_list) : []
 
   name                = "${replace(local.resource_prefix, "-", "")}fw${each.key}"
   redis_cache_name    = azurerm_redis_cache.default[0].name
