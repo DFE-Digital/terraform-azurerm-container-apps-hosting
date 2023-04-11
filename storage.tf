@@ -20,14 +20,7 @@ resource "azurerm_storage_account_network_rules" "container_app" {
   default_action             = "Deny"
   bypass                     = ["AzureServices"]
   virtual_network_subnet_ids = [local.virtual_network.id]
-
-  dynamic "ip_rules" {
-    for_each = length(local.container_app_blob_storage_ipv4_allow_list) > 0 ? [1] : []
-
-    content {
-      ip_rules = local.container_app_blob_storage_ipv4_allow_list
-    }
-  }
+  ip_rules                   = length(local.container_app_blob_storage_ipv4_allow_list) > 0 ? local.container_app_blob_storage_ipv4_allow_list : null
 
   private_link_access {
     endpoint_resource_id = azapi_resource.default.id
