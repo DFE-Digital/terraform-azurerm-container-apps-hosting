@@ -159,7 +159,10 @@ locals {
   )
   enable_container_app_blob_storage                = var.enable_container_app_blob_storage
   container_app_blob_storage_public_access_enabled = var.container_app_blob_storage_public_access_enabled
-  container_app_blob_storage_ipv4_allow_list       = var.container_app_blob_storage_ipv4_allow_list
+  container_app_blob_storage_ipv4_allow_list = concat(
+    jsondecode(azapi_resource.default.output).properties.outboundIpAddresses,
+    var.container_app_blob_storage_ipv4_allow_list
+  )
   container_app_blob_storage_sas_secret = local.enable_container_app_blob_storage ? [
     {
       name  = "connectionstrings--blobstorage",
