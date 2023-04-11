@@ -537,6 +537,12 @@ variable "cdn_frontdoor_remove_response_headers" {
   default     = []
 }
 
+variable "cdn_frontdoor_origin_fqdn_override" {
+  description = "Manually specify the hostname that the CDN Front Door should target. Defaults to the Container App FQDN"
+  type        = string
+  default     = ""
+}
+
 variable "enable_event_hub" {
   description = "Send Azure Container App logs to an Event Hub sink"
   type        = bool
