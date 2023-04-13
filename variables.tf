@@ -484,9 +484,15 @@ variable "cdn_frontdoor_response_timeout" {
 }
 
 variable "cdn_frontdoor_custom_domains" {
-  description = "Azure CDN Front Door custom domains. If they are within the DNS zone (optionally created), the Validation TXT records and ALIAS/CNAME records will be created"
+  description = "Azure CDN Front Door custom domains"
   type        = list(string)
   default     = []
+}
+
+variable "cdn_frontdoor_custom_domains_create_dns_records" {
+  description = "Should the TXT records and ALIAS/CNAME records be automatically created if the custom domains exist within the DNS Zone?"
+  type        = bool
+  default     = true
 }
 
 variable "cdn_frontdoor_host_redirects" {

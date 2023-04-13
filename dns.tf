@@ -23,7 +23,7 @@ resource "azurerm_dns_zone" "default" {
 }
 
 resource "azurerm_dns_txt_record" "frontdoor_custom_domain" {
-  for_each = local.enable_dns_zone ? local.cdn_frontdoor_custom_domain_dns_names : []
+  for_each = local.enable_dns_zone && local.cdn_frontdoor_custom_domains_create_dns_records ? local.cdn_frontdoor_custom_domain_dns_names : []
 
   name                = trim(join(".", ["_dnsauth", each.value]), ".")
   zone_name           = azurerm_dns_zone.default[0].name
@@ -38,7 +38,7 @@ resource "azurerm_dns_txt_record" "frontdoor_custom_domain" {
 }
 
 resource "azurerm_dns_a_record" "frontdoor_custom_domain" {
-  for_each = local.enable_dns_zone ? local.cdn_frontdoor_custom_domain_dns_names : []
+  for_each = local.enable_dns_zone && local.cdn_frontdoor_custom_domains_create_dns_records ? local.cdn_frontdoor_custom_domain_dns_names : []
 
   name                = trim(each.value, ".") == "" ? "@" : trim(each.value, ".")
   zone_name           = azurerm_dns_zone.default[0].name

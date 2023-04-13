@@ -12,3 +12,23 @@ output "azurerm_eventhub_container_app" {
   value       = local.enable_event_hub ? azurerm_eventhub.container_app[0] : null
   description = "Container App Event Hub"
 }
+
+output "cdn_frontdoor_dns_records" {
+  value = local.cdn_frontdoor_custom_domains_create_dns_records == false ? concat([
+    for domain in local.cdn_frontdoor_custom_domain_dns_names : {
+      name  = trim(domain, ".") == "" ? "@" : trim(domain, ".")
+      type  = "CNAME"
+      ttl   = 300
+      value = azurerm_cdn_frontdoor_endpoint.endpoint[0].host_name
+    }
+    ], local.dns_zone_domain_name != "" ? [
+    for domain in local.cdn_frontdoor_custom_domain_dns_names : {
+      name  = trim(join(".", ["_dnsauth", domain]), ".")
+      type  = "TXT"
+      ttl   = 3600
+      value = azurerm_cdn_frontdoor_custom_domain.custom_domain["${domain}${local.dns_zone_domain_name}"].validation_token
+    }
+    ] : []
+  ) : null
+  description = "Azure Front Door DNS Records that must be created manually"
+}
