@@ -44,11 +44,17 @@ module "azure_container_apps_hosting" {
 
   ## Deploy an Azure SQL Server and create an initial database
   # enable_mssql_database          = true
-  # mssql_server_admin_password    = "ZE8r6uY9&o4&1xaR0BCBkCIVxA6Mal£w"
   # mssql_sku_name                 = "Basic"
   # mssql_max_size_gb              = 2
   # mssql_database_name            = "my-database"
   # mssql_firewall_ipv4_allow_list = [ "8.8.8.8", "1.1.1.1" ]
+  ## If you want to use a local SQL administrator account you can set a password with
+  # mssql_server_admin_password    = "ZE8r6uY9&o4&1xaR0BCBkCIVxA6Mal£w"
+  ## Or, if you want to assign an Azure AD Administrator you must specify
+  # mssql_azuread_admin_username = "my-email-address@DOMAIN"
+  # mssql_azuread_admin_object_id = "aaaa-bbbb-cccc-dddd"
+  ## Restrict SQL authentication to Azure AD
+  # mssql_azuread_auth_only = true
 
   ## Deploy an Azure Cache for Redis instance
   # enable_redis_cache                   = true
