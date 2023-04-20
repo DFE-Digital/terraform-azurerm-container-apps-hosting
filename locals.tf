@@ -176,5 +176,17 @@ locals {
       value = "${azurerm_storage_account.container_app[0].primary_blob_endpoint}${azurerm_storage_container.container_app[0].name}${data.azurerm_storage_account_blob_container_sas.container_app[0].sas}"
     }
   ] : []
+  custom_container_apps = {
+    for custom_container_app_name, custom_container_app_value in var.custom_container_apps : custom_container_app_name => {
+      response_export_values = custom_container_app_value.response_export_values
+      body = {
+        properties = {
+          managedEnvironmentId = custom_container_app_value.body.properties.managedEnvironmentId != "" ? custom_container_app_value.body.properties.managedEnvironmentId : azapi_resource.container_app_env.id,
+          configuration        = custom_container_app_value.body.properties.configuration,
+          template             = custom_container_app_value.body.properties.template
+        }
+      }
+    }
+  }
   tagging_command = "timeout 15m ${path.module}/script/apply-tags-to-container-app-env-mc-resource-group -n \"${azapi_resource.container_app_env.name}\" -r \"${local.resource_group.name}\" -t \"${replace(jsonencode(local.tags), "\"", "\\\"")}\""
 }
