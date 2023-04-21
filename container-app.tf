@@ -54,6 +54,12 @@ resource "azapi_resource" "default" {
             "value" : azurerm_application_insights.main.instrumentation_key
           },
           ],
+          local.enable_redis_cache ? [
+            {
+              name  = "connectionstrings--redis",
+              value = azurerm_redis_cache.default[0].primary_connection_string
+            }
+          ] : [],
           local.container_app_blob_storage_sas_secret,
           [
             for env_name, env_value in local.container_secret_environment_variables : {
@@ -96,6 +102,13 @@ resource "azapi_resource" "default" {
                 {
                   "name" : "ConnectionStrings__BlobStorage",
                   "secretRef" : "connectionstrings--blobstorage"
+                }
+              ] : [],
+              local.enable_redis_cache ?
+              [
+                {
+                  "name" : "ConnectionStrings__Redis",
+                  "secretRef" : "connectionstrings--redis"
                 }
               ] : [],
               [
