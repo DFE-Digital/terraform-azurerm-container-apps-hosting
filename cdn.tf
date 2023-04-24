@@ -251,3 +251,28 @@ resource "azurerm_cdn_frontdoor_rule" "remove_response_header" {
     }
   }
 }
+
+resource "azurerm_monitor_diagnostic_setting" "waf" {
+  count = local.cdn_frontdoor_enable_waf ? 1 : 0
+
+  name                           = "${local.resource_prefix}waf"
+  target_resource_id             = azurerm_cdn_frontdoor_profile.cdn[0].id
+  log_analytics_workspace_id     = azurerm_log_analytics_workspace.container_app.id
+  log_analytics_destination_type = "AzureDiagnostics"
+
+  enabled_log {
+    category = "FrontdoorWebApplicationFirewallLog"
+
+    retention_policy {
+      enabled = false
+    }
+  }
+
+  metric {
+    category = "AllMetrics"
+
+    retention_policy {
+      enabled = false
+    }
+  }
+}
