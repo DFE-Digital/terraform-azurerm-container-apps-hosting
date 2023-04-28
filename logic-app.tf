@@ -1,5 +1,5 @@
 resource "azurerm_logic_app_workflow" "webhook" {
-  count = local.enable_monitoring ? 1 : 0
+  count = local.enable_monitoring && local.existing_logic_app_workflow.name == "" ? 1 : 0
 
   name                = "${local.resource_prefix}-webhook-workflow"
   location            = local.resource_group.location
@@ -9,11 +9,7 @@ resource "azurerm_logic_app_workflow" "webhook" {
 }
 
 resource "azurerm_logic_app_trigger_http_request" "webhook" {
-  count = local.enable_monitoring ? 1 : 0
-
-  depends_on = [
-    azurerm_logic_app_workflow.webhook[0]
-  ]
+  count = local.enable_monitoring && local.existing_logic_app_workflow.name == "" ? 1 : 0
 
   name         = "${local.resource_prefix}-trigger"
   logic_app_id = azurerm_logic_app_workflow.webhook[0].id
@@ -22,11 +18,7 @@ resource "azurerm_logic_app_trigger_http_request" "webhook" {
 }
 
 resource "azurerm_logic_app_action_http" "slack" {
-  count = local.enable_monitoring && local.monitor_enable_slack_webhook && length(local.monitor_slack_webhook_receiver) > 0 ? 1 : 0
-
-  depends_on = [
-    azurerm_logic_app_workflow.webhook[0]
-  ]
+  count = local.enable_monitoring && local.existing_logic_app_workflow.name == "" && local.monitor_enable_slack_webhook ? 1 : 0
 
   name         = "${local.resource_prefix}-action"
   logic_app_id = azurerm_logic_app_workflow.webhook[0].id
@@ -45,11 +37,7 @@ resource "azurerm_logic_app_action_http" "slack" {
 }
 
 resource "azurerm_monitor_diagnostic_setting" "webhook" {
-  count = local.enable_monitoring ? 1 : 0
-
-  depends_on = [
-    azurerm_logic_app_workflow.webhook[0]
-  ]
+  count = local.enable_monitoring && local.existing_logic_app_workflow.name == "" ? 1 : 0
 
   name               = "${local.resource_prefix}-webhook-diag"
   target_resource_id = azurerm_logic_app_workflow.webhook[0].id

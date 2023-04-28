@@ -71,12 +71,12 @@ resource "azurerm_monitor_action_group" "main" {
   }
 
   dynamic "logic_app_receiver" {
-    for_each = length(azurerm_logic_app_workflow.webhook[0].id) > 0 ? [0] : []
+    for_each = local.enable_monitoring || local.existing_logic_app_workflow.name != "" ? [0] : []
 
     content {
-      name                    = "Logic App"
-      resource_id             = azurerm_logic_app_workflow.webhook[0].id
-      callback_url            = azurerm_logic_app_trigger_http_request.webhook[0].callback_url
+      name                    = local.monitor_logic_app_receiver.name
+      resource_id             = local.monitor_logic_app_receiver.resource_id
+      callback_url            = local.monitor_logic_app_receiver.callback_url
       use_common_alert_schema = true
     }
   }

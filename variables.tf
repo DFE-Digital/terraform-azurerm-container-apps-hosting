@@ -592,20 +592,34 @@ variable "monitor_email_receivers" {
   default     = []
 }
 
+variable "existing_logic_app_workflow" {
+  description = "Name, Resource Group and HTTP Trigger URL of an existing Logic App Workflow. Leave empty to create a new Resource"
+  type = object({
+    name : string
+    resource_group_name : string
+    trigger_url : string
+  })
+  default = {
+    name                = ""
+    resource_group_name = ""
+    trigger_url         = ""
+  }
+}
+
 variable "monitor_enable_slack_webhook" {
-  description = "Enable slack webhooks to send monitoring notifications to a channel"
+  description = "Enable slack webhooks to send monitoring notifications to a channel. Has no effect if you have defined `existing_logic_app_workflow`"
   type        = bool
   default     = false
 }
 
 variable "monitor_slack_webhook_receiver" {
-  description = "A Slack App webhook URL"
+  description = "A Slack App webhook URL. Has no effect if you have defined `existing_logic_app_workflow`"
   type        = string
   default     = ""
 }
 
 variable "monitor_slack_channel" {
-  description = "Slack channel name/id to send messages to"
+  description = "Slack channel name/id to send messages to. Has no effect if you have defined `existing_logic_app_workflow`"
   type        = string
   default     = ""
 }
