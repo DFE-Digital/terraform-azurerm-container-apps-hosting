@@ -12,7 +12,7 @@
   ],
   "attachments": [
     {
-      "color": "#FF0000",
+      "color": "@{if(equals(triggerBody()?['data']?['essentials']?['monitorCondition'], 'Resolved'), '#097969', '#D22B2B')}",
       "blocks": [
         {
           "type": "header",
