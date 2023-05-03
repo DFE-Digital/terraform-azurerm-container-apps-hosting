@@ -2,7 +2,7 @@ resource "azapi_resource" "container_app_env" {
   type      = "Microsoft.App/managedEnvironments@2022-03-01"
   parent_id = local.resource_group.id
   location  = local.resource_group.location
-  name      = "${local.resource_prefix}containerapp"
+  name      = local.container_app_env_name
 
   body = jsonencode({
     properties = {
@@ -31,7 +31,7 @@ resource "azapi_resource" "default" {
   type      = "Microsoft.App/containerApps@2022-03-01"
   parent_id = local.resource_group.id
   location  = local.resource_group.location
-  name      = "${local.resource_prefix}-${local.image_name}"
+  name      = local.container_app_name
   body = jsonencode({
     properties : {
       managedEnvironmentId = azapi_resource.container_app_env.id
@@ -170,7 +170,7 @@ resource "azapi_resource" "worker" {
   type      = "Microsoft.App/containerApps@2022-03-01"
   parent_id = local.resource_group.id
   location  = local.resource_group.location
-  name      = "${local.resource_prefix}-${local.image_name}-worker"
+  name      = local.container_app_worker_name
   body = jsonencode({
     properties : {
       managedEnvironmentId = azapi_resource.container_app_env.id

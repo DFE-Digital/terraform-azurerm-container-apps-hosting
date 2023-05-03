@@ -675,3 +675,33 @@ variable "container_app_blob_storage_ipv4_allow_list" {
   type        = list(string)
   default     = []
 }
+
+variable "container_app_env_name" {
+  type        = string
+  description = "A custom name for the container app environment"
+  default     = ""
+  validation {
+    condition     = length(var.container_app_env_name) <= 32
+    error_message = "Must be 32 characters or less"
+  }
+}
+
+variable "container_app_name" {
+  type        = string
+  description = "A custom name for the container app web instance"
+  default     = ""
+  validation {
+    condition     = length(var.container_app_name) <= 32
+    error_message = "Must be 32 characters or less"
+  }
+}
+
+variable "container_app_worker_name" {
+  type        = string
+  description = "A custom name for the container app worker instance"
+  default     = ""
+  validation {
+    condition     = length(var.container_app_worker_name) <= 32
+    error_message = "Must be 32 characters or less"
+  }
+}

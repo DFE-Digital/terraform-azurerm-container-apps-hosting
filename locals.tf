@@ -171,5 +171,8 @@ locals {
       value = "${azurerm_storage_account.container_app[0].primary_blob_endpoint}${azurerm_storage_container.container_app[0].name}${data.azurerm_storage_account_blob_container_sas.container_app[0].sas}"
     }
   ] : []
-  tagging_command = "timeout 15m ${path.module}/script/apply-tags-to-container-app-env-mc-resource-group -n \"${azapi_resource.container_app_env.name}\" -r \"${local.resource_group.name}\" -t \"${replace(jsonencode(local.tags), "\"", "\\\"")}\""
+  container_app_env_name    = var.container_app_env_name == "" ? "${local.resource_prefix}containerapp" : var.container_app_env_name
+  container_app_name        = var.container_app_name == "" ? "${local.resource_prefix}-${local.image_name}" : var.container_app_name
+  container_app_worker_name = var.container_app_worker_name == "" ? "${local.resource_prefix}-${local.image_name}-worker" : var.container_app_worker_name
+  tagging_command           = "timeout 15m ${path.module}/script/apply-tags-to-container-app-env-mc-resource-group -n \"${azapi_resource.container_app_env.name}\" -r \"${local.resource_group.name}\" -t \"${replace(jsonencode(local.tags), "\"", "\\\"")}\""
 }

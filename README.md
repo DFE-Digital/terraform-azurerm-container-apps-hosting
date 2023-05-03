@@ -27,6 +27,15 @@ module "azure_container_apps_hosting" {
   ## Specify the name of an existing Resource Group to deploy resources into
   # existing_resource_group = "my-existing-resource-group"
 
+  ## Specify the name of the container app environment (up to 32 characters)
+  # container_app_env_name = "my-container-app-environment"
+
+  ## Specify the name of the container app web instance (up to 32 characters)
+  # container_app_name = "my-container-app-web"
+
+  ## Specify the name of the container app worker instance (up to 32 characters)
+  # container_app_worker_name = "my-container-app-worker"
+
   # Set the default IP Range that will be assigned to the Virtual Network used by the Container Apps
   virtual_network_address_space = "172.32.10.0/24"
 
@@ -556,6 +565,9 @@ jobs:
 | <a name="input_cdn_frontdoor_waf_mode"></a> [cdn\_frontdoor\_waf\_mode](#input\_cdn\_frontdoor\_waf\_mode) | CDN Front Door waf mode | `string` | `"Prevention"` | no |
 | <a name="input_container_app_blob_storage_ipv4_allow_list"></a> [container\_app\_blob\_storage\_ipv4\_allow\_list](#input\_container\_app\_blob\_storage\_ipv4\_allow\_list) | A list of public IPv4 address to grant access to the Blob Storage Account | `list(string)` | `[]` | no |
 | <a name="input_container_app_blob_storage_public_access_enabled"></a> [container\_app\_blob\_storage\_public\_access\_enabled](#input\_container\_app\_blob\_storage\_public\_access\_enabled) | Should the Azure Storage Account have Public visibility? | `bool` | `false` | no |
+| <a name="input_container_app_env_name"></a> [container\_app\_env\_name](#input\_container\_app\_env\_name) | A custom name for the container app environment | `string` | `""` | no |
+| <a name="input_container_app_name"></a> [container\_app\_name](#input\_container\_app\_name) | A custom name for the container app web instance | `string` | `""` | no |
+| <a name="input_container_app_worker_name"></a> [container\_app\_worker\_name](#input\_container\_app\_worker\_name) | A custom name for the container app worker instance | `string` | `""` | no |
 | <a name="input_container_command"></a> [container\_command](#input\_container\_command) | Container command | `list(any)` | `[]` | no |
 | <a name="input_container_cpu"></a> [container\_cpu](#input\_container\_cpu) | Number of container CPU cores | `number` | `1` | no |
 | <a name="input_container_environment_variables"></a> [container\_environment\_variables](#input\_container\_environment\_variables) | Container environment variables | `map(string)` | `{}` | no |
