@@ -112,6 +112,8 @@ locals {
   cdn_frontdoor_custom_domains_create_dns_records = var.cdn_frontdoor_custom_domains_create_dns_records
   cdn_frontdoor_origin_fqdn_override              = var.cdn_frontdoor_origin_fqdn_override != "" ? var.cdn_frontdoor_origin_fqdn_override : jsondecode(azapi_resource.default.output).properties.configuration.ingress.fqdn
   cdn_frontdoor_origin_host_header_override       = var.cdn_frontdoor_origin_host_header_override != "" ? var.cdn_frontdoor_origin_host_header_override : null
+  cdn_frontdoor_origin_http_port                  = var.cdn_frontdoor_origin_http_port
+  cdn_frontdoor_origin_https_port                 = var.cdn_frontdoor_origin_https_port
   ruleset_redirects_id                            = length(local.cdn_frontdoor_host_redirects) > 0 ? [azurerm_cdn_frontdoor_rule_set.redirects[0].id] : []
   ruleset_add_response_headers_id                 = length(local.cdn_frontdoor_host_add_response_headers) > 0 ? [azurerm_cdn_frontdoor_rule_set.add_response_headers[0].id] : []
   ruleset_remove_response_headers_id              = length(local.cdn_frontdoor_remove_response_headers) > 0 ? [azurerm_cdn_frontdoor_rule_set.remove_response_headers[0].id] : []

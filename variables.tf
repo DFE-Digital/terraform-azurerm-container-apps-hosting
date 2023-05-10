@@ -556,6 +556,18 @@ variable "cdn_frontdoor_origin_host_header_override" {
   nullable    = true
 }
 
+variable "cdn_frontdoor_origin_http_port" {
+  description = "The value of the HTTP port used for the CDN Origin. Must be between 1 and 65535. Defaults to 80"
+  type        = number
+  default     = 80
+}
+
+variable "cdn_frontdoor_origin_https_port" {
+  description = "The value of the HTTPS port used for the CDN Origin. Must be between 1 and 65535. Defaults to 443"
+  type        = number
+  default     = 443
+}
+
 variable "enable_event_hub" {
   description = "Send Azure Container App logs to an Event Hub sink"
   type        = bool

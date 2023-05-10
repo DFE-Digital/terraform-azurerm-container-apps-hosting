@@ -36,8 +36,8 @@ resource "azurerm_cdn_frontdoor_origin" "origin" {
   certificate_name_check_enabled = true
   host_name                      = local.cdn_frontdoor_origin_fqdn_override
   origin_host_header             = local.cdn_frontdoor_origin_host_header_override
-  http_port                      = 80
-  https_port                     = 443
+  http_port                      = local.cdn_frontdoor_origin_http_port
+  https_port                     = local.cdn_frontdoor_origin_https_port
 }
 
 resource "azurerm_cdn_frontdoor_endpoint" "endpoint" {

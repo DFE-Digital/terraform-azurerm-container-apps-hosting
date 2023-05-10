@@ -277,6 +277,10 @@ module "azure_container_apps_hosting" {
   ## Override the default Origin hostname if you do not want to use the FQDN of the Container App
   # cdn_frontdoor_origin_fqdn_override = "my-backend-host.acme.org"
 
+  ## Override the default origin ports of 80 (HTTP) and 443 (HTTPS) if required
+  # cdn_frontdoor_origin_http_port = 8080
+  # cdn_frontdoor_origin_https_port = 4443
+
   # Add additional HTTP Response Headers to include on every response
   cdn_frontdoor_host_add_response_headers = [
     {
@@ -547,6 +551,8 @@ jobs:
 | <a name="input_cdn_frontdoor_host_redirects"></a> [cdn\_frontdoor\_host\_redirects](#input\_cdn\_frontdoor\_host\_redirects) | CDN FrontDoor host redirects `[{ "from" = "example.com", "to" = "www.example.com" }]` | `list(map(string))` | `[]` | no |
 | <a name="input_cdn_frontdoor_origin_fqdn_override"></a> [cdn\_frontdoor\_origin\_fqdn\_override](#input\_cdn\_frontdoor\_origin\_fqdn\_override) | Manually specify the hostname that the CDN Front Door should target. Defaults to the Container App FQDN | `string` | `""` | no |
 | <a name="input_cdn_frontdoor_origin_host_header_override"></a> [cdn\_frontdoor\_origin\_host\_header\_override](#input\_cdn\_frontdoor\_origin\_host\_header\_override) | Manually specify the host header that the CDN sends to the target. Defaults to the recieved host header. Set to null to set it to the host\_name (`cdn_frontdoor_origin_fqdn_override`) | `string` | `""` | no |
+| <a name="input_cdn_frontdoor_origin_http_port"></a> [cdn\_frontdoor\_origin\_http\_port](#input\_cdn\_frontdoor\_origin\_http\_port) | The value of the HTTP port used for the CDN Origin. Must be between 1 and 65535. Defaults to 80 | `number` | `80` | no |
+| <a name="input_cdn_frontdoor_origin_https_port"></a> [cdn\_frontdoor\_origin\_https\_port](#input\_cdn\_frontdoor\_origin\_https\_port) | The value of the HTTPS port used for the CDN Origin. Must be between 1 and 65535. Defaults to 443 | `number` | `443` | no |
 | <a name="input_cdn_frontdoor_rate_limiting_bypass_ip_list"></a> [cdn\_frontdoor\_rate\_limiting\_bypass\_ip\_list](#input\_cdn\_frontdoor\_rate\_limiting\_bypass\_ip\_list) | List if IP CIDRs to bypass CDN Front Door rate limiting | `list(string)` | `[]` | no |
 | <a name="input_cdn_frontdoor_rate_limiting_duration_in_minutes"></a> [cdn\_frontdoor\_rate\_limiting\_duration\_in\_minutes](#input\_cdn\_frontdoor\_rate\_limiting\_duration\_in\_minutes) | CDN Front Door rate limiting duration in minutes | `number` | `1` | no |
 | <a name="input_cdn_frontdoor_rate_limiting_threshold"></a> [cdn\_frontdoor\_rate\_limiting\_threshold](#input\_cdn\_frontdoor\_rate\_limiting\_threshold) | Maximum number of concurrent requests before Rate Limiting policy is applied | `number` | `300` | no |
