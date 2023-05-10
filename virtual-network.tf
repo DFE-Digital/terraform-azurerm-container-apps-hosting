@@ -211,3 +211,47 @@ resource "azurerm_subnet_route_table_association" "containerinstances_subnet" {
   subnet_id      = azurerm_subnet.container_instances_subnet[0].id
   route_table_id = azurerm_route_table.default[0].id
 }
+
+resource "azurerm_subnet" "postgresql_private_endpoint_subnet" {
+  count = local.enable_postgresql_database ? (
+    local.launch_in_vnet ? 1 : 0
+  ) : 0
+
+  name                                      = "${local.resource_prefix}pgsqlprivateendpoint"
+  virtual_network_name                      = local.virtual_network.name
+  resource_group_name                       = local.resource_group.name
+  address_prefixes                          = [local.postgresql_subnet_cidr]
+  private_endpoint_network_policies_enabled = true
+  service_endpoints                         = ["Microsoft.Storage"]
+  delegation {
+    name = "fs"
+    service_delegation {
+      name = "Microsoft.DBforPostgreSQL/flexibleServers"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+      ]
+    }
+  }
+}
+
+resource "azurerm_private_dns_zone" "postgresql_private_link" {
+  count = local.enable_postgresql_database ? (
+    local.launch_in_vnet ? 1 : 0
+  ) : 0
+
+  name                = "${local.resource_prefix}.postgres.database.azure.com"
+  resource_group_name = local.resource_group.name
+  tags                = local.tags
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "postgresql_private_link" {
+  count = local.enable_postgresql_database ? (
+    local.launch_in_vnet ? 1 : 0
+  ) : 0
+
+  name                  = "${local.resource_prefix}pgsqlprivatelink"
+  resource_group_name   = local.resource_group.name
+  private_dns_zone_name = azurerm_private_dns_zone.postgresql_private_link[0].name
+  virtual_network_id    = local.virtual_network.id
+  tags                  = local.tags
+}

@@ -17,6 +17,7 @@ locals {
   container_instances_subnet_cidr               = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 2)
   redis_cache_private_endpoint_subnet_cidr      = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 3)
   redis_cache_subnet_cidr                       = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 4)
+  postgresql_subnet_cidr                        = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 5)
   enable_container_registry                     = var.enable_container_registry
   registry_server                               = local.enable_container_registry ? azurerm_container_registry.acr[0].login_server : var.registry_server
   registry_username                             = local.enable_container_registry ? azurerm_container_registry.acr[0].admin_username : var.registry_username
@@ -176,5 +177,15 @@ locals {
       value = "${azurerm_storage_account.container_app[0].primary_blob_endpoint}${azurerm_storage_container.container_app[0].name}${data.azurerm_storage_account_blob_container_sas.container_app[0].sas}"
     }
   ] : []
-  tagging_command = "timeout 15m ${path.module}/script/apply-tags-to-container-app-env-mc-resource-group -n \"${azapi_resource.container_app_env.name}\" -r \"${local.resource_group.name}\" -t \"${replace(jsonencode(local.tags), "\"", "\\\"")}\""
+  enable_postgresql_database        = var.enable_postgresql_database
+  postgresql_server_version         = var.postgresql_server_version
+  postgresql_administrator_login    = var.postgresql_administrator_login
+  postgresql_administrator_password = var.postgresql_administrator_password
+  postgresql_availability_zone      = var.postgresql_availability_zone
+  postgresql_max_storage_mb         = var.postgresql_max_storage_mb
+  postgresql_sku_name               = var.postgresql_sku_name
+  postgresql_enabled_extensions     = var.postgresql_enabled_extensions
+  postgresql_collation              = var.postgresql_collation
+  postgresql_charset                = var.postgresql_charset
+  tagging_command                   = "timeout 15m ${path.module}/script/apply-tags-to-container-app-env-mc-resource-group -n \"${azapi_resource.container_app_env.name}\" -r \"${local.resource_group.name}\" -t \"${replace(jsonencode(local.tags), "\"", "\\\"")}\""
 }
