@@ -1,71 +1,85 @@
 {
   "channel": "${channel}",
-  "text": "@{triggerBody()?['data']?['essentials']?['alertRule']}: @{triggerBody()?['data']?['essentials']?['description']}",
-  "blocks": [
-    {
-      "type": "section",
-      "text": {
-        "type": "mrkdwn",
-        "text": "<!here>"
-      }
-    }
-  ],
+  "text": "@{triggerBody()?['data']?['essentials']?['alertRule']}: @{triggerBody()?['data']?['essentials']?['monitorCondition']}",
+  "blocks": [],
   "attachments": [
     {
-      "color": "#FF0000",
       "blocks": [
         {
-          "type": "header",
           "text": {
-            "type": "plain_text",
-            "text": "@{triggerBody()?['data']?['essentials']?['alertRule']}"
-          }
+            "text": "<!here>",
+            "type": "mrkdwn"
+          },
+          "type": "section"
         },
         {
-          "type": "section",
           "text": {
-            "type": "mrkdwn",
-            "text": "_@{triggerBody()?['data']?['essentials']?['description']}_"
-          }
+            "text": "@{triggerBody()?['data']?['essentials']?['alertRule']}",
+            "type": "plain_text"
+          },
+          "type": "header"
         },
         {
-          "type": "section",
+          "text": {
+            "text": "_@{triggerBody()?['data']?['essentials']?['description']}_",
+            "type": "mrkdwn"
+          },
+          "type": "section"
+        },
+        {
+          "text": {
+            "text": "*Alarm status:* @{triggerBody()?['data']?['essentials']?['monitorCondition']}",
+            "type": "mrkdwn"
+          },
+          "type": "section"
+        },
+        {
           "fields": [
             {
-              "type": "mrkdwn",
-              "text": "*Severity*"
+              "text": "*Resource Group*",
+              "type": "mrkdwn"
             },
             {
-              "type": "plain_text",
-              "text": "@{triggerBody()?['data']?['essentials']?['severity']}"
+              "text": "@{variables('affectedResource')[4]} ",
+              "type": "plain_text"
             },
             {
-              "type": "mrkdwn",
-              "text": "*Metric definition*"
+              "text": "*Provider*",
+              "type": "mrkdwn"
             },
             {
-              "type": "plain_text",
-              "text": "@{triggerBody()?['data']?['alarmContext']?['condition']?['allOf']?[0]?['metricName']} @{triggerBody()?['data']?['alarmContext']?['condition']?['allOf']?[0]?['operator']} @{triggerBody()?['data']?['alarmContext']?['condition']?['allOf']?[0]?['threshold']}"
+              "text": "@{variables('AffectedResource')[6]} ",
+              "type": "plain_text"
             },
             {
-              "type": "mrkdwn",
-              "text": "*Metric value recorded*"
+              "text": "*Severity*",
+              "type": "mrkdwn"
             },
             {
-              "type": "plain_text",
-              "text": "@{triggerBody()?['data']?['alarmContext']?['condition']?['allOf']?[0]?['metricValue']} "
+              "text": "@{triggerBody()?['data']?['essentials']?['severity']} ",
+              "type": "plain_text"
             },
             {
-              "type": "mrkdwn",
-              "text": "*Alarm status*"
+              "text": "*Metric definition*",
+              "type": "mrkdwn"
             },
             {
-              "type": "plain_text",
-              "text": "@{triggerBody()?['data']?['essentials']?['monitorCondition']} "
+              "text": "@{variables('alarmContext')['metricName']} @{variables('alarmContext')['timeAggregation']} @{variables('alarmContext')['operator']} @{variables('alarmContext')['threshold']}",
+              "type": "plain_text"
+            },
+            {
+              "text": "*Recorded value*",
+              "type": "mrkdwn"
+            },
+            {
+              "text": "@{variables('alarmContext')['metricValue']} ",
+              "type": "plain_text"
             }
-          ]
+          ],
+          "type": "section"
         }
-      ]
+      ],
+      "color": "@{if(equals(triggerBody()?['data']?['essentials']?['monitorCondition'], 'Resolved'), '#50C878', '#D22B2B')}"
     }
   ]
 }
