@@ -48,7 +48,12 @@ module "azure_container_apps_hosting" {
   # mssql_sku_name                 = "Basic"
   # mssql_max_size_gb              = 2
   # mssql_database_name            = "my-database"
-  # mssql_firewall_ipv4_allow_list = [ "8.8.8.8", "1.1.1.1" ]
+  # mssql_firewall_ipv4_allow_list = [
+  #   "my-client-ipv4" = {
+  #     "start_ip_address" = "1.1.1.1"
+  #     "end_ip_address" = "1.1.1.2" # (optional)
+  #   }
+  # ]
 
   ## Deploy an Azure Cache for Redis instance
   # enable_redis_cache                   = true
@@ -618,7 +623,7 @@ jobs:
 | <a name="input_monitor_slack_channel"></a> [monitor\_slack\_channel](#input\_monitor\_slack\_channel) | Slack channel name/id to send messages to | `string` | `""` | no |
 | <a name="input_monitor_slack_webhook_receiver"></a> [monitor\_slack\_webhook\_receiver](#input\_monitor\_slack\_webhook\_receiver) | A Slack App webhook URL | `string` | `""` | no |
 | <a name="input_mssql_database_name"></a> [mssql\_database\_name](#input\_mssql\_database\_name) | The name of the MSSQL database to create. Must be set if `enable_mssql_database` is true | `string` | `""` | no |
-| <a name="input_mssql_firewall_ipv4_allow_list"></a> [mssql\_firewall\_ipv4\_allow\_list](#input\_mssql\_firewall\_ipv4\_allow\_list) | A list of IPv4 Addresses that require remote access to the MSSQL Server | `list(string)` | `[]` | no |
+| <a name="input_mssql_firewall_ipv4_allow_list"></a> [mssql\_firewall\_ipv4\_allow\_list](#input\_mssql\_firewall\_ipv4\_allow\_list) | A list of IPv4 Addresses that require remote access to the MSSQL Server | <pre>map(object({<br>    start_ip_address : string<br>    end_ip_address : optional(string)<br>  }))</pre> | `{}` | no |
 | <a name="input_mssql_max_size_gb"></a> [mssql\_max\_size\_gb](#input\_mssql\_max\_size\_gb) | The max size of the database in gigabytes | `number` | `2` | no |
 | <a name="input_mssql_server_admin_password"></a> [mssql\_server\_admin\_password](#input\_mssql\_server\_admin\_password) | The administrator password for the MSSQL server. Must be set if `enable_mssql_database` is true | `string` | `""` | no |
 | <a name="input_mssql_sku_name"></a> [mssql\_sku\_name](#input\_mssql\_sku\_name) | Specifies the name of the SKU used by the database | `string` | `"Basic"` | no |

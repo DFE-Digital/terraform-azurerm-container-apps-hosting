@@ -19,7 +19,7 @@ resource "azurerm_mssql_server" "default" {
   version                       = "12.0"
   administrator_login           = "${local.resource_prefix}-admin"
   administrator_login_password  = local.mssql_server_admin_password
-  public_network_access_enabled = length(toset(local.mssql_firewall_ipv4_allow_list)) > 0 ? true : false
+  public_network_access_enabled = length(keys(local.mssql_firewall_ipv4_allow_list)) > 0 ? true : false
   minimum_tls_version           = "1.2"
   tags                          = local.tags
 }
@@ -85,12 +85,12 @@ resource "azurerm_private_endpoint" "default_mssql" {
 }
 
 resource "azurerm_mssql_firewall_rule" "default_mssql" {
-  for_each = local.enable_mssql_database ? toset(local.mssql_firewall_ipv4_allow_list) : []
+  for_each = local.enable_mssql_database ? local.mssql_firewall_ipv4_allow_list : {}
 
-  name             = "${replace(local.resource_prefix, "-", "")}fw${each.key}"
+  name             = each.key
   server_id        = azurerm_mssql_server.default[0].id
-  start_ip_address = each.value
-  end_ip_address   = each.value
+  start_ip_address = each.value.start_ip_address
+  end_ip_address   = lookup(each.value, "end_ip_address", "") != "" ? each.value.end_ip_address : each.value.start_ip_address
 }
 
 resource "azurerm_private_dns_a_record" "mssql_private_endpoint" {

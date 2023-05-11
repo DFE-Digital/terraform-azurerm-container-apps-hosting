@@ -105,8 +105,11 @@ variable "mssql_database_name" {
 
 variable "mssql_firewall_ipv4_allow_list" {
   description = "A list of IPv4 Addresses that require remote access to the MSSQL Server"
-  type        = list(string)
-  default     = []
+  type = map(object({
+    start_ip_address : string
+    end_ip_address : optional(string)
+  }))
+  default = {}
 }
 
 variable "enable_redis_cache" {
