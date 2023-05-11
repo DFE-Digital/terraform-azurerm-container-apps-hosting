@@ -19,7 +19,7 @@ resource "azurerm_mssql_server" "default" {
   version                       = "12.0"
   administrator_login           = "${local.resource_prefix}-admin"
   administrator_login_password  = local.mssql_server_admin_password
-  public_network_access_enabled = false
+  public_network_access_enabled = length(toset(local.mssql_firewall_ipv4_allow_list)) > 0 ? true : false
   minimum_tls_version           = "1.2"
   tags                          = local.tags
 }
