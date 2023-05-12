@@ -44,11 +44,17 @@ module "azure_container_apps_hosting" {
 
   ## Deploy an Azure SQL Server and create an initial database
   # enable_mssql_database          = true
-  # mssql_server_admin_password    = "ZE8r6uY9&o4&1xaR0BCBkCIVxA6Mal£w"
   # mssql_sku_name                 = "Basic"
   # mssql_max_size_gb              = 2
   # mssql_database_name            = "my-database"
   # mssql_firewall_ipv4_allow_list = [ "8.8.8.8", "1.1.1.1" ]
+  ## If you want to use a local SQL administrator account you can set a password with
+  # mssql_server_admin_password    = "ZE8r6uY9&o4&1xaR0BCBkCIVxA6Mal£w"
+  ## Or, if you want to assign an Azure AD Administrator you must specify
+  # mssql_azuread_admin_username = "my-email-address@DOMAIN"
+  # mssql_azuread_admin_object_id = "aaaa-bbbb-cccc-dddd"
+  ## Restrict SQL authentication to Azure AD
+  # mssql_azuread_auth_only = true
 
   ## Deploy an Azure Cache for Redis instance
   # enable_redis_cache                   = true
@@ -619,10 +625,13 @@ jobs:
 | <a name="input_monitor_endpoint_healthcheck"></a> [monitor\_endpoint\_healthcheck](#input\_monitor\_endpoint\_healthcheck) | Specify a route that should be monitored for a 200 OK status | `string` | `"/"` | no |
 | <a name="input_monitor_slack_channel"></a> [monitor\_slack\_channel](#input\_monitor\_slack\_channel) | Slack channel name/id to send messages to | `string` | `""` | no |
 | <a name="input_monitor_slack_webhook_receiver"></a> [monitor\_slack\_webhook\_receiver](#input\_monitor\_slack\_webhook\_receiver) | A Slack App webhook URL | `string` | `""` | no |
+| <a name="input_mssql_azuread_admin_object_id"></a> [mssql\_azuread\_admin\_object\_id](#input\_mssql\_azuread\_admin\_object\_id) | Object ID of a User within Azure AD that you want to assign as the SQL Server Administrator | `string` | `""` | no |
+| <a name="input_mssql_azuread_admin_username"></a> [mssql\_azuread\_admin\_username](#input\_mssql\_azuread\_admin\_username) | Username of a User within Azure AD that you want to assign as the SQL Server Administrator | `string` | `""` | no |
+| <a name="input_mssql_azuread_auth_only"></a> [mssql\_azuread\_auth\_only](#input\_mssql\_azuread\_auth\_only) | Set to true to only permit SQL logins from Azure AD users | `bool` | `false` | no |
 | <a name="input_mssql_database_name"></a> [mssql\_database\_name](#input\_mssql\_database\_name) | The name of the MSSQL database to create. Must be set if `enable_mssql_database` is true | `string` | `""` | no |
 | <a name="input_mssql_firewall_ipv4_allow_list"></a> [mssql\_firewall\_ipv4\_allow\_list](#input\_mssql\_firewall\_ipv4\_allow\_list) | A list of IPv4 Addresses that require remote access to the MSSQL Server | `list(string)` | `[]` | no |
 | <a name="input_mssql_max_size_gb"></a> [mssql\_max\_size\_gb](#input\_mssql\_max\_size\_gb) | The max size of the database in gigabytes | `number` | `2` | no |
-| <a name="input_mssql_server_admin_password"></a> [mssql\_server\_admin\_password](#input\_mssql\_server\_admin\_password) | The administrator password for the MSSQL server. Must be set if `enable_mssql_database` is true | `string` | `""` | no |
+| <a name="input_mssql_server_admin_password"></a> [mssql\_server\_admin\_password](#input\_mssql\_server\_admin\_password) | The local administrator password for the MSSQL server | `string` | `""` | no |
 | <a name="input_mssql_sku_name"></a> [mssql\_sku\_name](#input\_mssql\_sku\_name) | Specifies the name of the SKU used by the database | `string` | `"Basic"` | no |
 | <a name="input_network_watcher_flow_log_retention"></a> [network\_watcher\_flow\_log\_retention](#input\_network\_watcher\_flow\_log\_retention) | Number of days to retain flow logs. Set to 0 to keep all logs. | `number` | `90` | no |
 | <a name="input_network_watcher_traffic_analytics_interval"></a> [network\_watcher\_traffic\_analytics\_interval](#input\_network\_watcher\_traffic\_analytics\_interval) | Interval in minutes for Traffic Analytics. | `number` | `60` | no |

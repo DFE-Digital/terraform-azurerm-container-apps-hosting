@@ -17,11 +17,23 @@ resource "azurerm_mssql_server" "default" {
   resource_group_name           = local.resource_group.name
   location                      = local.resource_group.location
   version                       = "12.0"
-  administrator_login           = "${local.resource_prefix}-admin"
-  administrator_login_password  = local.mssql_server_admin_password
+  administrator_login           = local.mssql_server_admin_password != "" ? "${local.resource_prefix}-admin" : null
+  administrator_login_password  = local.mssql_server_admin_password != "" ? local.mssql_server_admin_password : null
   public_network_access_enabled = false
   minimum_tls_version           = "1.2"
-  tags                          = local.tags
+
+  dynamic "azuread_administrator" {
+    for_each = local.mssql_azuread_admin_username != "" ? [1] : []
+
+    content {
+      object_id                   = local.mssql_azuread_admin_object_id
+      login_username              = local.mssql_azuread_admin_username
+      tenant_id                   = data.azurerm_subscription.current.tenant_id
+      azuread_authentication_only = local.mssql_azuread_auth_only
+    }
+  }
+
+  tags = local.tags
 }
 
 resource "azurerm_mssql_server_extended_auditing_policy" "default" {

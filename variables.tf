@@ -79,10 +79,28 @@ variable "enable_mssql_database" {
 }
 
 variable "mssql_server_admin_password" {
-  description = "The administrator password for the MSSQL server. Must be set if `enable_mssql_database` is true"
+  description = "The local administrator password for the MSSQL server"
   type        = string
   default     = ""
   sensitive   = true
+}
+
+variable "mssql_azuread_admin_username" {
+  description = "Username of a User within Azure AD that you want to assign as the SQL Server Administrator"
+  type        = string
+  default     = ""
+}
+
+variable "mssql_azuread_admin_object_id" {
+  description = "Object ID of a User within Azure AD that you want to assign as the SQL Server Administrator"
+  type        = string
+  default     = ""
+}
+
+variable "mssql_azuread_auth_only" {
+  description = "Set to true to only permit SQL logins from Azure AD users"
+  type        = bool
+  default     = false
 }
 
 variable "mssql_sku_name" {

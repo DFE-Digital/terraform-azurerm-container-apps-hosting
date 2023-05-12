@@ -27,6 +27,9 @@ locals {
   mssql_max_size_gb                             = var.mssql_max_size_gb
   mssql_database_name                           = var.mssql_database_name
   mssql_firewall_ipv4_allow_list                = var.mssql_firewall_ipv4_allow_list
+  mssql_azuread_admin_username                  = var.mssql_azuread_admin_username
+  mssql_azuread_admin_object_id                 = var.mssql_azuread_admin_object_id
+  mssql_azuread_auth_only                       = var.mssql_azuread_auth_only
   enable_redis_cache                            = var.enable_redis_cache
   redis_cache_version                           = var.redis_cache_version
   redis_cache_family                            = var.redis_cache_family
