@@ -459,6 +459,24 @@ variable "enable_cdn_frontdoor" {
   default     = false
 }
 
+variable "cdn_frontdoor_enable_waf_logs" {
+  description = "Toggle the Diagnostic Setting to log Web Application Firewall requests"
+  type        = bool
+  default     = true
+}
+
+variable "cdn_frontdoor_enable_access_logs" {
+  description = "Toggle the Diagnostic Setting to log Access requests"
+  type        = bool
+  default     = false
+}
+
+variable "cdn_frontdoor_enable_health_probe_logs" {
+  description = "Toggle the Diagnostic Setting to log Health Probe requests"
+  type        = bool
+  default     = false
+}
+
 variable "restrict_container_apps_to_cdn_inbound_only" {
   description = "Restricts access to the Container Apps by creating a network security group that only allows 'AzureFrontDoor.Backend' inbound, and attaches it to the subnet of the container app environment."
   type        = bool

@@ -324,6 +324,11 @@ module "azure_container_apps_hosting" {
   cdn_frontdoor_health_probe_path         = "/" # relative url to your status page (e.g. /healthcheck, /health, /status)
   cdn_frontdoor_health_probe_request_type = "GET" # HTTP Method (e.g. GET, POST, HEAD etc)
 
+  ## Switch on/off diagnostic settings for the Azure Front Door CDN
+  # cdn_frontdoor_enable_waf_logs        = false
+  cdn_frontdoor_enable_access_logs       = true # default: false
+  cdn_frontdoor_enable_health_probe_logs = true # default: false
+
   ## Logs are by default exported to a Log Analytics Workspace so enabling these two values are only necessary if you
   ## want to ingest the logs using a 3rd party service (e.g. logit.io)
   # enable_event_hub = true
@@ -484,10 +489,10 @@ jobs:
 | [azurerm_logic_app_workflow.webhook](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/logic_app_workflow) | resource |
 | [azurerm_management_lock.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) | resource |
 | [azurerm_monitor_action_group.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_action_group) | resource |
+| [azurerm_monitor_diagnostic_setting.cdn](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_monitor_diagnostic_setting.container_app](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_monitor_diagnostic_setting.default_network_watcher_nsg_flow_logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_monitor_diagnostic_setting.default_redis_cache](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
-| [azurerm_monitor_diagnostic_setting.waf](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_monitor_diagnostic_setting.webhook](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_monitor_metric_alert.count](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_monitor_metric_alert.cpu](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
@@ -551,7 +556,10 @@ jobs:
 | <a name="input_azure_location"></a> [azure\_location](#input\_azure\_location) | Azure location in which to launch resources. | `string` | n/a | yes |
 | <a name="input_cdn_frontdoor_custom_domains"></a> [cdn\_frontdoor\_custom\_domains](#input\_cdn\_frontdoor\_custom\_domains) | Azure CDN Front Door custom domains | `list(string)` | `[]` | no |
 | <a name="input_cdn_frontdoor_custom_domains_create_dns_records"></a> [cdn\_frontdoor\_custom\_domains\_create\_dns\_records](#input\_cdn\_frontdoor\_custom\_domains\_create\_dns\_records) | Should the TXT records and ALIAS/CNAME records be automatically created if the custom domains exist within the DNS Zone? | `bool` | `true` | no |
+| <a name="input_cdn_frontdoor_enable_access_logs"></a> [cdn\_frontdoor\_enable\_access\_logs](#input\_cdn\_frontdoor\_enable\_access\_logs) | Toggle the Diagnostic Setting to log Access requests | `bool` | `false` | no |
+| <a name="input_cdn_frontdoor_enable_health_probe_logs"></a> [cdn\_frontdoor\_enable\_health\_probe\_logs](#input\_cdn\_frontdoor\_enable\_health\_probe\_logs) | Toggle the Diagnostic Setting to log Health Probe requests | `bool` | `false` | no |
 | <a name="input_cdn_frontdoor_enable_rate_limiting"></a> [cdn\_frontdoor\_enable\_rate\_limiting](#input\_cdn\_frontdoor\_enable\_rate\_limiting) | Enable CDN Front Door Rate Limiting. This will create a WAF policy, and CDN security policy. For pricing reasons, there will only be one WAF policy created. | `bool` | `false` | no |
+| <a name="input_cdn_frontdoor_enable_waf_logs"></a> [cdn\_frontdoor\_enable\_waf\_logs](#input\_cdn\_frontdoor\_enable\_waf\_logs) | Toggle the Diagnostic Setting to log Web Application Firewall requests | `bool` | `true` | no |
 | <a name="input_cdn_frontdoor_health_probe_interval"></a> [cdn\_frontdoor\_health\_probe\_interval](#input\_cdn\_frontdoor\_health\_probe\_interval) | Specifies the number of seconds between health probes. | `number` | `120` | no |
 | <a name="input_cdn_frontdoor_health_probe_path"></a> [cdn\_frontdoor\_health\_probe\_path](#input\_cdn\_frontdoor\_health\_probe\_path) | Specifies the path relative to the origin that is used to determine the health of the origin. | `string` | `"/"` | no |
 | <a name="input_cdn_frontdoor_health_probe_request_type"></a> [cdn\_frontdoor\_health\_probe\_request\_type](#input\_cdn\_frontdoor\_health\_probe\_request\_type) | Specifies the type of health probe request that is made. | `string` | `"GET"` | no |
