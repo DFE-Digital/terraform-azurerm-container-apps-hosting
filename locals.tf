@@ -132,10 +132,13 @@ locals {
   dns_txt_records      = var.dns_txt_records
 
   # Azure Front Door
-  enable_cdn_frontdoor           = var.enable_cdn_frontdoor
-  cdn_frontdoor_sku              = var.cdn_frontdoor_sku
-  cdn_frontdoor_response_timeout = var.cdn_frontdoor_response_timeout
-  cdn_frontdoor_custom_domains   = var.cdn_frontdoor_custom_domains
+  enable_cdn_frontdoor                   = var.enable_cdn_frontdoor
+  cdn_frontdoor_sku                      = var.cdn_frontdoor_sku
+  cdn_frontdoor_response_timeout         = var.cdn_frontdoor_response_timeout
+  cdn_frontdoor_custom_domains           = var.cdn_frontdoor_custom_domains
+  cdn_frontdoor_enable_waf_logs          = var.cdn_frontdoor_enable_waf_logs
+  cdn_frontdoor_enable_access_logs       = var.cdn_frontdoor_enable_access_logs
+  cdn_frontdoor_enable_health_probe_logs = var.cdn_frontdoor_enable_health_probe_logs
   cdn_frontdoor_custom_domain_dns_names = local.enable_cdn_frontdoor && local.enable_dns_zone ? toset([
     for domain in local.cdn_frontdoor_custom_domains : replace(domain, local.dns_zone_domain_name, "") if endswith(domain, local.dns_zone_domain_name)
   ]) : []
