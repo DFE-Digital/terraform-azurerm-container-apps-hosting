@@ -79,10 +79,28 @@ variable "enable_mssql_database" {
 }
 
 variable "mssql_server_admin_password" {
-  description = "The administrator password for the MSSQL server. Must be set if `enable_mssql_database` is true"
+  description = "The local administrator password for the MSSQL server"
   type        = string
   default     = ""
   sensitive   = true
+}
+
+variable "mssql_azuread_admin_username" {
+  description = "Username of a User within Azure AD that you want to assign as the SQL Server Administrator"
+  type        = string
+  default     = ""
+}
+
+variable "mssql_azuread_admin_object_id" {
+  description = "Object ID of a User within Azure AD that you want to assign as the SQL Server Administrator"
+  type        = string
+  default     = ""
+}
+
+variable "mssql_azuread_auth_only" {
+  description = "Set to true to only permit SQL logins from Azure AD users"
+  type        = bool
+  default     = false
 }
 
 variable "mssql_sku_name" {
@@ -437,6 +455,24 @@ variable "dns_txt_records" {
 
 variable "enable_cdn_frontdoor" {
   description = "Enable Azure CDN Front Door. This will use the Container Apps endpoint as the origin."
+  type        = bool
+  default     = false
+}
+
+variable "cdn_frontdoor_enable_waf_logs" {
+  description = "Toggle the Diagnostic Setting to log Web Application Firewall requests"
+  type        = bool
+  default     = true
+}
+
+variable "cdn_frontdoor_enable_access_logs" {
+  description = "Toggle the Diagnostic Setting to log Access requests"
+  type        = bool
+  default     = false
+}
+
+variable "cdn_frontdoor_enable_health_probe_logs" {
+  description = "Toggle the Diagnostic Setting to log Health Probe requests"
   type        = bool
   default     = false
 }

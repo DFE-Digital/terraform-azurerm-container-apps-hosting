@@ -12,7 +12,7 @@ This module creates and manages [Azure Container Apps][1], deployed within an [A
 
 ```hcl
 module "azure_container_apps_hosting" {
-  source = "github.com/DFE-Digital/terraform-azurerm-container-apps-hosting?ref=v0.17.2"
+  source = "github.com/DFE-Digital/terraform-azurerm-container-apps-hosting?ref=v0.17.3"
 
   environment    = "dev"
   project_name   = "myproject"
@@ -44,11 +44,17 @@ module "azure_container_apps_hosting" {
 
   ## Deploy an Azure SQL Server and create an initial database
   # enable_mssql_database          = true
-  # mssql_server_admin_password    = "ZE8r6uY9&o4&1xaR0BCBkCIVxA6Mal£w"
   # mssql_sku_name                 = "Basic"
   # mssql_max_size_gb              = 2
   # mssql_database_name            = "my-database"
   # mssql_firewall_ipv4_allow_list = [ "8.8.8.8", "1.1.1.1" ]
+  ## If you want to use a local SQL administrator account you can set a password with
+  # mssql_server_admin_password    = "ZE8r6uY9&o4&1xaR0BCBkCIVxA6Mal£w"
+  ## Or, if you want to assign an Azure AD Administrator you must specify
+  # mssql_azuread_admin_username = "my-email-address@DOMAIN"
+  # mssql_azuread_admin_object_id = "aaaa-bbbb-cccc-dddd"
+  ## Restrict SQL authentication to Azure AD
+  # mssql_azuread_auth_only = true
 
   ## Deploy an Azure Cache for Redis instance
   # enable_redis_cache                   = true
@@ -318,6 +324,11 @@ module "azure_container_apps_hosting" {
   cdn_frontdoor_health_probe_path         = "/" # relative url to your status page (e.g. /healthcheck, /health, /status)
   cdn_frontdoor_health_probe_request_type = "GET" # HTTP Method (e.g. GET, POST, HEAD etc)
 
+  ## Switch on/off diagnostic settings for the Azure Front Door CDN
+  # cdn_frontdoor_enable_waf_logs        = false
+  cdn_frontdoor_enable_access_logs       = true # default: false
+  cdn_frontdoor_enable_health_probe_logs = true # default: false
+
   ## Logs are by default exported to a Log Analytics Workspace so enabling these two values are only necessary if you
   ## want to ingest the logs using a 3rd party service (e.g. logit.io)
   # enable_event_hub = true
@@ -419,17 +430,17 @@ jobs:
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.9 |
-| <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | >= 1.1.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.47.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.4.5 |
+| <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | >= 1.6.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.56.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.2.1 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azapi"></a> [azapi](#provider\_azapi) | 1.3.0 |
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.55.0 |
+| <a name="provider_azapi"></a> [azapi](#provider\_azapi) | 1.6.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.56.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | 3.2.1 |
 
 ## Resources
@@ -485,10 +496,10 @@ jobs:
 | [azurerm_logic_app_workflow.webhook](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/logic_app_workflow) | resource |
 | [azurerm_management_lock.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) | resource |
 | [azurerm_monitor_action_group.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_action_group) | resource |
+| [azurerm_monitor_diagnostic_setting.cdn](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_monitor_diagnostic_setting.container_app](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_monitor_diagnostic_setting.default_network_watcher_nsg_flow_logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_monitor_diagnostic_setting.default_redis_cache](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
-| [azurerm_monitor_diagnostic_setting.waf](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_monitor_diagnostic_setting.webhook](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_monitor_metric_alert.count](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_monitor_metric_alert.cpu](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
@@ -553,7 +564,10 @@ jobs:
 | <a name="input_azure_location"></a> [azure\_location](#input\_azure\_location) | Azure location in which to launch resources. | `string` | n/a | yes |
 | <a name="input_cdn_frontdoor_custom_domains"></a> [cdn\_frontdoor\_custom\_domains](#input\_cdn\_frontdoor\_custom\_domains) | Azure CDN Front Door custom domains | `list(string)` | `[]` | no |
 | <a name="input_cdn_frontdoor_custom_domains_create_dns_records"></a> [cdn\_frontdoor\_custom\_domains\_create\_dns\_records](#input\_cdn\_frontdoor\_custom\_domains\_create\_dns\_records) | Should the TXT records and ALIAS/CNAME records be automatically created if the custom domains exist within the DNS Zone? | `bool` | `true` | no |
+| <a name="input_cdn_frontdoor_enable_access_logs"></a> [cdn\_frontdoor\_enable\_access\_logs](#input\_cdn\_frontdoor\_enable\_access\_logs) | Toggle the Diagnostic Setting to log Access requests | `bool` | `false` | no |
+| <a name="input_cdn_frontdoor_enable_health_probe_logs"></a> [cdn\_frontdoor\_enable\_health\_probe\_logs](#input\_cdn\_frontdoor\_enable\_health\_probe\_logs) | Toggle the Diagnostic Setting to log Health Probe requests | `bool` | `false` | no |
 | <a name="input_cdn_frontdoor_enable_rate_limiting"></a> [cdn\_frontdoor\_enable\_rate\_limiting](#input\_cdn\_frontdoor\_enable\_rate\_limiting) | Enable CDN Front Door Rate Limiting. This will create a WAF policy, and CDN security policy. For pricing reasons, there will only be one WAF policy created. | `bool` | `false` | no |
+| <a name="input_cdn_frontdoor_enable_waf_logs"></a> [cdn\_frontdoor\_enable\_waf\_logs](#input\_cdn\_frontdoor\_enable\_waf\_logs) | Toggle the Diagnostic Setting to log Web Application Firewall requests | `bool` | `true` | no |
 | <a name="input_cdn_frontdoor_health_probe_interval"></a> [cdn\_frontdoor\_health\_probe\_interval](#input\_cdn\_frontdoor\_health\_probe\_interval) | Specifies the number of seconds between health probes. | `number` | `120` | no |
 | <a name="input_cdn_frontdoor_health_probe_path"></a> [cdn\_frontdoor\_health\_probe\_path](#input\_cdn\_frontdoor\_health\_probe\_path) | Specifies the path relative to the origin that is used to determine the health of the origin. | `string` | `"/"` | no |
 | <a name="input_cdn_frontdoor_health_probe_request_type"></a> [cdn\_frontdoor\_health\_probe\_request\_type](#input\_cdn\_frontdoor\_health\_probe\_request\_type) | Specifies the type of health probe request that is made. | `string` | `"GET"` | no |
@@ -628,10 +642,13 @@ jobs:
 | <a name="input_monitor_endpoint_healthcheck"></a> [monitor\_endpoint\_healthcheck](#input\_monitor\_endpoint\_healthcheck) | Specify a route that should be monitored for a 200 OK status | `string` | `"/"` | no |
 | <a name="input_monitor_slack_channel"></a> [monitor\_slack\_channel](#input\_monitor\_slack\_channel) | Slack channel name/id to send messages to. Has no effect if you have defined `existing_logic_app_workflow` | `string` | `""` | no |
 | <a name="input_monitor_slack_webhook_receiver"></a> [monitor\_slack\_webhook\_receiver](#input\_monitor\_slack\_webhook\_receiver) | A Slack App webhook URL. Has no effect if you have defined `existing_logic_app_workflow` | `string` | `""` | no |
+| <a name="input_mssql_azuread_admin_object_id"></a> [mssql\_azuread\_admin\_object\_id](#input\_mssql\_azuread\_admin\_object\_id) | Object ID of a User within Azure AD that you want to assign as the SQL Server Administrator | `string` | `""` | no |
+| <a name="input_mssql_azuread_admin_username"></a> [mssql\_azuread\_admin\_username](#input\_mssql\_azuread\_admin\_username) | Username of a User within Azure AD that you want to assign as the SQL Server Administrator | `string` | `""` | no |
+| <a name="input_mssql_azuread_auth_only"></a> [mssql\_azuread\_auth\_only](#input\_mssql\_azuread\_auth\_only) | Set to true to only permit SQL logins from Azure AD users | `bool` | `false` | no |
 | <a name="input_mssql_database_name"></a> [mssql\_database\_name](#input\_mssql\_database\_name) | The name of the MSSQL database to create. Must be set if `enable_mssql_database` is true | `string` | `""` | no |
 | <a name="input_mssql_firewall_ipv4_allow_list"></a> [mssql\_firewall\_ipv4\_allow\_list](#input\_mssql\_firewall\_ipv4\_allow\_list) | A list of IPv4 Addresses that require remote access to the MSSQL Server | `list(string)` | `[]` | no |
 | <a name="input_mssql_max_size_gb"></a> [mssql\_max\_size\_gb](#input\_mssql\_max\_size\_gb) | The max size of the database in gigabytes | `number` | `2` | no |
-| <a name="input_mssql_server_admin_password"></a> [mssql\_server\_admin\_password](#input\_mssql\_server\_admin\_password) | The administrator password for the MSSQL server. Must be set if `enable_mssql_database` is true | `string` | `""` | no |
+| <a name="input_mssql_server_admin_password"></a> [mssql\_server\_admin\_password](#input\_mssql\_server\_admin\_password) | The local administrator password for the MSSQL server | `string` | `""` | no |
 | <a name="input_mssql_sku_name"></a> [mssql\_sku\_name](#input\_mssql\_sku\_name) | Specifies the name of the SKU used by the database | `string` | `"Basic"` | no |
 | <a name="input_network_watcher_flow_log_retention"></a> [network\_watcher\_flow\_log\_retention](#input\_network\_watcher\_flow\_log\_retention) | Number of days to retain flow logs. Set to 0 to keep all logs. | `number` | `90` | no |
 | <a name="input_network_watcher_traffic_analytics_interval"></a> [network\_watcher\_traffic\_analytics\_interval](#input\_network\_watcher\_traffic\_analytics\_interval) | Interval in minutes for Traffic Analytics. | `number` | `60` | no |

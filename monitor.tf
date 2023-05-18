@@ -227,7 +227,7 @@ resource "azurerm_monitor_metric_alert" "latency" {
   criteria {
     metric_namespace = "Microsoft.Cdn/profiles"
     metric_name      = "TotalLatency"
-    aggregation      = "Average"
+    aggregation      = "Minimum"
     operator         = "GreaterThan"
     # 1,000ms = 1s
     threshold = local.alarm_latency_threshold_ms
