@@ -14,7 +14,7 @@ data "azurerm_resource_group" "existing_resource_group" {
 data "azurerm_subscription" "current" {}
 
 data "azurerm_logic_app_workflow" "existing_logic_app_workflow" {
-  count = local.existing_logic_app_workflow == "" ? 0 : 1
+  count = local.existing_logic_app_workflow.name == "" ? 0 : 1
 
   name                = local.existing_logic_app_workflow.name
   resource_group_name = local.existing_logic_app_workflow.resource_group_name
