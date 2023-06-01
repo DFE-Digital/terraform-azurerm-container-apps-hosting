@@ -127,6 +127,85 @@ variable "mssql_firewall_ipv4_allow_list" {
   default     = []
 }
 
+variable "enable_postgresql_database" {
+  type        = bool
+  description = "Set to true to create an Azure Postgres server/database, with a private endpoint within the virtual network"
+  default     = false
+}
+
+variable "postgresql_server_version" {
+  type        = string
+  description = "Specify the version of postgres server to run (either 11,12,13 or 14)"
+  default     = ""
+}
+
+variable "postgresql_administrator_login" {
+  type        = string
+  description = "Specify a login that will be assigned to the administrator when creating the Postgres server"
+  default     = ""
+}
+
+variable "postgresql_administrator_password" {
+  type        = string
+  description = "Specify a password that will be assigned to the administrator when creating the Postgres server"
+  default     = ""
+}
+
+variable "postgresql_availability_zone" {
+  type        = string
+  description = "Specify the availibility zone in which the Postgres server should be located"
+  default     = "1"
+}
+
+variable "postgresql_max_storage_mb" {
+  type        = number
+  description = "Specify the max amount of storage allowed for the Postgres server"
+  default     = 32768
+}
+
+variable "postgresql_sku_name" {
+  type        = string
+  description = "Specify the SKU to be used for the Postgres server"
+  default     = "B_Standard_B1ms"
+}
+
+variable "postgresql_collation" {
+  type        = string
+  description = "Specify the collation to be used for the Postgres database"
+  default     = "en_US.utf8"
+}
+
+variable "postgresql_charset" {
+  type        = string
+  description = "Specify the charset to be used for the Postgres database"
+  default     = "utf8"
+}
+
+variable "postgresql_enabled_extensions" {
+  type        = string
+  description = "Specify a comma seperated list of Postgres extensions to enable. See https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/concepts-extensions#postgres-14-extensions"
+  default     = ""
+}
+
+variable "postgresql_network_connectivity_method" {
+  type        = string
+  description = "Specify postgresql networking method, public or private. See https://learn.microsoft.com/en-gb/azure/postgresql/flexible-server/concepts-networking"
+  default     = "private"
+  validation {
+    condition     = contains(["public", "private"], var.postgresql_network_connectivity_method)
+    error_message = "Valid values for postgresql_network_connectivity_method are public or private."
+  }
+}
+
+variable "postgresql_firewall_ipv4_allow" {
+  type = map(object({
+    start_ip_address = string
+    end_ip_address   = string
+  }))
+  description = "Map of IP address ranges to add into the postgres firewall. Note: only applicable if postgresql_network_connectivity_method is set to public."
+  default     = {}
+}
+
 variable "enable_redis_cache" {
   description = "Set to true to create an Azure Redis Cache, with a private endpoint within the virtual network"
   type        = bool

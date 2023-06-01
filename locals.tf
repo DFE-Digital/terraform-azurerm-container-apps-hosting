@@ -22,6 +22,7 @@ locals {
   container_instances_subnet_cidr          = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 2)
   redis_cache_private_endpoint_subnet_cidr = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 3)
   redis_cache_subnet_cidr                  = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 4)
+  postgresql_subnet_cidr                   = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 5)
 
   # Azure Container Registry
   enable_container_registry = var.enable_container_registry
@@ -39,6 +40,28 @@ locals {
   mssql_azuread_admin_username   = var.mssql_azuread_admin_username
   mssql_azuread_admin_object_id  = var.mssql_azuread_admin_object_id
   mssql_azuread_auth_only        = var.mssql_azuread_auth_only
+
+  # Postgres Server
+  enable_postgresql_database             = var.enable_postgresql_database
+  postgresql_server_version              = var.postgresql_server_version
+  postgresql_administrator_login         = var.postgresql_administrator_login
+  postgresql_administrator_password      = var.postgresql_administrator_password
+  postgresql_availability_zone           = var.postgresql_availability_zone
+  postgresql_max_storage_mb              = var.postgresql_max_storage_mb
+  postgresql_sku_name                    = var.postgresql_sku_name
+  postgresql_enabled_extensions          = var.postgresql_enabled_extensions
+  postgresql_collation                   = var.postgresql_collation
+  postgresql_charset                     = var.postgresql_charset
+  postgresql_network_connectivity_method = var.postgresql_network_connectivity_method
+  postgresql_firewall_ipv4_allow = merge(
+    {
+      "container-apps-env" = {
+        start_ip_address = jsondecode(azapi_resource.container_app_env.output).properties.staticIp
+        end_ip_address   = jsondecode(azapi_resource.container_app_env.output).properties.staticIp
+      }
+    },
+    var.postgresql_firewall_ipv4_allow
+  )
 
   # Azure Cache for Redis
   enable_redis_cache                   = var.enable_redis_cache
