@@ -71,12 +71,12 @@ resource "azurerm_monitor_action_group" "main" {
   }
 
   dynamic "logic_app_receiver" {
-    for_each = length(azurerm_logic_app_workflow.webhook[0].id) > 0 ? [0] : []
+    for_each = local.enable_monitoring || local.existing_logic_app_workflow.name != "" ? [0] : []
 
     content {
-      name                    = "Logic App"
-      resource_id             = azurerm_logic_app_workflow.webhook[0].id
-      callback_url            = azurerm_logic_app_trigger_http_request.webhook[0].callback_url
+      name                    = local.monitor_logic_app_receiver.name
+      resource_id             = local.monitor_logic_app_receiver.resource_id
+      callback_url            = local.monitor_logic_app_receiver.callback_url
       use_common_alert_schema = true
     }
   }
@@ -127,6 +127,30 @@ resource "azurerm_monitor_metric_alert" "memory" {
     operator         = "GreaterThan"
     # Memory usage in bytes (1,000,000,000 bytes = 1 GB)
     threshold = ((local.container_memory * 10000000) * local.alarm_memory_threshold_percentage)
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.main[0].id
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_monitor_metric_alert" "exceptions" {
+  name                = "${azurerm_application_insights.main.name}-exceptions"
+  resource_group_name = local.resource_group.name
+  scopes              = [azurerm_application_insights.main.id]
+  description         = "Action will be triggered when the number of exceptions exceeds 0"
+  window_size         = "PT5M"
+  frequency           = "PT1M"
+  severity            = 2
+
+  criteria {
+    metric_namespace = "Microsoft.Insights/components"
+    metric_name      = "exceptions/count"
+    aggregation      = "Count"
+    operator         = "GreaterThan"
+    threshold        = 0
   }
 
   action {
@@ -227,7 +251,7 @@ resource "azurerm_monitor_metric_alert" "latency" {
   criteria {
     metric_namespace = "Microsoft.Cdn/profiles"
     metric_name      = "TotalLatency"
-    aggregation      = "Average"
+    aggregation      = "Minimum"
     operator         = "GreaterThan"
     # 1,000ms = 1s
     threshold = local.alarm_latency_threshold_ms
