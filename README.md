@@ -121,6 +121,71 @@ module "azure_container_apps_hosting" {
   # worker_container_min_replicas = 1
   # worker_container_max_replicas = 1
 
+  ## Custom container apps
+  # custom_container_apps = {
+  #   "my-container-app" = {
+  #     # managedEnvironmentId = "/existing-managed-environment-id" # Use this if
+  #     #                        you need to launch the container in a different
+  #     #                        container app environment
+  #     configuration = {
+  #       activeRevisionsMode = "single",
+  #       secrets = [
+  #         {
+  #           "name"  = "my-secret",
+  #           "value" = "S3creTz"
+  #         }
+  #       ],
+  #       ingress = {
+  #         external = false
+  #       },
+  #       registries = [
+  #         {
+  #           "server"            = "my-registry.com",
+  #           "username"          = "me",
+  #           "passwordSecretRef" = "my-secret"
+  #         }
+  #       ],
+  #       dapr = {
+  #         enabled = false
+  #       }
+  #     },
+  #     template = {
+  #       revisionSuffix = "my-container-app",
+  #       containers = [
+  #         {
+  #           name  = "app",
+  #           image = "my-registry.com/my-app:latest",
+  #           resources = {
+  #             cpu = 0.25,
+  #             memory = "0.5Gi"
+  #           },
+  #           command = [
+  #             "say",
+  #             "'hello world'",
+  #             "-v",
+  #             "10"
+  #           ]
+  #         }
+  #       ],
+  #       scale = {
+  #         minReplicas = 0,
+  #         maxReplicas = 1
+  #       },
+  #       volumes = [
+  #         {
+  #           "name": "myempty",
+  #           "storageType": "EmptyDir"
+  #         },
+  #         {
+  #           "name": "azure-files-volume",
+  #           "storageType": "AzureFile",
+  #           "storageName": "myazurefiles"
+  #         }
+  #       ]
+  #     }
+  #   }
+  # }
+
   # Create a DNS Zone, associate a primary domain and map different DNS Records as you require.
   enable_dns_zone      = true
   dns_zone_domain_name = "example.com"
@@ -448,6 +513,7 @@ jobs:
 | Name | Type |
 |------|------|
 | [azapi_resource.container_app_env](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) | resource |
+| [azapi_resource.custom_container_apps](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource.default](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) | resource |
 | [azapi_resource.worker](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) | resource |
 | [azurerm_application_insights.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights) | resource |
@@ -603,6 +669,7 @@ jobs:
 | <a name="input_container_scale_rule_out_of_hours_start"></a> [container\_scale\_rule\_out\_of\_hours\_start](#input\_container\_scale\_rule\_out\_of\_hours\_start) | Specify a time using Linux cron format that represents the start of the out-of-hours window. Defaults to 23:00 | `string` | `"0 23 * * *"` | no |
 | <a name="input_container_scale_rule_scale_down_out_of_hours"></a> [container\_scale\_rule\_scale\_down\_out\_of\_hours](#input\_container\_scale\_rule\_scale\_down\_out\_of\_hours) | Should the Container App scale down to the minReplicas outside of normal operating hours? | `bool` | `false` | no |
 | <a name="input_container_secret_environment_variables"></a> [container\_secret\_environment\_variables](#input\_container\_secret\_environment\_variables) | Container environment variables, which are defined as `secrets` within the container app configuration. This is to help reduce the risk of accidentally exposing secrets. | `map(string)` | `{}` | no |
+| <a name="input_custom_container_apps"></a> [custom\_container\_apps](#input\_custom\_container\_apps) | Custom container apps, by default deployed within the container app environment | <pre>map(object({<br>    response_export_values = optional(list(string), [])<br>    body = object({<br>      properties = object({<br>        managedEnvironmentId = optional(string, "")<br>        configuration = object({<br>          activeRevisionsMode = optional(string, "single")<br>          secrets             = optional(list(map(string)), [])<br>          ingress             = optional(any, {})<br>          registries          = optional(list(map(any)), [])<br>          dapr                = optional(map(string), {})<br>        })<br>        template = object({<br>          revisionSuffix = string<br>          containers     = list(any)<br>          scale          = map(any)<br>          volumes        = list(map(string))<br>        })<br>      })<br>    })<br>  }))</pre> | `{}` | no |
 | <a name="input_dns_a_records"></a> [dns\_a\_records](#input\_dns\_a\_records) | DNS A records to add to the DNS Zone | <pre>map(<br>    object({<br>      ttl : optional(number, 300),<br>      records : list(string)<br>    })<br>  )</pre> | `{}` | no |
 | <a name="input_dns_aaaa_records"></a> [dns\_aaaa\_records](#input\_dns\_aaaa\_records) | DNS AAAA records to add to the DNS Zone | <pre>map(<br>    object({<br>      ttl : optional(number, 300),<br>      records : list(string)<br>    })<br>  )</pre> | `{}` | no |
 | <a name="input_dns_alias_records"></a> [dns\_alias\_records](#input\_dns\_alias\_records) | DNS ALIAS records to add to the DNS Zone | <pre>map(<br>    object({<br>      ttl : optional(number, 300),<br>      target_resource_id : string<br>    })<br>  )</pre> | `{}` | no |

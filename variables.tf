@@ -737,3 +737,29 @@ variable "container_app_blob_storage_ipv4_allow_list" {
   type        = list(string)
   default     = []
 }
+
+variable "custom_container_apps" {
+  description = "Custom container apps, by default deployed within the container app environment"
+  type = map(object({
+    response_export_values = optional(list(string), [])
+    body = object({
+      properties = object({
+        managedEnvironmentId = optional(string, "")
+        configuration = object({
+          activeRevisionsMode = optional(string, "single")
+          secrets             = optional(list(map(string)), [])
+          ingress             = optional(any, {})
+          registries          = optional(list(map(any)), [])
+          dapr                = optional(map(string), {})
+        })
+        template = object({
+          revisionSuffix = string
+          containers     = list(any)
+          scale          = map(any)
+          volumes        = list(map(string))
+        })
+      })
+    })
+  }))
+  default = {}
+}

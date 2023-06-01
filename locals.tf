@@ -101,6 +101,19 @@ locals {
   worker_container_command      = var.worker_container_command
   worker_container_min_replicas = var.worker_container_min_replicas
   worker_container_max_replicas = var.worker_container_max_replicas
+  # Container app / Custom
+  custom_container_apps = {
+    for custom_container_app_name, custom_container_app_value in var.custom_container_apps : custom_container_app_name => {
+      response_export_values = custom_container_app_value.response_export_values
+      body = {
+        properties = {
+          managedEnvironmentId = custom_container_app_value.body.properties.managedEnvironmentId != "" ? custom_container_app_value.body.properties.managedEnvironmentId : azapi_resource.container_app_env.id,
+          configuration        = custom_container_app_value.body.properties.configuration,
+          template             = custom_container_app_value.body.properties.template
+        }
+      }
+    }
+  }
 
   # Storage Account
   enable_container_app_blob_storage                = var.enable_container_app_blob_storage
