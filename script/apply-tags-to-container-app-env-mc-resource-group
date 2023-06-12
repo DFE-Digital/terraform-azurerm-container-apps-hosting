@@ -70,7 +70,7 @@ do
 done
 
 CONTAINER_APP_ENVIRONMENT_DEFAULT_DOMAIN=$(echo "$CONTAINER_APP" | jq -r ".properties.defaultDomain")
-CONTAINER_APP_ENVIRONMENT_LOCATION=$(echo "$CONTAINER_APP" | jq -r ".location" | awk '{print gsub(" ", ""); print tolower($0)}')
+CONTAINER_APP_ENVIRONMENT_LOCATION=$(echo "$CONTAINER_APP" | jq -r ".location" | awk '{gsub(" ", ""); print tolower($0)}')
 CONTAINER_APP_ENVIRONMENT_SLUG=$(echo "$CONTAINER_APP_ENVIRONMENT_DEFAULT_DOMAIN" | cut -d'.' -f1 )
 MC_RESOURCE_GROUP_NAME="MC_${CONTAINER_APP_ENVIRONMENT_SLUG}-rg_${CONTAINER_APP_ENVIRONMENT_SLUG}_${CONTAINER_APP_ENVIRONMENT_LOCATION}"
 MC_RESOURCE_GROUP="$(az group show --name "$MC_RESOURCE_GROUP_NAME")"
