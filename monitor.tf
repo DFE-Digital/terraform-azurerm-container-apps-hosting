@@ -137,6 +137,8 @@ resource "azurerm_monitor_metric_alert" "memory" {
 }
 
 resource "azurerm_monitor_metric_alert" "exceptions" {
+  count = local.enable_monitoring ? 1 : 0
+
   name                = "${azurerm_application_insights.main.name}-exceptions"
   resource_group_name = local.resource_group.name
   scopes              = [azurerm_application_insights.main.id]
