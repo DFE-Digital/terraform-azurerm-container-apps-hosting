@@ -712,12 +712,10 @@ variable "existing_logic_app_workflow" {
   type = object({
     name : string
     resource_group_name : string
-    trigger_url : string
   })
   default = {
     name                = ""
     resource_group_name = ""
-    trigger_url         = ""
   }
 }
 
