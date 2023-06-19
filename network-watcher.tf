@@ -46,9 +46,21 @@ resource "azurerm_monitor_diagnostic_setting" "default_network_watcher_nsg_flow_
   log_analytics_destination_type = "Dedicated"
 
   metric {
-    category = "Transaction"
+    category = "Capacity"
+    enabled  = true
 
     retention_policy {
+      days    = 0
+      enabled = false
+    }
+  }
+
+  metric {
+    category = "Transaction"
+    enabled  = true
+
+    retention_policy {
+      days    = 0
       enabled = false
     }
   }
