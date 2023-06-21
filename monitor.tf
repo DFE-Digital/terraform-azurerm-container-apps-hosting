@@ -19,11 +19,7 @@ resource "azurerm_application_insights_standard_web_test" "main" {
   description             = "Regional HTTP availability check"
   enabled                 = true
 
-  geo_locations = [
-    "emea-se-sto-edge", # UK West
-    "emea-nl-ams-azr",  # West Europe
-    "emea-ru-msa-edge"  # UK South
-  ]
+  geo_locations = slice(data.azurerm_extended_locations.geo_locations.extended_locations, 0, 3) # Use 3 locations
 
   request {
     url = local.monitor_http_availability_url
@@ -32,6 +28,42 @@ resource "azurerm_application_insights_standard_web_test" "main" {
       name  = "X-AppInsights-HttpTest"
       value = azurerm_application_insights.main.name
     }
+  }
+
+  tags = merge(
+    local.tags,
+    { "hidden-link:${azurerm_application_insights.main.id}" = "Resource" },
+  )
+}
+
+resource "azurerm_application_insights_standard_web_test" "tls" {
+  count = local.enable_monitoring && local.monitor_tls_expiry ? 1 : 0
+
+  name                    = "${local.resource_prefix}-tls"
+  resource_group_name     = local.resource_group.name
+  location                = local.resource_group.location
+  application_insights_id = azurerm_application_insights.main.id
+  timeout                 = 60
+  frequency               = 900 # Interval in seconds to test. (15 mins)
+  retry_enabled           = true
+  description             = "TLS certificate validity check"
+  enabled                 = true
+
+  geo_locations = slice(data.azurerm_extended_locations.geo_locations.extended_locations, 0, 1) # Use 1 location
+
+  request {
+    url                              = local.monitor_http_availability_url
+    parse_dependent_requests_enabled = false
+
+    header {
+      name  = "X-AppInsights-TlsExpiryTest"
+      value = azurerm_application_insights.main.name
+    }
+  }
+
+  validation_rules {
+    ssl_cert_remaining_lifetime = local.alarm_tls_expiry_days_remaining
+    ssl_check_enabled           = true
   }
 
   tags = merge(
@@ -177,6 +209,30 @@ resource "azurerm_monitor_metric_alert" "http" {
     web_test_id           = azurerm_application_insights_standard_web_test.main[0].id
     component_id          = azurerm_application_insights.main.id
     failed_location_count = 2 # 2 out of 3 locations
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.main[0].id
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_monitor_metric_alert" "tls" {
+  count = local.enable_monitoring && local.monitor_tls_expiry ? 1 : 0
+
+  name                = "${local.resource_prefix}-tls"
+  resource_group_name = local.resource_group.name
+  # Scope requires web test to come first
+  # https://github.com/hashicorp/terraform-provider-azurerm/issues/8551
+  scopes      = [azurerm_application_insights_standard_web_test.tls[0].id, azurerm_application_insights.main.id]
+  description = "Action will be triggered when the TLS certificate expires in ${local.alarm_tls_expiry_days_remaining} days or less"
+  severity    = 2
+
+  application_insights_web_test_location_availability_criteria {
+    web_test_id           = azurerm_application_insights_standard_web_test.tls[0].id
+    component_id          = azurerm_application_insights.main.id
+    failed_location_count = 1
   }
 
   action {

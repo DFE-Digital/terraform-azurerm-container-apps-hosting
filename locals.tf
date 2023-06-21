@@ -237,10 +237,12 @@ locals {
     resource_id  = local.logic_app_workflow_id
     callback_url = local.logic_app_workflow_callback_url
   }
+  monitor_tls_expiry = var.monitor_tls_expiry
   # Azure Monitor / Alarm thresholds
   alarm_cpu_threshold_percentage    = var.alarm_cpu_threshold_percentage
   alarm_memory_threshold_percentage = var.alarm_memory_threshold_percentage
   alarm_latency_threshold_ms        = var.alarm_latency_threshold_ms
+  alarm_tls_expiry_days_remaining   = var.alarm_tls_expiry_days_remaining
 
   # Network Watcher
   enable_network_watcher                                                      = var.enable_network_watcher

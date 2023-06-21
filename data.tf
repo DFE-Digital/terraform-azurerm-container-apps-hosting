@@ -36,3 +36,7 @@ data "azapi_resource_action" "existing_logic_app_workflow_callback_url" {
 
   response_export_values = ["value"]
 }
+
+data "azurerm_extended_locations" "geo_locations" {
+  location = local.resource_group.location
+}
