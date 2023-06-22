@@ -438,6 +438,7 @@ module "azure_container_apps_hosting" {
   alarm_cpu_threshold_percentage    = 80
   alarm_memory_threshold_percentage = 80
   alarm_latency_threshold_ms        = 1000
+  alarm_log_ingestion_gb_per_day    = 1
 
   # Note: that only 1 network watcher can be created within an Azure Subscription
   #     It would probably be advisable to create a Network Watcher outside of this module, as it
@@ -596,6 +597,7 @@ jobs:
 | [azurerm_monitor_metric_alert.memory](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_monitor_metric_alert.redis](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_monitor_metric_alert.tls](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
+| [azurerm_monitor_scheduled_query_rules_alert_v2.log-analytics-ingestion](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_scheduled_query_rules_alert_v2) | resource |
 | [azurerm_mssql_database.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database) | resource |
 | [azurerm_mssql_database_extended_auditing_policy.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database_extended_auditing_policy) | resource |
 | [azurerm_mssql_firewall_rule.default_mssql](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_firewall_rule) | resource |
@@ -659,6 +661,7 @@ jobs:
 |------|-------------|------|---------|:--------:|
 | <a name="input_alarm_cpu_threshold_percentage"></a> [alarm\_cpu\_threshold\_percentage](#input\_alarm\_cpu\_threshold\_percentage) | Specify a number (%) which should be set as a threshold for a CPU usage monitoring alarm | `number` | `80` | no |
 | <a name="input_alarm_latency_threshold_ms"></a> [alarm\_latency\_threshold\_ms](#input\_alarm\_latency\_threshold\_ms) | Specify a number in milliseconds which should be set as a threshold for a request latency monitoring alarm | `number` | `1000` | no |
+| <a name="input_alarm_log_ingestion_gb_per_day"></a> [alarm\_log\_ingestion\_gb\_per\_day](#input\_alarm\_log\_ingestion\_gb\_per\_day) | Define an alarm threshold for Log Analytics ingestion rate in GB (per day) (Defaults to no limit) | `number` | `0` | no |
 | <a name="input_alarm_memory_threshold_percentage"></a> [alarm\_memory\_threshold\_percentage](#input\_alarm\_memory\_threshold\_percentage) | Specify a number (%) which should be set as a threshold for a memory usage monitoring alarm | `number` | `80` | no |
 | <a name="input_alarm_tls_expiry_days_remaining"></a> [alarm\_tls\_expiry\_days\_remaining](#input\_alarm\_tls\_expiry\_days\_remaining) | Number of days remaining of TLS validity before an alarm should be raised | `number` | `30` | no |
 | <a name="input_azure_location"></a> [azure\_location](#input\_azure\_location) | Azure location in which to launch resources. | `string` | n/a | yes |

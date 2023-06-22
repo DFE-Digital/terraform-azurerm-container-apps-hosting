@@ -321,3 +321,31 @@ resource "azurerm_monitor_metric_alert" "latency" {
 
   tags = local.tags
 }
+
+resource "azurerm_monitor_scheduled_query_rules_alert_v2" "log-analytics-ingestion" {
+  count = local.enable_monitoring && local.alarm_log_ingestion_gb_per_day != 0 ? 1 : 0
+
+  name                = "${azurerm_log_analytics_workspace.container_app.name}-log-ingestion"
+  resource_group_name = local.resource_group.name
+  location            = local.resource_group.location
+
+  criteria {
+    operator                = "GreaterThan"
+    query                   = "Usage | where IsBillable | summarize DataGB = sum(Quantity / 1000)"
+    threshold               = local.alarm_log_ingestion_gb_per_day
+    time_aggregation_method = "Total"
+    metric_measure_column   = "DataGB"
+  }
+
+  evaluation_frequency = "P1D"
+  scopes               = [azurerm_log_analytics_workspace.container_app.id]
+  severity             = 2
+  window_duration      = "P1D"
+
+  action {
+    action_groups = [azurerm_monitor_action_group.main[0].id]
+  }
+
+  description = "Action will be triggered when log ingestion reaches more than ${local.alarm_log_ingestion_gb_per_day}GB/day"
+  tags        = local.tags
+}
