@@ -243,6 +243,7 @@ locals {
   alarm_memory_threshold_percentage = var.alarm_memory_threshold_percentage
   alarm_latency_threshold_ms        = var.alarm_latency_threshold_ms
   alarm_tls_expiry_days_remaining   = var.alarm_tls_expiry_days_remaining
+  alarm_log_ingestion_gb_per_day    = var.alarm_log_ingestion_gb_per_day
 
   # Network Watcher
   enable_network_watcher                                                      = var.enable_network_watcher

@@ -755,6 +755,12 @@ variable "alarm_tls_expiry_days_remaining" {
   default     = 30
 }
 
+variable "alarm_log_ingestion_gb_per_day" {
+  description = "Define an alarm threshold for Log Analytics ingestion rate in GB (per day) (Defaults to no limit)"
+  type        = number
+  default     = 0
+}
+
 variable "alarm_cpu_threshold_percentage" {
   description = "Specify a number (%) which should be set as a threshold for a CPU usage monitoring alarm"
   type        = number
