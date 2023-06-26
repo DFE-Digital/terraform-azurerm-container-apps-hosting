@@ -22,6 +22,7 @@ resource "azapi_resource" "container_app_env" {
 
   response_export_values = [
     "properties.staticIp",
+    "location"
   ]
 
   tags = local.tags

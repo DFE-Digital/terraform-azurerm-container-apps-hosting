@@ -38,5 +38,5 @@ data "azapi_resource_action" "existing_logic_app_workflow_callback_url" {
 }
 
 data "azurerm_extended_locations" "geo_locations" {
-  location = local.resource_group.location
+  location = jsondecode(azapi_resource.container_app_env.output).location
 }
