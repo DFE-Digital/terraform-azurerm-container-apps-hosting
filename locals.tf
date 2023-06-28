@@ -207,8 +207,9 @@ locals {
   cdn_frontdoor_rate_limiting_bypass_ip_list      = var.cdn_frontdoor_rate_limiting_bypass_ip_list
 
   # Event Hub
-  enable_event_hub         = var.enable_event_hub
-  enable_logstash_consumer = var.enable_logstash_consumer
+  enable_event_hub                          = var.enable_event_hub
+  enable_logstash_consumer                  = var.enable_logstash_consumer
+  eventhub_export_log_analytics_table_names = var.eventhub_export_log_analytics_table_names
 
   # Azure Monitor
   enable_monitoring = var.enable_monitoring
