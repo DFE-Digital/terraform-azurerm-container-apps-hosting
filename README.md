@@ -418,6 +418,10 @@ module "azure_container_apps_hosting" {
   ## want to ingest the logs using a 3rd party service (e.g. logit.io)
   # enable_event_hub = true
   # enable_logstash_consumer = true
+  ## Specify which Log Analytics tables you want to send to Event Hub
+  # eventhub_export_log_analytics_table_names = [
+  #   "AppExceptions"
+  # ]
 
   # Monitoring is disabled by default. If enabled, the following metrics will be monitored:
   # Container App: CPU usage, Memory usage, Latency, Revision count, HTTP regional availability
@@ -734,6 +738,7 @@ jobs:
 | <a name="input_enable_resource_group_lock"></a> [enable\_resource\_group\_lock](#input\_enable\_resource\_group\_lock) | Enabling this will add a Resource Lock to the Resource Group preventing any resources from being deleted. | `bool` | `false` | no |
 | <a name="input_enable_worker_container"></a> [enable\_worker\_container](#input\_enable\_worker\_container) | Conditionally launch a worker container. This container uses the same image and environment variables as the default container app, but allows a different container command to be run. The worker container does not expose any ports. | `bool` | `false` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name. Will be used along with `project_name` as a prefix for all resources. | `string` | n/a | yes |
+| <a name="input_eventhub_export_log_analytics_table_names"></a> [eventhub\_export\_log\_analytics\_table\_names](#input\_eventhub\_export\_log\_analytics\_table\_names) | List of Log Analytics table names that you want to export to Event Hub. See https://learn.microsoft.com/en-gb/azure/azure-monitor/logs/logs-data-export?tabs=portal#supported-tables for a list of supported tables | `list(string)` | `[]` | no |
 | <a name="input_existing_logic_app_workflow"></a> [existing\_logic\_app\_workflow](#input\_existing\_logic\_app\_workflow) | Name, Resource Group and HTTP Trigger URL of an existing Logic App Workflow. Leave empty to create a new Resource | <pre>object({<br>    name : string<br>    resource_group_name : string<br>  })</pre> | <pre>{<br>  "name": "",<br>  "resource_group_name": ""<br>}</pre> | no |
 | <a name="input_existing_network_watcher_name"></a> [existing\_network\_watcher\_name](#input\_existing\_network\_watcher\_name) | Use an existing network watcher to add flow logs. | `string` | `""` | no |
 | <a name="input_existing_network_watcher_resource_group_name"></a> [existing\_network\_watcher\_resource\_group\_name](#input\_existing\_network\_watcher\_resource\_group\_name) | Existing network watcher resource group. | `string` | `""` | no |

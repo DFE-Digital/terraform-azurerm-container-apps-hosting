@@ -13,7 +13,7 @@ resource "azurerm_log_analytics_data_export_rule" "container_app" {
   resource_group_name     = local.resource_group.name
   workspace_resource_id   = azurerm_log_analytics_workspace.container_app.id
   destination_resource_id = azurerm_eventhub.container_app[0].id
-  table_names             = ["ContainerLog"]
+  table_names             = local.eventhub_export_log_analytics_table_names
   enabled                 = true
 }
 
