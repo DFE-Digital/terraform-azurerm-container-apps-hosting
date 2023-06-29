@@ -13,6 +13,11 @@ output "azurerm_eventhub_container_app" {
   description = "Container App Event Hub"
 }
 
+output "azurerm_dns_zone_name_servers" {
+  value       = local.enable_dns_zone ? azurerm_dns_zone.default[0].name_servers : null
+  description = "Name servers of the DNS Zone"
+}
+
 output "cdn_frontdoor_dns_records" {
   value = local.cdn_frontdoor_custom_domains_create_dns_records == false ? concat([
     for domain in local.cdn_frontdoor_custom_domain_dns_names : {
