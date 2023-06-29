@@ -19,7 +19,11 @@ resource "azurerm_application_insights_standard_web_test" "main" {
   description             = "Regional HTTP availability check"
   enabled                 = true
 
-  geo_locations = slice(data.azurerm_extended_locations.geo_locations.extended_locations, 0, 3) # Use 3 locations
+  geo_locations = [
+    "emea-nl-ams-azr",  # West Europe
+    "emea-se-sto-edge", # UK West
+    "emea-ru-msa-edge"  # UK South
+  ]
 
   request {
     url = local.monitor_http_availability_url
@@ -49,7 +53,7 @@ resource "azurerm_application_insights_standard_web_test" "tls" {
   description             = "TLS certificate validity check"
   enabled                 = true
 
-  geo_locations = slice(data.azurerm_extended_locations.geo_locations.extended_locations, 0, 1) # Use 1 location
+  geo_locations = ["emea-nl-ams-azr"] # West Europe
 
   request {
     url                              = local.monitor_http_availability_url

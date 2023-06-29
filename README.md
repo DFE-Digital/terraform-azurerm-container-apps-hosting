@@ -652,7 +652,6 @@ jobs:
 | [azurerm_virtual_network.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
 | [null_resource.tagging](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [azapi_resource_action.existing_logic_app_workflow_callback_url](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_action) | data source |
-| [azurerm_extended_locations.geo_locations](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/extended_locations) | data source |
 | [azurerm_logic_app_workflow.existing_logic_app_workflow](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/logic_app_workflow) | data source |
 | [azurerm_resource_group.existing_resource_group](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
 | [azurerm_storage_account_blob_container_sas.container_app](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/storage_account_blob_container_sas) | data source |
