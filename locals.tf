@@ -31,15 +31,16 @@ locals {
   registry_password         = local.enable_container_registry ? azurerm_container_registry.acr[0].admin_password : var.registry_password
 
   # SQL Server
-  enable_mssql_database          = var.enable_mssql_database
-  mssql_server_admin_password    = var.mssql_server_admin_password
-  mssql_sku_name                 = var.mssql_sku_name
-  mssql_max_size_gb              = var.mssql_max_size_gb
-  mssql_database_name            = var.mssql_database_name
-  mssql_firewall_ipv4_allow_list = var.mssql_firewall_ipv4_allow_list
-  mssql_azuread_admin_username   = var.mssql_azuread_admin_username
-  mssql_azuread_admin_object_id  = var.mssql_azuread_admin_object_id
-  mssql_azuread_auth_only        = var.mssql_azuread_auth_only
+  enable_mssql_database              = var.enable_mssql_database
+  mssql_server_admin_password        = var.mssql_server_admin_password
+  mssql_sku_name                     = var.mssql_sku_name
+  mssql_max_size_gb                  = var.mssql_max_size_gb
+  mssql_database_name                = var.mssql_database_name
+  mssql_firewall_ipv4_allow_list     = var.mssql_firewall_ipv4_allow_list
+  mssql_azuread_admin_username       = var.mssql_azuread_admin_username
+  mssql_azuread_admin_object_id      = var.mssql_azuread_admin_object_id
+  mssql_azuread_auth_only            = var.mssql_azuread_auth_only
+  mssql_server_public_access_enabled = var.mssql_server_public_access_enabled
 
   # Postgres Server
   enable_postgresql_database             = var.enable_postgresql_database
