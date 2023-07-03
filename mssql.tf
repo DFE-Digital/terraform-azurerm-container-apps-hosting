@@ -16,10 +16,10 @@ resource "azurerm_mssql_server" "default" {
   name                          = local.resource_prefix
   resource_group_name           = local.resource_group.name
   location                      = local.resource_group.location
-  version                       = "12.0"
+  version                       = local.mssql_version
   administrator_login           = local.mssql_server_admin_password != "" ? "${local.resource_prefix}-admin" : null
   administrator_login_password  = local.mssql_server_admin_password != "" ? local.mssql_server_admin_password : null
-  public_network_access_enabled = false
+  public_network_access_enabled = local.mssql_server_public_access_enabled
   minimum_tls_version           = "1.2"
 
   dynamic "azuread_administrator" {

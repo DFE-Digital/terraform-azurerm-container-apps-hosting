@@ -127,6 +127,18 @@ variable "mssql_firewall_ipv4_allow_list" {
   default     = []
 }
 
+variable "mssql_server_public_access_enabled" {
+  description = "Enable public internet access to your MSSQL instance. Be sure to specify 'mssql_firewall_ipv4_allow_list' to restrict inbound connections"
+  type        = bool
+  default     = false
+}
+
+variable "mssql_version" {
+  description = "Specify the version of Microsoft SQL Server you want to run"
+  type        = string
+  default     = "12.0"
+}
+
 variable "enable_postgresql_database" {
   type        = bool
   description = "Set to true to create an Azure Postgres server/database, with a private endpoint within the virtual network"
