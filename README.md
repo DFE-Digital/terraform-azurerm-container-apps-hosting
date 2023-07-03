@@ -49,6 +49,7 @@ module "azure_container_apps_hosting" {
   # mssql_database_name            = "my-database"
   # mssql_firewall_ipv4_allow_list = [ "8.8.8.8", "1.1.1.1" ]
   # mssql_server_public_access_enabled = true
+  # mssql_version = "12.0"
   ## If you want to use a local SQL administrator account you can set a password with
   # mssql_server_admin_password    = "change-me-!!!"
   ## Or, if you want to assign an Azure AD Administrator you must specify
@@ -762,6 +763,7 @@ jobs:
 | <a name="input_mssql_server_admin_password"></a> [mssql\_server\_admin\_password](#input\_mssql\_server\_admin\_password) | The local administrator password for the MSSQL server | `string` | `""` | no |
 | <a name="input_mssql_server_public_access_enabled"></a> [mssql\_server\_public\_access\_enabled](#input\_mssql\_server\_public\_access\_enabled) | Enable public internet access to your MSSQL instance. Be sure to specify 'mssql\_firewall\_ipv4\_allow\_list' to restrict inbound connections | `bool` | `false` | no |
 | <a name="input_mssql_sku_name"></a> [mssql\_sku\_name](#input\_mssql\_sku\_name) | Specifies the name of the SKU used by the database | `string` | `"Basic"` | no |
+| <a name="input_mssql_version"></a> [mssql\_version](#input\_mssql\_version) | Specify the version of Microsoft SQL Server you want to run | `string` | `"12.0"` | no |
 | <a name="input_network_watcher_flow_log_retention"></a> [network\_watcher\_flow\_log\_retention](#input\_network\_watcher\_flow\_log\_retention) | Number of days to retain flow logs. Set to 0 to keep all logs. | `number` | `90` | no |
 | <a name="input_network_watcher_traffic_analytics_interval"></a> [network\_watcher\_traffic\_analytics\_interval](#input\_network\_watcher\_traffic\_analytics\_interval) | Interval in minutes for Traffic Analytics. | `number` | `60` | no |
 | <a name="input_postgresql_administrator_login"></a> [postgresql\_administrator\_login](#input\_postgresql\_administrator\_login) | Specify a login that will be assigned to the administrator when creating the Postgres server | `string` | `""` | no |

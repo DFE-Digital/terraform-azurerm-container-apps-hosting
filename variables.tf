@@ -133,6 +133,12 @@ variable "mssql_server_public_access_enabled" {
   default     = false
 }
 
+variable "mssql_version" {
+  description = "Specify the version of Microsoft SQL Server you want to run"
+  type        = string
+  default     = "12.0"
+}
+
 variable "enable_postgresql_database" {
   type        = bool
   description = "Set to true to create an Azure Postgres server/database, with a private endpoint within the virtual network"

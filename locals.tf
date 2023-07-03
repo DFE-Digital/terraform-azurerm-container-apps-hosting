@@ -40,6 +40,7 @@ locals {
   mssql_azuread_admin_username       = var.mssql_azuread_admin_username
   mssql_azuread_admin_object_id      = var.mssql_azuread_admin_object_id
   mssql_azuread_auth_only            = var.mssql_azuread_auth_only
+  mssql_version                      = var.mssql_version
   mssql_server_public_access_enabled = var.mssql_server_public_access_enabled
 
   # Postgres Server
