@@ -215,7 +215,7 @@ resource "azurerm_cdn_frontdoor_rule" "add_response_headers" {
 
   name                      = replace("addresponseheaders${each.key}", "-", "")
   cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.add_response_headers[0].id
-  order                     = 0
+  order                     = each.key
   behavior_on_match         = "Continue"
 
   actions {
@@ -241,7 +241,7 @@ resource "azurerm_cdn_frontdoor_rule" "remove_response_header" {
 
   name                      = replace("removeresponseheader${each.value}", "-", "")
   cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.remove_response_headers[0].id
-  order                     = 0
+  order                     = index(local.cdn_frontdoor_remove_response_headers, each.value)
   behavior_on_match         = "Continue"
 
   actions {
