@@ -190,6 +190,7 @@ locals {
   cdn_frontdoor_health_probe_path                 = var.cdn_frontdoor_health_probe_path
   cdn_frontdoor_health_probe_request_type         = var.cdn_frontdoor_health_probe_request_type
   restrict_container_apps_to_cdn_inbound_only     = var.restrict_container_apps_to_cdn_inbound_only
+  container_apps_allow_ips_inbound                = var.container_apps_allow_ips_inbound
   cdn_frontdoor_host_redirects                    = var.cdn_frontdoor_host_redirects
   cdn_frontdoor_host_add_response_headers         = var.cdn_frontdoor_host_add_response_headers
   cdn_frontdoor_remove_response_headers           = var.cdn_frontdoor_remove_response_headers

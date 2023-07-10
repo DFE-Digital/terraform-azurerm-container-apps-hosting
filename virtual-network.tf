@@ -65,6 +65,23 @@ resource "azurerm_network_security_rule" "container_apps_infra_allow_frontdoor_i
   destination_address_prefix = "${jsondecode(azapi_resource.container_app_env.output).properties.staticIp}/32"
 }
 
+resource "azurerm_network_security_rule" "container_apps_infra_allow_ips_inbound" {
+  count = local.launch_in_vnet && length(local.container_apps_allow_ips_inbound) != 0 ? 1 : 0
+
+  network_security_group_name = azurerm_network_security_group.container_apps_infra[0].name
+  resource_group_name         = local.resource_group.name
+
+  name                       = "AllowIpsInbound"
+  priority                   = 200
+  direction                  = "Inbound"
+  access                     = "Allow"
+  protocol                   = "*"
+  source_port_range          = "*"
+  destination_port_range     = "443"
+  source_address_prefixes    = local.container_apps_allow_ips_inbound
+  destination_address_prefix = "${jsondecode(azapi_resource.container_app_env.output).properties.staticIp}/32"
+}
+
 resource "azurerm_subnet_network_security_group_association" "container_apps_infra" {
   count = local.launch_in_vnet ? 1 : 0
 
