@@ -249,17 +249,17 @@ locals {
   alarm_log_ingestion_gb_per_day    = var.alarm_log_ingestion_gb_per_day
 
   # Network Watcher
-  enable_network_watcher                                                      = var.enable_network_watcher
-  existing_network_watcher_name                                               = var.existing_network_watcher_name
-  existing_network_watcher_resource_group_name                                = var.existing_network_watcher_resource_group_name
-  network_watcher_name                                                        = local.enable_network_watcher ? azurerm_network_watcher.default[0].name : local.existing_network_watcher_name
-  network_watcher_resource_group_name                                         = local.network_watcher_name != "" ? local.existing_network_watcher_resource_group_name : local.resource_group.name
-  network_watcher_flow_log_retention                                          = var.network_watcher_flow_log_retention
-  enable_network_watcher_traffic_analytics                                    = var.enable_network_watcher_traffic_analytics
-  network_watcher_traffic_analytics_interval                                  = var.network_watcher_traffic_analytics_interval
-  network_security_group_container_apps_infra_allow_frontdoor_inbound_only_id = local.launch_in_vnet && local.restrict_container_apps_to_cdn_inbound_only && local.enable_cdn_frontdoor ? { "container_apps_infra_allow_frontdoor_inbound_only" = azurerm_network_security_group.container_apps_infra_allow_frontdoor_inbound_only[0].id } : {}
+  enable_network_watcher                         = var.enable_network_watcher
+  existing_network_watcher_name                  = var.existing_network_watcher_name
+  existing_network_watcher_resource_group_name   = var.existing_network_watcher_resource_group_name
+  network_watcher_name                           = local.enable_network_watcher ? azurerm_network_watcher.default[0].name : local.existing_network_watcher_name
+  network_watcher_resource_group_name            = local.network_watcher_name != "" ? local.existing_network_watcher_resource_group_name : local.resource_group.name
+  network_watcher_flow_log_retention             = var.network_watcher_flow_log_retention
+  enable_network_watcher_traffic_analytics       = var.enable_network_watcher_traffic_analytics
+  network_watcher_traffic_analytics_interval     = var.network_watcher_traffic_analytics_interval
+  network_security_group_container_apps_infra_id = local.launch_in_vnet ? { "container_apps_infra" = azurerm_network_security_group.container_apps_infra[0].id } : {}
   network_security_group_ids = merge(
-    local.network_security_group_container_apps_infra_allow_frontdoor_inbound_only_id,
+    local.network_security_group_container_apps_infra_id,
   )
 
   # Misc.
