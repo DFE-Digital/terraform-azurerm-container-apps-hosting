@@ -185,6 +185,7 @@ locals {
   cdn_frontdoor_origin_host_header_override       = var.cdn_frontdoor_origin_host_header_override != "" ? var.cdn_frontdoor_origin_host_header_override : null
   cdn_frontdoor_origin_http_port                  = var.cdn_frontdoor_origin_http_port
   cdn_frontdoor_origin_https_port                 = var.cdn_frontdoor_origin_https_port
+  cdn_frontdoor_forwarding_protocol               = var.cdn_frontdoor_forwarding_protocol
   enable_cdn_frontdoor_health_probe               = var.enable_cdn_frontdoor_health_probe
   cdn_frontdoor_health_probe_interval             = var.cdn_frontdoor_health_probe_interval
   cdn_frontdoor_health_probe_path                 = var.cdn_frontdoor_health_probe_path
