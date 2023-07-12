@@ -12,7 +12,7 @@ This module creates and manages [Azure Container Apps][1], deployed within an [A
 
 ```hcl
 module "azure_container_apps_hosting" {
-  source = "github.com/DFE-Digital/terraform-azurerm-container-apps-hosting?ref=v0.18.2"
+  source = "github.com/DFE-Digital/terraform-azurerm-container-apps-hosting?ref=v0.19.0"
 
   environment    = "dev"
   project_name   = "myproject"
@@ -494,7 +494,7 @@ concurrency:
 
 jobs:
   deploy-to-environment:
-    uses: DFE-Digital/terraform-azurerm-container-apps-hosting/.github/workflows/build-push-and-deploy-to-environment.yml@v0.17.7
+    uses: DFE-Digital/terraform-azurerm-container-apps-hosting/.github/workflows/build-push-and-deploy-to-environment.yml@v0.19.0
     with:
       docker-image-name: "my-app"                 # Required
       docker-build-file-name: "Dockerfile"        # Optional
