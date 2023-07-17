@@ -592,6 +592,12 @@ variable "enable_cdn_frontdoor_health_probe" {
   default     = true
 }
 
+variable "cdn_frontdoor_health_probe_protocol" {
+  description = "Use Http or Https"
+  type        = string
+  default     = "Https"
+}
+
 variable "cdn_frontdoor_health_probe_interval" {
   description = "Specifies the number of seconds between health probes."
   type        = number
