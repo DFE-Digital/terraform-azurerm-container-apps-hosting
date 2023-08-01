@@ -23,7 +23,7 @@ resource "azurerm_storage_account_network_rules" "container_app" {
   ip_rules                   = local.container_app_blob_storage_ipv4_allow_list
 
   private_link_access {
-    endpoint_resource_id = azapi_resource.default.id
+    endpoint_resource_id = azurerm_container_app.container_apps["main"].id
   }
 }
 
