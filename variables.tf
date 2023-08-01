@@ -31,16 +31,6 @@ variable "existing_virtual_network" {
   default     = ""
 }
 
-variable "environment_accessibility_level" {
-  description = "Configure whether your container app allows public ingress or only ingress from within your VNet at the environment level."
-  type        = string
-  default     = "external"
-  validation {
-    condition     = contains(["internal", "external"], var.environment_accessibility_level)
-    error_message = "Valid values for environment_accessibility_level are internal or external."
-  }
-}
-
 variable "existing_resource_group" {
   description = "Conditionally launch resources into an existing resource group. Specifying this will NOT create a resource group."
   type        = string
@@ -311,30 +301,6 @@ variable "container_max_replicas" {
   default     = 2
 }
 
-variable "container_scale_rule_concurrent_request_count" {
-  description = "Maximum number of concurrent HTTP requests before a new replica is created"
-  type        = number
-  default     = 10
-}
-
-variable "container_scale_rule_scale_down_out_of_hours" {
-  description = "Should the Container App scale down to the minReplicas outside of normal operating hours?"
-  type        = bool
-  default     = false
-}
-
-variable "container_scale_rule_out_of_hours_start" {
-  description = "Specify a time using Linux cron format that represents the start of the out-of-hours window. Defaults to 23:00"
-  type        = string
-  default     = "0 23 * * *"
-}
-
-variable "container_scale_rule_out_of_hours_end" {
-  description = "Specify a time using Linux cron format that represents the end of the out-of-hours window. Defaults to 06:00"
-  type        = string
-  default     = "0 6 * * *"
-}
-
 variable "container_port" {
   description = "Container port"
   type        = number
@@ -588,6 +554,12 @@ variable "container_apps_allow_ips_inbound" {
   description = "Restricts access to the Container Apps by creating a network security group rule that only allow inbound traffic from the provided list of IPs"
   type        = list(string)
   default     = []
+}
+
+variable "container_app_environment_internal_load_balancer_enabled" {
+  description = "Should the Container Environment operate in Internal Load Balancing Mode?"
+  type        = bool
+  default     = false
 }
 
 variable "cdn_frontdoor_sku" {
@@ -880,27 +852,46 @@ variable "container_app_blob_storage_ipv4_allow_list" {
 }
 
 variable "custom_container_apps" {
-  description = "Custom container apps, by default deployed within the container app environment"
+  description = "Custom container apps, by default deployed within the container app environment managed by this module."
   type = map(object({
-    response_export_values = optional(list(string), [])
-    body = object({
-      properties = object({
-        managedEnvironmentId = optional(string, "")
-        configuration = object({
-          activeRevisionsMode = optional(string, "single")
-          secrets             = optional(list(map(string)), [])
-          ingress             = optional(any, {})
-          registries          = optional(list(map(any)), [])
-          dapr                = optional(map(string), {})
-        })
-        template = object({
-          revisionSuffix = string
-          containers     = list(any)
-          scale          = map(any)
-          volumes        = list(map(string))
-        })
+    container_app_environment_id = optional(string, "")
+    resource_group_name          = optional(string, "")
+    revision_mode                = optional(string, "Single")
+    container_port               = optional(number, 0)
+    ingress = optional(object({
+      external_enabled = optional(bool, true)
+      target_port      = optional(number, null)
+      traffic_weight = object({
+        percentage = optional(number, 100)
       })
-    })
+    }), null)
+    secrets = optional(list(object({
+      name  = string
+      value = string
+    })), [])
+    registry = object({
+      server               = optional(string, "")
+      username             = optional(string, "")
+      password_secret_name = optional(string, "")
+      identity             = optional(string, "")
+    }),
+    image   = string
+    cpu     = number
+    memory  = number
+    command = list(string)
+    liveness_probes = optional(list(object({
+      interval_seconds = number
+      transport        = string
+      port             = number
+      path             = optional(string, null)
+    })), [])
+    env = optional(list(object({
+      name      = string
+      value     = optional(string, null)
+      secretRef = optional(string, null)
+    })), [])
+    min_replicas = number
+    max_replicas = number
   }))
   default = {}
 }
