@@ -31,6 +31,16 @@ variable "existing_virtual_network" {
   default     = ""
 }
 
+variable "environment_accessibility_level" {
+  description = "Configure whether your container app allows public ingress or only ingress from within your VNet at the environment level."
+  type        = string
+  default     = "external"
+  validation {
+    condition     = contains(["internal", "external"], var.environment_accessibility_level)
+    error_message = "Valid values for environment_accessibility_level are internal or external."
+  }
+}
+
 variable "existing_resource_group" {
   description = "Conditionally launch resources into an existing resource group. Specifying this will NOT create a resource group."
   type        = string
