@@ -212,7 +212,7 @@ jobs:
 
       - name: Upload screenshots
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: screenshots-${{ needs.set-env.outputs.environment }}
           path: ${{ inputs.cypress-tests-screenshot-path }}
