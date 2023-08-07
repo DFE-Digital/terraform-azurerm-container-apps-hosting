@@ -13,6 +13,8 @@ resource "azurerm_postgresql_flexible_server" "default" {
   storage_mb             = local.postgresql_max_storage_mb
   sku_name               = local.postgresql_sku_name
   tags                   = local.tags
+
+  depends_on = [azurerm_private_dns_zone_virtual_network_link.postgresql_private_link[0]]
 }
 
 resource "azurerm_postgresql_flexible_server_database" "default" {

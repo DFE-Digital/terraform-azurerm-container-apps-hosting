@@ -57,9 +57,9 @@ locals {
   postgresql_network_connectivity_method = var.postgresql_network_connectivity_method
   postgresql_firewall_ipv4_allow = merge(
     {
-      "container-apps-env" = {
-        start_ip_address = jsondecode(azapi_resource.container_app_env.output).properties.staticIp
-        end_ip_address   = jsondecode(azapi_resource.container_app_env.output).properties.staticIp
+      "container-app" = {
+        start_ip_address = jsondecode(azapi_resource.default.output).properties.outboundIpAddresses[0]
+        end_ip_address   = jsondecode(azapi_resource.default.output).properties.outboundIpAddresses[0]
       }
     },
     var.postgresql_firewall_ipv4_allow
