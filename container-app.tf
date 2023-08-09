@@ -15,7 +15,7 @@ resource "azapi_resource" "container_app_env" {
       }
       vnetConfiguration = local.launch_in_vnet ? {
         infrastructureSubnetId = azurerm_subnet.container_apps_infra_subnet[0].id
-        internal               = local.environment_accessibility_level
+        internal               = local.environment_accessibility_level == "internal"
       } : null
     }
   })
