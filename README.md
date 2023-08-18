@@ -699,6 +699,7 @@ jobs:
 | <a name="input_container_app_blob_storage_ipv4_allow_list"></a> [container\_app\_blob\_storage\_ipv4\_allow\_list](#input\_container\_app\_blob\_storage\_ipv4\_allow\_list) | A list of public IPv4 address to grant access to the Blob Storage Account | `list(string)` | `[]` | no |
 | <a name="input_container_app_blob_storage_public_access_enabled"></a> [container\_app\_blob\_storage\_public\_access\_enabled](#input\_container\_app\_blob\_storage\_public\_access\_enabled) | Should the Azure Storage Account have Public visibility? | `bool` | `false` | no |
 | <a name="input_container_apps_allow_ips_inbound"></a> [container\_apps\_allow\_ips\_inbound](#input\_container\_apps\_allow\_ips\_inbound) | Restricts access to the Container Apps by creating a network security group rule that only allow inbound traffic from the provided list of IPs | `list(string)` | `[]` | no |
+| <a name="input_container_apps_infra_subnet_service_endpoints"></a> [container\_apps\_infra\_subnet\_service\_endpoints](#input\_container\_apps\_infra\_subnet\_service\_endpoints) | Endpoints to assign to infra subnet | `list(string)` | `[]` | no |
 | <a name="input_container_command"></a> [container\_command](#input\_container\_command) | Container command | `list(any)` | `[]` | no |
 | <a name="input_container_cpu"></a> [container\_cpu](#input\_container\_cpu) | Number of container CPU cores | `number` | `1` | no |
 | <a name="input_container_environment_variables"></a> [container\_environment\_variables](#input\_container\_environment\_variables) | Container environment variables | `map(string)` | `{}` | no |
@@ -810,6 +811,7 @@ jobs:
 | <a name="output_azurerm_log_analytics_workspace_container_app"></a> [azurerm\_log\_analytics\_workspace\_container\_app](#output\_azurerm\_log\_analytics\_workspace\_container\_app) | Container App Log Analytics Workspace |
 | <a name="output_azurerm_resource_group_default"></a> [azurerm\_resource\_group\_default](#output\_azurerm\_resource\_group\_default) | Default Azure Resource Group |
 | <a name="output_cdn_frontdoor_dns_records"></a> [cdn\_frontdoor\_dns\_records](#output\_cdn\_frontdoor\_dns\_records) | Azure Front Door DNS Records that must be created manually |
+| <a name="output_networking"></a> [networking](#output\_networking) | IDs for various VNet resources if created |
 <!-- END_TF_DOCS -->
 
 [1]: https://azure.microsoft.com/en-us/services/container-apps
