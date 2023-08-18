@@ -810,6 +810,7 @@ jobs:
 | <a name="output_azurerm_log_analytics_workspace_container_app"></a> [azurerm\_log\_analytics\_workspace\_container\_app](#output\_azurerm\_log\_analytics\_workspace\_container\_app) | Container App Log Analytics Workspace |
 | <a name="output_azurerm_resource_group_default"></a> [azurerm\_resource\_group\_default](#output\_azurerm\_resource\_group\_default) | Default Azure Resource Group |
 | <a name="output_cdn_frontdoor_dns_records"></a> [cdn\_frontdoor\_dns\_records](#output\_cdn\_frontdoor\_dns\_records) | Azure Front Door DNS Records that must be created manually |
+| <a name="output_container_fqdn"></a> [container\_fqdn](#output\_container\_fqdn) | FQDN for the Container App |
 <!-- END_TF_DOCS -->
 
 [1]: https://azure.microsoft.com/en-us/services/container-apps

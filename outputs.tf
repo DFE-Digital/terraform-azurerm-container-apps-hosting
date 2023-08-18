@@ -37,3 +37,8 @@ output "cdn_frontdoor_dns_records" {
   ) : null
   description = "Azure Front Door DNS Records that must be created manually"
 }
+
+output "container_fqdn" {
+  description = "FQDN for the Container App"
+  value       = local.container_fqdn
+}
