@@ -68,6 +68,16 @@ resource "azurerm_container_app" "container_apps" {
     }
   }
 
+  dynamic "identity" {
+    for_each = local.container_app_identities != null ? toset([1]) : toset([])
+
+    content {
+      type         = local.container_app_identities.type
+      identity_ids = local.container_app_identities.identity_ids
+    }
+  }
+
+
   registry {
     server               = local.registry_server
     username             = local.registry_username

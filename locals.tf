@@ -87,6 +87,7 @@ locals {
   container_environment_variables        = var.container_environment_variables
   container_secret_environment_variables = var.container_secret_environment_variables
   container_fqdn                         = azurerm_container_app.container_apps["main"].ingress[0].fqdn
+  container_app_identities               = var.container_app_identities
   # Container App / Container image
   image_name = var.image_name
   image_tag  = var.image_tag

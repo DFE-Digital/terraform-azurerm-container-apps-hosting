@@ -902,3 +902,17 @@ variable "container_apps_infra_subnet_service_endpoints" {
   type        = list(string)
   default     = []
 }
+
+variable "container_app_identities" {
+  description = "Identities to assign to container app"
+  type = object({
+    type : string
+    identity_ids : list(string)
+  })
+  default = null
+
+  validation {
+    condition     = contains(["SystemAssigned", "UserAssigned", "SystemAssigned, UserAssigned", ], var.container_app_identities.type)
+    error_message = "All destination_types must be one of CIDR_BLOCK,NETWORK_SECURITY_GROUP or SERVICE_CIDR_BLOCK!"
+  }
+}
