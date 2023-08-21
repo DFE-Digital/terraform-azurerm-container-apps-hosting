@@ -45,3 +45,8 @@ output "networking" {
   } : null
   description = "IDs for various VNet resources if created"
 }
+
+output "container_fqdn" {
+  description = "FQDN for the Container App"
+  value       = local.container_fqdn
+}

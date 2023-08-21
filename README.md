@@ -812,6 +812,7 @@ jobs:
 | <a name="output_azurerm_resource_group_default"></a> [azurerm\_resource\_group\_default](#output\_azurerm\_resource\_group\_default) | Default Azure Resource Group |
 | <a name="output_cdn_frontdoor_dns_records"></a> [cdn\_frontdoor\_dns\_records](#output\_cdn\_frontdoor\_dns\_records) | Azure Front Door DNS Records that must be created manually |
 | <a name="output_networking"></a> [networking](#output\_networking) | IDs for various VNet resources if created |
+| <a name="output_container_fqdn"></a> [container\_fqdn](#output\_container\_fqdn) | FQDN for the Container App |
 <!-- END_TF_DOCS -->
 
 [1]: https://azure.microsoft.com/en-us/services/container-apps
