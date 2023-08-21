@@ -913,6 +913,6 @@ variable "container_app_identities" {
 
   validation {
     condition     = contains(["SystemAssigned", "UserAssigned", "SystemAssigned, UserAssigned", ], var.container_app_identities.type)
-    error_message = "All destination_types must be one of CIDR_BLOCK,NETWORK_SECURITY_GROUP or SERVICE_CIDR_BLOCK!"
+    error_message = "Identity type must be one of the following: 'SystemAssigned', 'UserAssigned', or 'SystemAssigned, UserAssigned'!"
   }
 }
