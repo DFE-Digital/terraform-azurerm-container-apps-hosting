@@ -69,7 +69,7 @@ resource "azurerm_container_app" "container_apps" {
   }
 
   dynamic "identity" {
-    for_each = local.container_app_identities != null ? toset([1]) : toset([])
+    for_each = local.container_app_identities != {} ? [1] : [0]
 
     content {
       type         = local.container_app_identities.type
