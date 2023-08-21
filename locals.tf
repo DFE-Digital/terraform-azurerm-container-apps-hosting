@@ -85,6 +85,7 @@ locals {
   container_command                      = var.container_command
   container_environment_variables        = var.container_environment_variables
   container_secret_environment_variables = var.container_secret_environment_variables
+  container_fqdn                         = jsondecode(azapi_resource.default.output).properties.configuration.ingress.fqdn
   # Container App / Container image
   image_name = var.image_name
   image_tag  = var.image_tag
@@ -182,7 +183,7 @@ locals {
     for domain in local.cdn_frontdoor_custom_domains : replace(domain, local.dns_zone_domain_name, "") if endswith(domain, local.dns_zone_domain_name)
   ]) : []
   cdn_frontdoor_custom_domains_create_dns_records = var.cdn_frontdoor_custom_domains_create_dns_records
-  cdn_frontdoor_origin_fqdn_override              = var.cdn_frontdoor_origin_fqdn_override != "" ? var.cdn_frontdoor_origin_fqdn_override : jsondecode(azapi_resource.default.output).properties.configuration.ingress.fqdn
+  cdn_frontdoor_origin_fqdn_override              = var.cdn_frontdoor_origin_fqdn_override != "" ? var.cdn_frontdoor_origin_fqdn_override : local.container_fqdn
   cdn_frontdoor_origin_host_header_override       = var.cdn_frontdoor_origin_host_header_override != "" ? var.cdn_frontdoor_origin_host_header_override : null
   cdn_frontdoor_origin_http_port                  = var.cdn_frontdoor_origin_http_port
   cdn_frontdoor_origin_https_port                 = var.cdn_frontdoor_origin_https_port
@@ -228,7 +229,7 @@ locals {
   monitor_endpoint_healthcheck    = var.monitor_endpoint_healthcheck
   monitor_http_availability_fqdn = local.enable_cdn_frontdoor ? (
     length(local.cdn_frontdoor_custom_domains) >= 1 ? local.cdn_frontdoor_custom_domains[0] : azurerm_cdn_frontdoor_endpoint.endpoint[0].host_name
-  ) : jsondecode(azapi_resource.default.output).properties.configuration.ingress.fqdn
+  ) : local.container_fqdn
   monitor_http_availability_url = "https://${local.monitor_http_availability_fqdn}${local.monitor_endpoint_healthcheck}"
   monitor_default_container_id  = { "default_id" = azapi_resource.default.id }
   monitor_worker_container_id   = local.enable_worker_container ? { "worker_id" = azapi_resource.worker[0].id } : {}
