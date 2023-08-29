@@ -526,6 +526,7 @@ jobs:
 | <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | >= 1.6.0 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.59.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.2.1 |
+| <a name="requirement_statuscake"></a> [statuscake](#requirement\_statuscake) | >= 2.1.0 |
 
 ## Providers
 
@@ -534,6 +535,7 @@ jobs:
 | <a name="provider_azapi"></a> [azapi](#provider\_azapi) | 1.8.0 |
 | <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.70.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | 3.2.1 |
+| <a name="provider_statuscake"></a> [statuscake](#provider\_statuscake) | 2.1.0 |
 
 ## Resources
 
@@ -655,6 +657,8 @@ jobs:
 | [azurerm_subnet_route_table_association.redis_cache_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
 | [azurerm_virtual_network.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
 | [null_resource.tagging](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [statuscake_contact_group.monitoring_team](https://registry.terraform.io/providers/StatusCakeDev/statuscake/latest/docs/resources/contact_group) | resource |
+| [statuscake_ssl_check.main](https://registry.terraform.io/providers/StatusCakeDev/statuscake/latest/docs/resources/ssl_check) | resource |
 | [azapi_resource_action.existing_logic_app_workflow_callback_url](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_action) | data source |
 | [azurerm_logic_app_workflow.existing_logic_app_workflow](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/logic_app_workflow) | data source |
 | [azurerm_resource_group.existing_resource_group](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
@@ -795,6 +799,14 @@ jobs:
 | <a name="input_registry_server"></a> [registry\_server](#input\_registry\_server) | Container registry server (required if `enable_container_registry` is false) | `string` | `""` | no |
 | <a name="input_registry_username"></a> [registry\_username](#input\_registry\_username) | Container registry username (required if `enable_container_registry` is false) | `string` | `""` | no |
 | <a name="input_restrict_container_apps_to_cdn_inbound_only"></a> [restrict\_container\_apps\_to\_cdn\_inbound\_only](#input\_restrict\_container\_apps\_to\_cdn\_inbound\_only) | Restricts access to the Container Apps by creating a network security group rule that only allows 'AzureFrontDoor.Backend' inbound, and attaches it to the subnet of the container app environment. | `bool` | `true` | no |
+| <a name="input_statuscake_alert_at"></a> [statuscake\_alert\_at](#input\_statuscake\_alert\_at) | Statuscake alerts at number of days before expiration | `list(number)` | n/a | yes |
+| <a name="input_statuscake_api_token"></a> [statuscake\_api\_token](#input\_statuscake\_api\_token) | Api token for Statuscake | `string` | n/a | yes |
+| <a name="input_statuscake_monitored_resource_address"></a> [statuscake\_monitored\_resource\_address](#input\_statuscake\_monitored\_resource\_address) | Set of URLs to perform SSL checks on | `string` | `""` | no |
+| <a name="input_statuscake_name"></a> [statuscake\_name](#input\_statuscake\_name) | Name of the contact group in statuscake | `string` | n/a | yes |
+| <a name="input_statuscake_on_broken"></a> [statuscake\_on\_broken](#input\_statuscake\_on\_broken) | Statuscake problem alerts to be informed when your certificate has issues which cause it to throw errors. | `bool` | `false` | no |
+| <a name="input_statuscake_on_expiry"></a> [statuscake\_on\_expiry](#input\_statuscake\_on\_expiry) | Statuscake expiration alerts to be informed when your certificate has expired. | `bool` | `true` | no |
+| <a name="input_statuscake_on_mixed"></a> [statuscake\_on\_mixed](#input\_statuscake\_on\_mixed) | Statuscake warnings whenever insecure content gets loaded on your HTTPS enabled website. | `bool` | `false` | no |
+| <a name="input_statuscake_on_reminder"></a> [statuscake\_on\_reminder](#input\_statuscake\_on\_reminder) | Statuscake reminders to be informed when your certificate is about to expire. You can configure this below. | `bool` | `true` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to be applied to all resources | `map(string)` | `{}` | no |
 | <a name="input_virtual_network_address_space"></a> [virtual\_network\_address\_space](#input\_virtual\_network\_address\_space) | Virtual Network address space CIDR | `string` | `"172.16.0.0/12"` | no |
 | <a name="input_worker_container_command"></a> [worker\_container\_command](#input\_worker\_container\_command) | Container command for the Worker container. `enable_worker_container` must be set to true for this to have any effect. | `list(string)` | `[]` | no |

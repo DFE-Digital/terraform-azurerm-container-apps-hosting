@@ -253,6 +253,16 @@ locals {
   alarm_tls_expiry_days_remaining   = var.alarm_tls_expiry_days_remaining
   alarm_log_ingestion_gb_per_day    = var.alarm_log_ingestion_gb_per_day
 
+  # Statuscake Monitoring
+  statuscake_api_token                  = var.statuscake_api_token
+  statuscake_monitored_resource_address = var.statuscake_monitored_resource_address
+  statuscake_alert_at                   = var.statuscake_alert_at
+  statuscake_on_reminder                = var.statuscake_on_reminder
+  statuscake_on_expiry                  = var.statuscake_on_expiry
+  statuscake_on_broken                  = var.statuscake_on_broken
+  statuscake_on_mixed                   = var.statuscake_on_mixed
+  statuscake_name                       = var.statuscake_name
+
   # Network Watcher
   enable_network_watcher                         = var.enable_network_watcher
   existing_network_watcher_name                  = var.existing_network_watcher_name

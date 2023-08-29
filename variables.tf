@@ -904,3 +904,48 @@ variable "custom_container_apps" {
   }))
   default = {}
 }
+
+variable "statuscake_api_token" {
+  description = "Api token for Statuscake"
+  type        = string
+}
+
+variable "statuscake_monitored_resource_address" {
+  description = "Set of URLs to perform SSL checks on"
+  type        = string
+  default     = ""
+}
+
+variable "statuscake_alert_at" {
+  description = "Statuscake alerts at number of days before expiration"
+  type        = list(number)
+}
+
+variable "statuscake_on_reminder" {
+  description = "Statuscake reminders to be informed when your certificate is about to expire. You can configure this below."
+  type        = bool
+  default     = true
+}
+
+variable "statuscake_on_expiry" {
+  description = "Statuscake expiration alerts to be informed when your certificate has expired."
+  type        = bool
+  default     = true
+}
+
+variable "statuscake_on_broken" {
+  description = "Statuscake problem alerts to be informed when your certificate has issues which cause it to throw errors."
+  type        = bool
+  default     = false
+}
+
+variable "statuscake_on_mixed" {
+  description = "Statuscake warnings whenever insecure content gets loaded on your HTTPS enabled website."
+  type        = bool
+  default     = false
+}
+
+variable "statuscake_name" {
+  description = "Name of the contact group in statuscake"
+  type        = string
+}
