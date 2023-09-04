@@ -99,7 +99,7 @@ jobs:
     runs-on: ubuntu-22.04
     environment: ${{ needs.set-env.outputs.environment }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
 
@@ -128,7 +128,7 @@ jobs:
     needs: set-env
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
 
@@ -190,7 +190,7 @@ jobs:
       run:
         working-directory: ${{ inputs.cypress-tests-working-directory }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
 
