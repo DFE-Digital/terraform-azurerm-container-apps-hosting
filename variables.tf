@@ -909,11 +909,4 @@ variable "container_apps_infra_subnet_service_endpoints" {
   description = "Endpoints to assign to infra subnet"
   type        = list(string)
   default     = []
-
-  validation {
-    condition = alltrue([
-      for endpoint in var.container_apps_infra_subnet_service_endpoints : contains(["Microsoft.Storage", "Microsoft.Sql", "Microsoft.AzureActiveDirectory", "Microsoft.AzureCosmosDB", "Microsoft.Web", "Microsoft.KeyVault", "Microsoft.EventHub", "Microsoft.ServiceBus", "Microsoft.ContainerRegistry", "Microsoft.CognitiveServices", "Microsoft.Storage.Global"], endpoint)
-    ])
-    error_message = "Service endpoints must match one of following: Microsoft.Storage Microsoft.Sql Microsoft.AzureActiveDirectory Microsoft.AzureCosmosDB Microsoft.Web Microsoft.KeyVault Microsoft.EventHub Microsoft.ServiceBus Microsoft.ContainerRegistry Microsoft.CognitiveServices Microsoft.Storage.Global"
-  }
 }
