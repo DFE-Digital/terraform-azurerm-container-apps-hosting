@@ -906,18 +906,18 @@ variable "container_apps_infra_subnet_service_endpoints" {
 variable "container_app_identities" {
   description = "Identities to assign to container app"
   type = object({
-    type : optional(string)
-    identity_ids : optional(list(string))
+    type : string
+    identity_ids : list(string)
   })
-  default = {}
+  default = null
 
   validation {
-    condition     = anytrue([var.container_app_identities.type == null && var.container_app_identities.identity_ids == null, contains(["SystemAssigned", "UserAssigned", "SystemAssigned, UserAssigned", ], coalesce(var.container_app_identities.type, " "))])
-    error_message = "Identity type must be one of the following: 'SystemAssigned', 'UserAssigned', or 'SystemAssigned, UserAssigned'!"
+    condition     = try(length(var.container_app_identities.type) > 0, var.container_app_identities == null)
+    error_message = "Identity type must not be null or empty"
   }
 
   validation {
-    condition     = anytrue([var.container_app_identities.type == null && var.container_app_identities.identity_ids == null, length(coalesce(var.container_app_identities.identity_ids, [])) > 0])
+    condition     = try(length(var.container_app_identities.identity_ids) > 0, var.container_app_identities == null)
     error_message = "At least one identity ID must be supplied"
   }
 }
