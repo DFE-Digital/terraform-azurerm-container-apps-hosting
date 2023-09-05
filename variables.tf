@@ -908,6 +908,7 @@ variable "custom_container_apps" {
 variable "statuscake_api_token" {
   description = "Api token for Statuscake"
   type        = string
+  default     = ""
 }
 
 variable "statuscake_monitored_resource_address" {
@@ -919,6 +920,7 @@ variable "statuscake_monitored_resource_address" {
 variable "statuscake_alert_at" {
   description = "Statuscake alerts at number of days before expiration"
   type        = list(number)
+  default     = []
 }
 
 variable "statuscake_on_reminder" {
@@ -948,4 +950,5 @@ variable "statuscake_on_mixed" {
 variable "statuscake_name" {
   description = "Name of the contact group in statuscake"
   type        = string
+  default     = ""
 }

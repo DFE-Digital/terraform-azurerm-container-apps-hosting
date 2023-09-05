@@ -532,8 +532,8 @@ jobs:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azapi"></a> [azapi](#provider\_azapi) | 1.8.0 |
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.70.0 |
+| <a name="provider_azapi"></a> [azapi](#provider\_azapi) | 1.9.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.71.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | 3.2.1 |
 | <a name="provider_statuscake"></a> [statuscake](#provider\_statuscake) | 2.1.0 |
 
@@ -799,10 +799,10 @@ jobs:
 | <a name="input_registry_server"></a> [registry\_server](#input\_registry\_server) | Container registry server (required if `enable_container_registry` is false) | `string` | `""` | no |
 | <a name="input_registry_username"></a> [registry\_username](#input\_registry\_username) | Container registry username (required if `enable_container_registry` is false) | `string` | `""` | no |
 | <a name="input_restrict_container_apps_to_cdn_inbound_only"></a> [restrict\_container\_apps\_to\_cdn\_inbound\_only](#input\_restrict\_container\_apps\_to\_cdn\_inbound\_only) | Restricts access to the Container Apps by creating a network security group rule that only allows 'AzureFrontDoor.Backend' inbound, and attaches it to the subnet of the container app environment. | `bool` | `true` | no |
-| <a name="input_statuscake_alert_at"></a> [statuscake\_alert\_at](#input\_statuscake\_alert\_at) | Statuscake alerts at number of days before expiration | `list(number)` | n/a | yes |
-| <a name="input_statuscake_api_token"></a> [statuscake\_api\_token](#input\_statuscake\_api\_token) | Api token for Statuscake | `string` | n/a | yes |
+| <a name="input_statuscake_alert_at"></a> [statuscake\_alert\_at](#input\_statuscake\_alert\_at) | Statuscake alerts at number of days before expiration | `list(number)` | `[]` | no |
+| <a name="input_statuscake_api_token"></a> [statuscake\_api\_token](#input\_statuscake\_api\_token) | Api token for Statuscake | `string` | `""` | no |
 | <a name="input_statuscake_monitored_resource_address"></a> [statuscake\_monitored\_resource\_address](#input\_statuscake\_monitored\_resource\_address) | Set of URLs to perform SSL checks on | `string` | `""` | no |
-| <a name="input_statuscake_name"></a> [statuscake\_name](#input\_statuscake\_name) | Name of the contact group in statuscake | `string` | n/a | yes |
+| <a name="input_statuscake_name"></a> [statuscake\_name](#input\_statuscake\_name) | Name of the contact group in statuscake | `string` | `""` | no |
 | <a name="input_statuscake_on_broken"></a> [statuscake\_on\_broken](#input\_statuscake\_on\_broken) | Statuscake problem alerts to be informed when your certificate has issues which cause it to throw errors. | `bool` | `false` | no |
 | <a name="input_statuscake_on_expiry"></a> [statuscake\_on\_expiry](#input\_statuscake\_on\_expiry) | Statuscake expiration alerts to be informed when your certificate has expired. | `bool` | `true` | no |
 | <a name="input_statuscake_on_mixed"></a> [statuscake\_on\_mixed](#input\_statuscake\_on\_mixed) | Statuscake warnings whenever insecure content gets loaded on your HTTPS enabled website. | `bool` | `false` | no |
