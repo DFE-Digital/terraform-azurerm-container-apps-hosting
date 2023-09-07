@@ -28,7 +28,7 @@ resource "azurerm_subnet" "container_apps_infra_subnet" {
   resource_group_name  = local.resource_group.name
   address_prefixes     = [local.container_apps_infra_subnet_cidr]
 
-  service_endpoints = local.enable_container_app_blob_storage ? ["Microsoft.Storage"] : []
+  service_endpoints = local.container_apps_infra_subnet_service_endpoints
 }
 
 resource "azurerm_subnet_route_table_association" "container_apps_infra_subnet" {

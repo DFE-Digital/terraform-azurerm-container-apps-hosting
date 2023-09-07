@@ -904,3 +904,9 @@ variable "custom_container_apps" {
   }))
   default = {}
 }
+
+variable "container_apps_infra_subnet_service_endpoints" {
+  description = "Endpoints to assign to infra subnet"
+  type        = list(string)
+  default     = []
+}

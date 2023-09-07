@@ -38,6 +38,14 @@ output "cdn_frontdoor_dns_records" {
   description = "Azure Front Door DNS Records that must be created manually"
 }
 
+output "networking" {
+  value = local.launch_in_vnet ? {
+    vnet_id : local.existing_virtual_network == "" ? azurerm_virtual_network.default[0].id : null
+    subnet_id : azurerm_subnet.container_apps_infra_subnet[0].id
+  } : null
+  description = "IDs for various VNet resources if created"
+}
+
 output "container_fqdn" {
   description = "FQDN for the Container App"
   value       = local.container_fqdn
