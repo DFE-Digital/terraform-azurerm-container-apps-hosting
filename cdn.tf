@@ -100,6 +100,22 @@ resource "azurerm_cdn_frontdoor_custom_domain" "custom_domain" {
   }
 }
 
+resource "azurerm_cdn_frontdoor_custom_domain" "custom_container_apps" {
+  for_each = local.enable_cdn_frontdoor ? { for name, container in local.custom_container_apps : name => container
+    if container.ingress.external_enabled && container.ingress.cdn_frontdoor_custom_domain != ""
+  } : {}
+
+  name                     = "${local.resource_prefix}custom-domain-${each.key}"
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.cdn[0].id
+  dns_zone_id              = local.enable_dns_zone && endswith(each.value.ingress.cdn_frontdoor_custom_domain, local.dns_zone_domain_name) ? azurerm_dns_zone.default[0].id : null
+  host_name                = each.value.ingress.cdn_frontdoor_custom_domain
+
+  tls {
+    certificate_type    = "ManagedCertificate"
+    minimum_tls_version = "TLS12"
+  }
+}
+
 resource "azurerm_cdn_frontdoor_route" "route" {
   count = local.enable_cdn_frontdoor ? 1 : 0
 
@@ -138,6 +154,8 @@ resource "azurerm_cdn_frontdoor_route" "custom_container_apps" {
   https_redirect_enabled = true
   patterns_to_match      = ["/*"]
   supported_protocols    = ["Http", "Https"]
+
+  cdn_frontdoor_custom_domain_ids = each.value.ingress.cdn_frontdoor_custom_domain != "" ? [azurerm_cdn_frontdoor_custom_domain.custom_container_apps[each.key].id] : []
 }
 
 resource "azurerm_cdn_frontdoor_custom_domain_association" "custom_domain_association" {
@@ -246,10 +264,30 @@ resource "azurerm_cdn_frontdoor_security_policy" "waf" {
         }
 
         dynamic "domain" {
+          for_each = local.enable_cdn_frontdoor ? { for name, container in local.custom_container_apps : name => container
+            if container.ingress.external_enabled
+          } : {}
+
+          content {
+            cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_endpoint.custom_container_apps[domain.key].id
+          }
+        }
+
+        dynamic "domain" {
           for_each = toset(local.cdn_frontdoor_custom_domains)
 
           content {
             cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_custom_domain.custom_domain[domain.value].id
+          }
+        }
+
+        dynamic "domain" {
+          for_each = local.enable_cdn_frontdoor ? { for name, container in local.custom_container_apps : name => container
+            if container.ingress.external_enabled && container.ingress.cdn_frontdoor_custom_domain != ""
+          } : {}
+
+          content {
+            cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_custom_domain.custom_container_apps[domain.key].id
           }
         }
       }

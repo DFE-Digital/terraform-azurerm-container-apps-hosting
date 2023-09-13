@@ -864,6 +864,7 @@ variable "custom_container_apps" {
       traffic_weight = object({
         percentage = optional(number, 100)
       })
+      cdn_frontdoor_custom_domain = optional(string, "")
     }), null)
     secrets = optional(list(object({
       name  = string

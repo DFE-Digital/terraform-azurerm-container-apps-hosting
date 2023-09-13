@@ -118,6 +118,10 @@ locals {
   worker_container_max_replicas = var.worker_container_max_replicas
   # Container app / Custom
   custom_container_apps = var.custom_container_apps
+  custom_container_apps_cdn_frontdoor_custom_domain_dns_names = local.enable_cdn_frontdoor ? {
+    for name, container in local.custom_container_apps : name => replace(container.ingress.cdn_frontdoor_custom_domain, local.dns_zone_domain_name, "")
+    if container.ingress.external_enabled && container.ingress.cdn_frontdoor_custom_domain != "" && endswith(container.ingress.cdn_frontdoor_custom_domain, local.dns_zone_domain_name)
+  } : {}
 
   # Storage Account
   enable_container_app_blob_storage                = var.enable_container_app_blob_storage
