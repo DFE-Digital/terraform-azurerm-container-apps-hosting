@@ -535,7 +535,7 @@ jobs:
 | Name | Version |
 |------|---------|
 | <a name="provider_azapi"></a> [azapi](#provider\_azapi) | 1.9.0 |
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.71.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.72.0 |
 
 ## Resources
 
@@ -544,13 +544,18 @@ jobs:
 | [azurerm_application_insights.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights) | resource |
 | [azurerm_application_insights_standard_web_test.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_standard_web_test) | resource |
 | [azurerm_application_insights_standard_web_test.tls](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_standard_web_test) | resource |
+| [azurerm_cdn_frontdoor_custom_domain.custom_container_apps](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_custom_domain) | resource |
 | [azurerm_cdn_frontdoor_custom_domain.custom_domain](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_custom_domain) | resource |
 | [azurerm_cdn_frontdoor_custom_domain_association.custom_domain_association](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_custom_domain_association) | resource |
+| [azurerm_cdn_frontdoor_endpoint.custom_container_apps](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_endpoint) | resource |
 | [azurerm_cdn_frontdoor_endpoint.endpoint](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_endpoint) | resource |
 | [azurerm_cdn_frontdoor_firewall_policy.waf](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_firewall_policy) | resource |
+| [azurerm_cdn_frontdoor_origin.custom_container_apps](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_origin) | resource |
 | [azurerm_cdn_frontdoor_origin.origin](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_origin) | resource |
+| [azurerm_cdn_frontdoor_origin_group.custom_container_apps](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_origin_group) | resource |
 | [azurerm_cdn_frontdoor_origin_group.group](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_origin_group) | resource |
 | [azurerm_cdn_frontdoor_profile.cdn](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_profile) | resource |
+| [azurerm_cdn_frontdoor_route.custom_container_apps](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_route) | resource |
 | [azurerm_cdn_frontdoor_route.route](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_route) | resource |
 | [azurerm_cdn_frontdoor_rule.add_response_headers](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_rule) | resource |
 | [azurerm_cdn_frontdoor_rule.redirect](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_rule) | resource |
@@ -563,6 +568,7 @@ jobs:
 | [azurerm_container_app.custom_container_apps](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app) | resource |
 | [azurerm_container_app_environment.container_app_env](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment) | resource |
 | [azurerm_container_registry.acr](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry) | resource |
+| [azurerm_dns_a_record.custom_container_frontdoor_custom_domain](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
 | [azurerm_dns_a_record.dns_a_records](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
 | [azurerm_dns_a_record.dns_alias_records](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
 | [azurerm_dns_a_record.frontdoor_custom_domain](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_a_record) | resource |
@@ -573,6 +579,7 @@ jobs:
 | [azurerm_dns_ns_record.dns_ns_records](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_ns_record) | resource |
 | [azurerm_dns_ptr_record.dns_ptr_records](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_ptr_record) | resource |
 | [azurerm_dns_srv_record.dns_srv_records](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_srv_record) | resource |
+| [azurerm_dns_txt_record.custom_container_frontdoor_custom_domain](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_txt_record) | resource |
 | [azurerm_dns_txt_record.dns_txt_records](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_txt_record) | resource |
 | [azurerm_dns_txt_record.frontdoor_custom_domain](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_txt_record) | resource |
 | [azurerm_dns_zone.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/dns_zone) | resource |
@@ -656,6 +663,7 @@ jobs:
 | [azurerm_subnet_route_table_association.redis_cache_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
 | [azurerm_virtual_network.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
 | [azapi_resource_action.existing_logic_app_workflow_callback_url](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_action) | data source |
+| [azurerm_container_app.custom_container_apps](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/container_app) | data source |
 | [azurerm_logic_app_workflow.existing_logic_app_workflow](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/logic_app_workflow) | data source |
 | [azurerm_resource_group.existing_resource_group](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
 | [azurerm_storage_account_blob_container_sas.container_app](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/storage_account_blob_container_sas) | data source |
@@ -706,13 +714,13 @@ jobs:
 | <a name="input_container_environment_variables"></a> [container\_environment\_variables](#input\_container\_environment\_variables) | Container environment variables | `map(string)` | `{}` | no |
 | <a name="input_container_health_probe_interval"></a> [container\_health\_probe\_interval](#input\_container\_health\_probe\_interval) | How often in seconds to poll the Container to determine liveness | `number` | `30` | no |
 | <a name="input_container_health_probe_path"></a> [container\_health\_probe\_path](#input\_container\_health\_probe\_path) | Specifies the path that is used to determine the liveness of the Container | `string` | `"/"` | no |
-| <a name="input_container_health_probe_protocol"></a> [container\_health\_probe\_protocol](#input\_container\_health\_probe\_protocol) | Use HTTPS or a TCP connection for the Container liveness probe | `string` | `"https"` | no |
+| <a name="input_container_health_probe_protocol"></a> [container\_health\_probe\_protocol](#input\_container\_health\_probe\_protocol) | Use HTTPS or a TCP connection for the Container liveness probe | `string` | `"http"` | no |
 | <a name="input_container_max_replicas"></a> [container\_max\_replicas](#input\_container\_max\_replicas) | Container max replicas | `number` | `2` | no |
 | <a name="input_container_memory"></a> [container\_memory](#input\_container\_memory) | Container memory in GB | `number` | `2` | no |
 | <a name="input_container_min_replicas"></a> [container\_min\_replicas](#input\_container\_min\_replicas) | Container min replicas | `number` | `1` | no |
 | <a name="input_container_port"></a> [container\_port](#input\_container\_port) | Container port | `number` | `80` | no |
 | <a name="input_container_secret_environment_variables"></a> [container\_secret\_environment\_variables](#input\_container\_secret\_environment\_variables) | Container environment variables, which are defined as `secrets` within the container app configuration. This is to help reduce the risk of accidentally exposing secrets. | `map(string)` | `{}` | no |
-| <a name="input_custom_container_apps"></a> [custom\_container\_apps](#input\_custom\_container\_apps) | Custom container apps, by default deployed within the container app environment managed by this module. | <pre>map(object({<br>    container_app_environment_id = optional(string, "")<br>    resource_group_name          = optional(string, "")<br>    revision_mode                = optional(string, "Single")<br>    container_port               = optional(number, 0)<br>    ingress = optional(object({<br>      external_enabled = optional(bool, true)<br>      target_port      = optional(number, null)<br>      traffic_weight = object({<br>        percentage = optional(number, 100)<br>      })<br>    }), null)<br>    secrets = optional(list(object({<br>      name  = string<br>      value = string<br>    })), [])<br>    registry = object({<br>      server               = optional(string, "")<br>      username             = optional(string, "")<br>      password_secret_name = optional(string, "")<br>      identity             = optional(string, "")<br>    }),<br>    image   = string<br>    cpu     = number<br>    memory  = number<br>    command = list(string)<br>    liveness_probes = optional(list(object({<br>      interval_seconds = number<br>      transport        = string<br>      port             = number<br>      path             = optional(string, null)<br>    })), [])<br>    env = optional(list(object({<br>      name      = string<br>      value     = optional(string, null)<br>      secretRef = optional(string, null)<br>    })), [])<br>    min_replicas = number<br>    max_replicas = number<br>  }))</pre> | `{}` | no |
+| <a name="input_custom_container_apps"></a> [custom\_container\_apps](#input\_custom\_container\_apps) | Custom container apps, by default deployed within the container app environment managed by this module. | <pre>map(object({<br>    container_app_environment_id = optional(string, "")<br>    resource_group_name          = optional(string, "")<br>    revision_mode                = optional(string, "Single")<br>    container_port               = optional(number, 0)<br>    ingress = optional(object({<br>      external_enabled = optional(bool, true)<br>      target_port      = optional(number, null)<br>      traffic_weight = object({<br>        percentage = optional(number, 100)<br>      })<br>      cdn_frontdoor_custom_domain = optional(string, "")<br>    }), null)<br>    secrets = optional(list(object({<br>      name  = string<br>      value = string<br>    })), [])<br>    registry = object({<br>      server               = optional(string, "")<br>      username             = optional(string, "")<br>      password_secret_name = optional(string, "")<br>      identity             = optional(string, "")<br>    }),<br>    image   = string<br>    cpu     = number<br>    memory  = number<br>    command = list(string)<br>    liveness_probes = optional(list(object({<br>      interval_seconds = number<br>      transport        = string<br>      port             = number<br>      path             = optional(string, null)<br>    })), [])<br>    env = optional(list(object({<br>      name      = string<br>      value     = optional(string, null)<br>      secretRef = optional(string, null)<br>    })), [])<br>    min_replicas = number<br>    max_replicas = number<br>  }))</pre> | `{}` | no |
 | <a name="input_dns_a_records"></a> [dns\_a\_records](#input\_dns\_a\_records) | DNS A records to add to the DNS Zone | <pre>map(<br>    object({<br>      ttl : optional(number, 300),<br>      records : list(string)<br>    })<br>  )</pre> | `{}` | no |
 | <a name="input_dns_aaaa_records"></a> [dns\_aaaa\_records](#input\_dns\_aaaa\_records) | DNS AAAA records to add to the DNS Zone | <pre>map(<br>    object({<br>      ttl : optional(number, 300),<br>      records : list(string)<br>    })<br>  )</pre> | `{}` | no |
 | <a name="input_dns_alias_records"></a> [dns\_alias\_records](#input\_dns\_alias\_records) | DNS ALIAS records to add to the DNS Zone | <pre>map(<br>    object({<br>      ttl : optional(number, 300),<br>      target_resource_id : string<br>    })<br>  )</pre> | `{}` | no |

@@ -24,7 +24,7 @@ locals {
   redis_cache_subnet_cidr                                  = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 4)
   postgresql_subnet_cidr                                   = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 5)
   container_app_environment_internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
-  container_apps_infra_subnet_service_endpoints            = var.container_apps_infra_subnet_service_endpoints
+  container_apps_infra_subnet_service_endpoints            = distinct(concat(local.launch_in_vnet && local.enable_container_app_blob_storage ? ["Microsoft.Storage"] : [], var.container_apps_infra_subnet_service_endpoints))
 
   # Azure Container Registry
   enable_container_registry = var.enable_container_registry
@@ -100,6 +100,12 @@ locals {
     transport        = "TCP"
     port             = local.container_port
   }
+  container_health_http_probe = {
+    interval_seconds = local.container_health_probe_interval
+    transport        = "HTTP"
+    port             = local.container_port
+    path             = local.container_health_probe_path
+  }
   container_health_https_probe = {
     interval_seconds = local.container_health_probe_interval
     transport        = "HTTPS"
@@ -108,6 +114,7 @@ locals {
   }
   container_health_probes = {
     "tcp" : local.container_health_tcp_probe
+    "http" : local.container_health_http_probe
     "https" : local.container_health_https_probe
   }
   container_health_probe = lookup(local.container_health_probes, local.container_health_probe_protocol, null)
@@ -118,6 +125,10 @@ locals {
   worker_container_max_replicas = var.worker_container_max_replicas
   # Container app / Custom
   custom_container_apps = var.custom_container_apps
+  custom_container_apps_cdn_frontdoor_custom_domain_dns_names = local.enable_cdn_frontdoor ? {
+    for name, container in local.custom_container_apps : name => replace(container.ingress.cdn_frontdoor_custom_domain, local.dns_zone_domain_name, "")
+    if container.ingress.external_enabled && container.ingress.cdn_frontdoor_custom_domain != "" && endswith(container.ingress.cdn_frontdoor_custom_domain, local.dns_zone_domain_name)
+  } : {}
 
   # Storage Account
   enable_container_app_blob_storage                = var.enable_container_app_blob_storage
