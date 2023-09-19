@@ -49,6 +49,33 @@ resource "azurerm_dns_a_record" "frontdoor_custom_domain" {
   tags = local.tags
 }
 
+resource "azurerm_dns_txt_record" "custom_container_frontdoor_custom_domain" {
+  for_each = local.enable_dns_zone && local.cdn_frontdoor_custom_domains_create_dns_records ? local.custom_container_apps_cdn_frontdoor_custom_domain_dns_names : {}
+
+  name                = trim(join(".", ["_dnsauth", each.value]), ".")
+  zone_name           = azurerm_dns_zone.default[0].name
+  resource_group_name = local.resource_group.name
+  ttl                 = 3600
+
+  record {
+    value = azurerm_cdn_frontdoor_custom_domain.custom_container_apps[each.key].validation_token
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_dns_a_record" "custom_container_frontdoor_custom_domain" {
+  for_each = local.enable_dns_zone && local.cdn_frontdoor_custom_domains_create_dns_records ? local.custom_container_apps_cdn_frontdoor_custom_domain_dns_names : {}
+
+  name                = trim(each.value, ".") == "" ? "@" : trim(each.value, ".")
+  zone_name           = azurerm_dns_zone.default[0].name
+  resource_group_name = local.resource_group.name
+  ttl                 = 300
+  target_resource_id  = azurerm_cdn_frontdoor_endpoint.custom_container_apps[each.key].id
+
+  tags = local.tags
+}
+
 resource "azurerm_dns_a_record" "dns_a_records" {
   for_each = local.enable_dns_zone ? local.dns_a_records : {}
 

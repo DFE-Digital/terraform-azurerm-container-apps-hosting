@@ -27,6 +27,17 @@ resource "azurerm_cdn_frontdoor_origin_group" "group" {
   }
 }
 
+resource "azurerm_cdn_frontdoor_origin_group" "custom_container_apps" {
+  for_each = local.enable_cdn_frontdoor ? { for name, container in local.custom_container_apps : name => container
+    if container.ingress.external_enabled
+  } : {}
+
+  name                     = "${local.resource_prefix}origingroup${replace(each.key, "-", "")}"
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.cdn[0].id
+
+  load_balancing {}
+}
+
 resource "azurerm_cdn_frontdoor_origin" "origin" {
   count = local.enable_cdn_frontdoor ? 1 : 0
 
@@ -40,10 +51,37 @@ resource "azurerm_cdn_frontdoor_origin" "origin" {
   https_port                     = local.cdn_frontdoor_origin_https_port
 }
 
+resource "azurerm_cdn_frontdoor_origin" "custom_container_apps" {
+  for_each = local.enable_cdn_frontdoor ? { for name, container in local.custom_container_apps : name => container
+    if container.ingress.external_enabled
+  } : {}
+
+  name                           = "${local.resource_prefix}origin${replace(each.key, "-", "")}"
+  cdn_frontdoor_origin_group_id  = azurerm_cdn_frontdoor_origin_group.custom_container_apps[each.key].id
+  enabled                        = true
+  certificate_name_check_enabled = true
+  host_name                      = data.azurerm_container_app.custom_container_apps[each.key].ingress[0].fqdn
+  origin_host_header             = data.azurerm_container_app.custom_container_apps[each.key].ingress[0].fqdn
+  http_port                      = local.cdn_frontdoor_origin_http_port
+  https_port                     = local.cdn_frontdoor_origin_https_port
+
+  depends_on = [azurerm_container_app.custom_container_apps]
+}
+
 resource "azurerm_cdn_frontdoor_endpoint" "endpoint" {
   count = local.enable_cdn_frontdoor ? 1 : 0
 
   name                     = "${local.resource_prefix}cdnendpoint"
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.cdn[0].id
+  tags                     = local.tags
+}
+
+resource "azurerm_cdn_frontdoor_endpoint" "custom_container_apps" {
+  for_each = local.enable_cdn_frontdoor ? { for name, container in local.custom_container_apps : name => container
+    if container.ingress.external_enabled
+  } : {}
+
+  name                     = "${local.resource_prefix}cdnendpoint-${replace(each.key, "-", "")}"
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.cdn[0].id
   tags                     = local.tags
 }
@@ -55,6 +93,22 @@ resource "azurerm_cdn_frontdoor_custom_domain" "custom_domain" {
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.cdn[0].id
   dns_zone_id              = local.enable_dns_zone && endswith(each.value, local.dns_zone_domain_name) ? azurerm_dns_zone.default[0].id : null
   host_name                = each.value
+
+  tls {
+    certificate_type    = "ManagedCertificate"
+    minimum_tls_version = "TLS12"
+  }
+}
+
+resource "azurerm_cdn_frontdoor_custom_domain" "custom_container_apps" {
+  for_each = local.enable_cdn_frontdoor ? { for name, container in local.custom_container_apps : name => container
+    if container.ingress.external_enabled && container.ingress.cdn_frontdoor_custom_domain != ""
+  } : {}
+
+  name                     = "${local.resource_prefix}custom-domain-${each.key}"
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.cdn[0].id
+  dns_zone_id              = local.enable_dns_zone && endswith(each.value.ingress.cdn_frontdoor_custom_domain, local.dns_zone_domain_name) ? azurerm_dns_zone.default[0].id : null
+  host_name                = each.value.ingress.cdn_frontdoor_custom_domain
 
   tls {
     certificate_type    = "ManagedCertificate"
@@ -82,6 +136,26 @@ resource "azurerm_cdn_frontdoor_route" "route" {
   ]
 
   link_to_default_domain = true
+}
+
+resource "azurerm_cdn_frontdoor_route" "custom_container_apps" {
+  for_each = local.enable_cdn_frontdoor ? { for name, container in local.custom_container_apps : name => container
+    if container.ingress.external_enabled
+  } : {}
+
+  name                          = "${local.resource_prefix}route-${replace(each.key, "-", "")}"
+  cdn_frontdoor_endpoint_id     = azurerm_cdn_frontdoor_endpoint.custom_container_apps[each.key].id
+  cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.custom_container_apps[each.key].id
+  cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.custom_container_apps[each.key].id]
+  cdn_frontdoor_rule_set_ids    = local.ruleset_ids
+  enabled                       = true
+
+  forwarding_protocol    = local.cdn_frontdoor_forwarding_protocol
+  https_redirect_enabled = true
+  patterns_to_match      = ["/*"]
+  supported_protocols    = ["Http", "Https"]
+
+  cdn_frontdoor_custom_domain_ids = each.value.ingress.cdn_frontdoor_custom_domain != "" ? [azurerm_cdn_frontdoor_custom_domain.custom_container_apps[each.key].id] : []
 }
 
 resource "azurerm_cdn_frontdoor_custom_domain_association" "custom_domain_association" {
@@ -190,10 +264,30 @@ resource "azurerm_cdn_frontdoor_security_policy" "waf" {
         }
 
         dynamic "domain" {
+          for_each = local.enable_cdn_frontdoor ? { for name, container in local.custom_container_apps : name => container
+            if container.ingress.external_enabled
+          } : {}
+
+          content {
+            cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_endpoint.custom_container_apps[domain.key].id
+          }
+        }
+
+        dynamic "domain" {
           for_each = toset(local.cdn_frontdoor_custom_domains)
 
           content {
             cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_custom_domain.custom_domain[domain.value].id
+          }
+        }
+
+        dynamic "domain" {
+          for_each = local.enable_cdn_frontdoor ? { for name, container in local.custom_container_apps : name => container
+            if container.ingress.external_enabled && container.ingress.cdn_frontdoor_custom_domain != ""
+          } : {}
+
+          content {
+            cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_custom_domain.custom_container_apps[domain.key].id
           }
         }
       }
