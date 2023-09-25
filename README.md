@@ -12,7 +12,7 @@ This module creates and manages [Azure Container Apps][1], deployed within an [A
 
 ```hcl
 module "azure_container_apps_hosting" {
-  source = "github.com/DFE-Digital/terraform-azurerm-container-apps-hosting?ref=v1.0.0"
+  source = "github.com/DFE-Digital/terraform-azurerm-container-apps-hosting?ref=v1.1.0"
 
   environment    = "dev"
   project_name   = "myproject"
@@ -350,7 +350,7 @@ module "azure_container_apps_hosting" {
 
   ## Add additional service endpoints to the infrastructure subnet
   # container_apps_infra_subnet_service_endpoints = ["Microsoft.KeyVault"]
-  
+
   # Deploy an Azure Front Door CDN. This will be configured as the entrypoint for all traffic accessing your Containers
   enable_cdn_frontdoor           = true
   # cdn_frontdoor_sku            = "Standard_AzureFrontDoor"
@@ -497,7 +497,7 @@ concurrency:
 
 jobs:
   deploy-to-environment:
-    uses: DFE-Digital/terraform-azurerm-container-apps-hosting/.github/workflows/build-push-and-deploy-to-environment.yml@v1.0.0
+    uses: DFE-Digital/terraform-azurerm-container-apps-hosting/.github/workflows/build-push-and-deploy-to-environment.yml@v1.1.0
     with:
       docker-image-name: "my-app"                 # Required
       docker-build-file-name: "Dockerfile"        # Optional
