@@ -172,27 +172,72 @@ resource "azurerm_monitor_metric_alert" "memory" {
   tags = local.tags
 }
 
-resource "azurerm_monitor_metric_alert" "exceptions" {
+resource "azurerm_monitor_scheduled_query_rules_alert_v2" "exceptions" {
   count = local.enable_monitoring ? 1 : 0
 
-  name                = "${azurerm_application_insights.main.name}-exceptions"
-  resource_group_name = local.resource_group.name
-  scopes              = [azurerm_application_insights.main.id]
-  description         = "Action will be triggered when the number of exceptions exceeds 0"
-  window_size         = "PT5M"
-  frequency           = "PT1M"
-  severity            = 2
+  name                 = "${azurerm_application_insights.main.name}-exceptions"
+  resource_group_name  = local.resource_group.name
+  location             = local.resource_group.location
+  evaluation_frequency = "PT5M"
+  window_duration      = "PT5M"
+  scopes               = [azurerm_application_insights.main.id]
+  severity             = 2
+  description          = "Action will be triggered when an Exception is raised in App Insights"
 
   criteria {
-    metric_namespace = "Microsoft.Insights/components"
-    metric_name      = "exceptions/count"
-    aggregation      = "Count"
-    operator         = "GreaterThan"
-    threshold        = 0
+    query = <<-QUERY
+      exceptions
+        | where timestamp > ago(5min)
+        | project cloud_RoleInstance, type, outerMessage, innermostMessage
+        | summarize ErrorCount=count() by cloud_RoleInstance, type, outerMessage, innermostMessage
+        | project ErrorCount, cloud_RoleInstance, type, outerMessage, innermostMessage
+        | order by ErrorCount desc
+      QUERY
+
+    time_aggregation_method = "Count"
+    threshold               = 1
+    operator                = "GreaterThanOrEqual"
+
+    dimension {
+      name     = "ErrorCount"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "cloud_RoleInstance"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "type"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "outerMessage"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "innermostMessage"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    failing_periods {
+      minimum_failing_periods_to_trigger_alert = 1
+      number_of_evaluation_periods             = 1
+    }
   }
 
+  auto_mitigation_enabled = false
+
   action {
-    action_group_id = azurerm_monitor_action_group.main[0].id
+    action_groups = [azurerm_monitor_action_group.main[0].id]
   }
 
   tags = local.tags
