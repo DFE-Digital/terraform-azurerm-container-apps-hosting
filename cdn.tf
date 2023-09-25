@@ -60,8 +60,8 @@ resource "azurerm_cdn_frontdoor_origin" "custom_container_apps" {
   cdn_frontdoor_origin_group_id  = azurerm_cdn_frontdoor_origin_group.custom_container_apps[each.key].id
   enabled                        = true
   certificate_name_check_enabled = true
-  host_name                      = data.azurerm_container_app.custom_container_apps[each.key].ingress[0].fqdn
-  origin_host_header             = data.azurerm_container_app.custom_container_apps[each.key].ingress[0].fqdn
+  host_name                      = azurerm_container_app.custom_container_apps[each.key].ingress[0].fqdn
+  origin_host_header             = azurerm_container_app.custom_container_apps[each.key].ingress[0].fqdn
   http_port                      = local.cdn_frontdoor_origin_http_port
   https_port                     = local.cdn_frontdoor_origin_https_port
 
