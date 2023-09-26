@@ -535,7 +535,7 @@ jobs:
 | Name | Version |
 |------|---------|
 | <a name="provider_azapi"></a> [azapi](#provider\_azapi) | 1.9.0 |
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.72.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.74.0 |
 
 ## Resources
 
