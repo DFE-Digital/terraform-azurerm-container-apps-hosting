@@ -102,11 +102,6 @@ resource "azurerm_monitor_diagnostic_setting" "webhook" {
 
   enabled_log {
     category = "WorkflowRuntime"
-
-    retention_policy {
-      enabled = true
-      days    = 7
-    }
   }
 
   metric {

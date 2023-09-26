@@ -112,11 +112,6 @@ resource "azurerm_monitor_diagnostic_setting" "default_redis_cache" {
 
   enabled_log {
     category = "ConnectedClientList"
-
-    retention_policy {
-      enabled = true
-      days    = 7
-    }
   }
 
   metric {

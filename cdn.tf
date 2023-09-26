@@ -359,10 +359,6 @@ resource "azurerm_monitor_diagnostic_setting" "cdn" {
 
     content {
       category = "FrontdoorWebApplicationFirewallLog"
-
-      retention_policy {
-        enabled = false
-      }
     }
   }
 
@@ -371,10 +367,6 @@ resource "azurerm_monitor_diagnostic_setting" "cdn" {
 
     content {
       category = "FrontdoorAccessLog"
-
-      retention_policy {
-        enabled = false
-      }
     }
   }
 
@@ -383,18 +375,10 @@ resource "azurerm_monitor_diagnostic_setting" "cdn" {
 
     content {
       category = "FrontdoorHealthProbeLog"
-
-      retention_policy {
-        enabled = false
-      }
     }
   }
 
   metric {
     category = "AllMetrics"
-
-    retention_policy {
-      enabled = false
-    }
   }
 }
