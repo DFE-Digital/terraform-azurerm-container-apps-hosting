@@ -47,10 +47,6 @@ resource "azurerm_monitor_diagnostic_setting" "container_app" {
 
   metric {
     category = "Transaction"
-
-    retention_policy {
-      enabled = false
-    }
   }
 }
 
