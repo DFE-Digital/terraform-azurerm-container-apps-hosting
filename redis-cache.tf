@@ -87,17 +87,13 @@ resource "azurerm_private_endpoint" "default_redis_cache" {
 }
 
 resource "azurerm_private_dns_a_record" "redis_cache_private_endpoint" {
-  count = local.enable_redis_cache ? (
-    local.launch_in_vnet ? (
-      local.redis_cache_sku == "Premium" ? 0 : 1
-    ) : 0
-  ) : 0
+  count = local.enable_private_endpoint_redis ? 1 : 0
 
   name                = "@"
   zone_name           = azurerm_private_dns_zone.redis_cache_private_link[0].name
   resource_group_name = local.resource_group.name
   ttl                 = 300
-  records             = [azurerm_private_endpoint.default_redis_cache[0].private_service_connection[0].private_ip_address]
+  records             = [azurerm_private_endpoint.default["rediscache"].private_service_connection[0].private_ip_address]
   tags                = local.tags
 }
 

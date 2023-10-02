@@ -235,7 +235,7 @@ resource "azurerm_subnet_route_table_association" "containerinstances_subnet" {
 }
 
 resource "azurerm_subnet" "postgresql_subnet" {
-  count = local.enable_postgresql_database && local.launch_in_vnet && local.postgresql_network_connectivity_method == "private" ? 1 : 0
+  count = local.enable_private_endpoint_postgres ? 1 : 0
 
   name                                      = "${local.resource_prefix}postgresql"
   virtual_network_name                      = local.virtual_network.name
@@ -255,14 +255,14 @@ resource "azurerm_subnet" "postgresql_subnet" {
 }
 
 resource "azurerm_subnet_route_table_association" "postgresql_subnet" {
-  count = local.enable_postgresql_database && local.launch_in_vnet && local.postgresql_network_connectivity_method == "private" ? 1 : 0
+  count = local.enable_private_endpoint_postgres ? 1 : 0
 
   subnet_id      = azurerm_subnet.postgresql_subnet[0].id
   route_table_id = azurerm_route_table.default[0].id
 }
 
 resource "azurerm_private_dns_zone" "postgresql_private_link" {
-  count = local.enable_postgresql_database && local.launch_in_vnet && local.postgresql_network_connectivity_method == "private" ? 1 : 0
+  count = local.enable_private_endpoint_postgres ? 1 : 0
 
   name                = "${local.resource_prefix}.postgres.database.azure.com"
   resource_group_name = local.resource_group.name
@@ -270,11 +270,22 @@ resource "azurerm_private_dns_zone" "postgresql_private_link" {
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "postgresql_private_link" {
-  count = local.enable_postgresql_database && local.launch_in_vnet && local.postgresql_network_connectivity_method == "private" ? 1 : 0
+  count = local.enable_private_endpoint_postgres ? 1 : 0
 
   name                  = "${local.resource_prefix}pgsqlprivatelink"
   resource_group_name   = local.resource_group.name
   private_dns_zone_name = azurerm_private_dns_zone.postgresql_private_link[0].name
   virtual_network_id    = local.virtual_network.id
   tags                  = local.tags
+}
+
+resource "azurerm_private_dns_a_record" "postgresql_private_link" {
+  count = local.enable_private_endpoint_postgres ? 1 : 0
+
+  name                = "@"
+  zone_name           = azurerm_private_dns_zone.postgresql_private_link[0].name
+  resource_group_name = local.resource_group.name
+  ttl                 = 300
+  records             = [azurerm_private_endpoint.default["postgres"].private_service_connection[0].private_ip_address]
+  tags                = local.tags
 }

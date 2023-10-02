@@ -25,6 +25,47 @@ locals {
   postgresql_subnet_cidr                                   = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 5)
   container_app_environment_internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
   container_apps_infra_subnet_service_endpoints            = distinct(concat(local.launch_in_vnet && local.enable_storage_account ? ["Microsoft.Storage"] : [], var.container_apps_infra_subnet_service_endpoints))
+  # Networking / Private Endpoints
+  enable_private_endpoint_redis = local.enable_redis_cache ? (
+    local.launch_in_vnet ? (
+      local.redis_cache_sku == "Premium" ? false : true
+    ) : false
+  ) : false
+  private_endpoint_redis = local.enable_private_endpoint_redis ? [{
+    "rediscache" : {
+      resource_group : local.resource_group,
+      subnet_id : azurerm_subnet.redis_cache_subnet[0].id,
+      resource_id : azurerm_redis_cache.default[0].id,
+      subresource_names : ["redisCache"]
+    }
+  }] : []
+  enable_private_endpoint_mssql = local.enable_mssql_database ? (
+    local.launch_in_vnet ? true : false
+  ) : false
+  private_endpoint_mssql = local.enable_private_endpoint_mssql ? [{
+    "mssql" : {
+      resource_group : local.resource_group,
+      subnet_id : azurerm_subnet.mssql_private_endpoint_subnet[0].id,
+      resource_id : azurerm_mssql_server.default[0].id,
+      subresource_names : ["sqlServer"]
+    }
+  }] : []
+  enable_private_endpoint_postgres = local.enable_postgresql_database && local.launch_in_vnet && local.postgresql_network_connectivity_method == "private" ? 1 : 0
+  private_endpoint_postgres = local.enable_private_endpoint_postgres ? [{
+    "postgres" : {
+      resource_group : local.resource_group,
+      subnet_id : azurerm_subnet.postgresql_subnet[0].id,
+      resource_id : azurerm_postgresql_flexible_server.default[0].id,
+      subresource_names : ["postgresqlServer"]
+    }
+  }] : []
+  custom_private_endpoints = var.custom_private_endpoints
+  private_endpoints = concat(
+    local.private_endpoint_redis,
+    local.private_endpoint_mssql,
+    local.private_endpoint_postgres,
+    local.custom_private_endpoints,
+  )
 
   # Azure Container Registry
   enable_container_registry        = var.enable_container_registry
