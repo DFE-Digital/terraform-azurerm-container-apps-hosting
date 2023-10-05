@@ -155,7 +155,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "mssql_private_link" {
 resource "azurerm_subnet" "redis_cache_private_endpoint_subnet" {
   count = local.enable_redis_cache ? (
     local.launch_in_vnet ? (
-      local.redis_cache_sku == "Premium" ? 1 : 0
+      local.redis_cache_sku == "Premium" ? 0 : 1
     ) : 0
   ) : 0
 
@@ -169,7 +169,7 @@ resource "azurerm_subnet" "redis_cache_private_endpoint_subnet" {
 resource "azurerm_subnet_route_table_association" "redis_cache_private_endpoint_subnet" {
   count = local.enable_redis_cache ? (
     local.launch_in_vnet ? (
-      local.redis_cache_sku == "Premium" ? 1 : 0
+      local.redis_cache_sku == "Premium" ? 0 : 1
     ) : 0
   ) : 0
 
@@ -180,7 +180,7 @@ resource "azurerm_subnet_route_table_association" "redis_cache_private_endpoint_
 resource "azurerm_private_dns_zone" "redis_cache_private_link" {
   count = local.enable_redis_cache ? (
     local.launch_in_vnet ? (
-      local.redis_cache_sku == "Premium" ? 1 : 0
+      local.redis_cache_sku == "Premium" ? 0 : 1
     ) : 0
   ) : 0
 
@@ -192,7 +192,7 @@ resource "azurerm_private_dns_zone" "redis_cache_private_link" {
 resource "azurerm_private_dns_zone_virtual_network_link" "redis_cache_private_link" {
   count = local.enable_redis_cache ? (
     local.launch_in_vnet ? (
-      local.redis_cache_sku == "Premium" ? 1 : 0
+      local.redis_cache_sku == "Premium" ? 0 : 1
     ) : 0
   ) : 0
 
