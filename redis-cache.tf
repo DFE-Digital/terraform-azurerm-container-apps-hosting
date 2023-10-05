@@ -64,7 +64,7 @@ resource "azurerm_redis_firewall_rule" "default" {
 resource "azurerm_private_endpoint" "default_redis_cache" {
   count = local.enable_redis_cache ? (
     local.launch_in_vnet ? (
-      local.redis_cache_sku == "Premium" ? 1 : 0
+      local.redis_cache_sku == "Premium" ? 0 : 1
     ) : 0
   ) : 0
 
@@ -85,7 +85,7 @@ resource "azurerm_private_endpoint" "default_redis_cache" {
 resource "azurerm_private_dns_a_record" "redis_cache_private_endpoint" {
   count = local.enable_redis_cache ? (
     local.launch_in_vnet ? (
-      local.redis_cache_sku == "Premium" ? 1 : 0
+      local.redis_cache_sku == "Premium" ? 0 : 1
     ) : 0
   ) : 0
 
