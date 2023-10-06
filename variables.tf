@@ -120,6 +120,12 @@ variable "registry_ipv4_allow_list" {
   default     = []
 }
 
+variable "registry_use_managed_identity" {
+  description = "Authenticate the Container App environment with the Container Registry using a Managed Identity instead of using access keys"
+  type        = bool
+  default     = false
+}
+
 variable "enable_mssql_database" {
   description = "Set to true to create an Azure SQL server/database, with a private endpoint within the virtual network"
   type        = bool

@@ -9,6 +9,14 @@ resource "azurerm_container_registry" "acr" {
   public_network_access_enabled = local.registry_public_access_enabled
   tags                          = local.tags
 
+  dynamic "identity" {
+    for_each = local.registry_use_managed_identity ? [1] : []
+
+    content {
+      type = "SystemAssigned"
+    }
+  }
+
   dynamic "retention_policy" {
     for_each = local.registry_sku == "Premium" ? [1] : []
 

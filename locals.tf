@@ -80,6 +80,8 @@ locals {
   registry_admin_enabled           = var.registry_admin_enabled
   registry_public_access_enabled   = var.registry_public_access_enabled
   registry_ipv4_allow_list         = var.registry_ipv4_allow_list
+  registry_use_managed_identity    = var.registry_use_managed_identity
+  registry_identity_id             = local.registry_use_managed_identity ? azurerm_container_registry.acr[0].identity[0].principal_id : null
 
   # SQL Server
   enable_mssql_database              = var.enable_mssql_database
