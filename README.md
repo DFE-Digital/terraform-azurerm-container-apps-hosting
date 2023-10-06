@@ -646,6 +646,7 @@ jobs:
 | [azurerm_private_dns_zone_virtual_network_link.mssql_private_link](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
 | [azurerm_private_dns_zone_virtual_network_link.postgresql_private_link](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
 | [azurerm_private_dns_zone_virtual_network_link.redis_cache_private_link](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
+| [azurerm_private_endpoint.acr](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 | [azurerm_private_endpoint.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 | [azurerm_private_endpoint.default_redis_cache](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 | [azurerm_redis_cache.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/redis_cache) | resource |
@@ -762,7 +763,7 @@ jobs:
 | <a name="input_enable_network_watcher_traffic_analytics"></a> [enable\_network\_watcher\_traffic\_analytics](#input\_enable\_network\_watcher\_traffic\_analytics) | Enable network watcher traffic analytics (Requires `enable_network_watcher` to be true) | `bool` | `true` | no |
 | <a name="input_enable_postgresql_database"></a> [enable\_postgresql\_database](#input\_enable\_postgresql\_database) | Set to true to create an Azure Postgres server/database, with a private endpoint within the virtual network | `bool` | `false` | no |
 | <a name="input_enable_redis_cache"></a> [enable\_redis\_cache](#input\_enable\_redis\_cache) | Set to true to create an Azure Redis Cache, with a private endpoint within the virtual network | `bool` | `false` | no |
-| <a name="input_enable_registry_retention_policy"></a> [enable\_registry\_retention\_policy](#input\_enable\_registry\_retention\_policy) | Boolean value that indicates whether the policy is enabled | `bool` | `true` | no |
+| <a name="input_enable_registry_retention_policy"></a> [enable\_registry\_retention\_policy](#input\_enable\_registry\_retention\_policy) | Boolean value that indicates whether the policy is enabled | `bool` | `false` | no |
 | <a name="input_enable_resource_group_lock"></a> [enable\_resource\_group\_lock](#input\_enable\_resource\_group\_lock) | Enabling this will add a Resource Lock to the Resource Group preventing any resources from being deleted. | `bool` | `false` | no |
 | <a name="input_enable_worker_container"></a> [enable\_worker\_container](#input\_enable\_worker\_container) | Conditionally launch a worker container. This container uses the same image and environment variables as the default container app, but allows a different container command to be run. The worker container does not expose any ports. | `bool` | `false` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Environment name. Will be used along with `project_name` as a prefix for all resources. | `string` | n/a | yes |
@@ -813,8 +814,11 @@ jobs:
 | <a name="input_redis_cache_sku"></a> [redis\_cache\_sku](#input\_redis\_cache\_sku) | Redis Cache SKU | `string` | `"Basic"` | no |
 | <a name="input_redis_cache_version"></a> [redis\_cache\_version](#input\_redis\_cache\_version) | Redis Cache version | `number` | `6` | no |
 | <a name="input_redis_config"></a> [redis\_config](#input\_redis\_config) | Overrides for Redis Cache Configuration options | <pre>object({<br>    maxmemory_reserved : optional(number),<br>    maxmemory_delta : optional(number),<br>    maxfragmentationmemory_reserved : optional(number),<br>    maxmemory_policy : optional(string),<br>  })</pre> | `{}` | no |
+| <a name="input_registry_admin_enabled"></a> [registry\_admin\_enabled](#input\_registry\_admin\_enabled) | Do you want to enable access key based authentication for your Container Registry? | `bool` | `true` | no |
 | <a name="input_registry_custom_image_url"></a> [registry\_custom\_image\_url](#input\_registry\_custom\_image\_url) | Custom image registry url (required if `use_external_container_registry` is true) | `string` | `""` | no |
+| <a name="input_registry_ipv4_allow_list"></a> [registry\_ipv4\_allow\_list](#input\_registry\_ipv4\_allow\_list) | List of IPv4 CIDR blocks that require access to the Container Registry | `list(string)` | `[]` | no |
 | <a name="input_registry_password"></a> [registry\_password](#input\_registry\_password) | Container registry password (required if `enable_container_registry` is false) | `string` | `""` | no |
+| <a name="input_registry_public_access_enabled"></a> [registry\_public\_access\_enabled](#input\_registry\_public\_access\_enabled) | Should your Container Registry be publicly accessible? | `bool` | `true` | no |
 | <a name="input_registry_retention_days"></a> [registry\_retention\_days](#input\_registry\_retention\_days) | The number of days to retain an untagged manifest after which it gets purged | `number` | `7` | no |
 | <a name="input_registry_server"></a> [registry\_server](#input\_registry\_server) | Container registry server (required if `enable_container_registry` is false) | `string` | `""` | no |
 | <a name="input_registry_sku"></a> [registry\_sku](#input\_registry\_sku) | The SKU name of the container registry. Possible values are 'Basic', 'Standard' and 'Premium'. | `string` | `"Standard"` | no |
@@ -834,6 +838,7 @@ jobs:
 
 | Name | Description |
 |------|-------------|
+| <a name="output_azurerm_container_registry"></a> [azurerm\_container\_registry](#output\_azurerm\_container\_registry) | Container Registry |
 | <a name="output_azurerm_dns_zone_name_servers"></a> [azurerm\_dns\_zone\_name\_servers](#output\_azurerm\_dns\_zone\_name\_servers) | Name servers of the DNS Zone |
 | <a name="output_azurerm_eventhub_container_app"></a> [azurerm\_eventhub\_container\_app](#output\_azurerm\_eventhub\_container\_app) | Container App Event Hub |
 | <a name="output_azurerm_log_analytics_workspace_container_app"></a> [azurerm\_log\_analytics\_workspace\_container\_app](#output\_azurerm\_log\_analytics\_workspace\_container\_app) | Container App Log Analytics Workspace |

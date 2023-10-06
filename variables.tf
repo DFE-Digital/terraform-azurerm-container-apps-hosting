@@ -99,7 +99,25 @@ variable "registry_retention_days" {
 variable "enable_registry_retention_policy" {
   description = "Boolean value that indicates whether the policy is enabled"
   type        = bool
+  default     = false
+}
+
+variable "registry_admin_enabled" {
+  description = "Do you want to enable access key based authentication for your Container Registry?"
+  type        = bool
   default     = true
+}
+
+variable "registry_public_access_enabled" {
+  description = "Should your Container Registry be publicly accessible?"
+  type        = bool
+  default     = true
+}
+
+variable "registry_ipv4_allow_list" {
+  description = "List of IPv4 CIDR blocks that require access to the Container Registry"
+  type        = list(string)
+  default     = []
 }
 
 variable "enable_mssql_database" {
