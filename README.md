@@ -461,6 +461,13 @@ module "azure_container_apps_hosting" {
   # enable_network_watcher_traffic_analytics   = true
   # network_watcher_traffic_analytics_interval = 60
 
+  ## Use a user assigned or system assigned identity on the Container App
+  #   container_app_identities = {
+  #   type         = "UserAssigned", # Accepted values: "UserAssigned", "SystemAssigned", "SystemAssigned, UserAssigned"
+  #   identity_ids = [azurerm_user_assigned_identity.user_assigned_identity.id]
+  # }
+
+
   # Tags are applied to every resource deployed by this module
   # Include them as Key:Value pairs
   tags = {
@@ -706,6 +713,7 @@ jobs:
 | <a name="input_container_app_blob_storage_ipv4_allow_list"></a> [container\_app\_blob\_storage\_ipv4\_allow\_list](#input\_container\_app\_blob\_storage\_ipv4\_allow\_list) | A list of public IPv4 address to grant access to the Blob Storage Account | `list(string)` | `[]` | no |
 | <a name="input_container_app_blob_storage_public_access_enabled"></a> [container\_app\_blob\_storage\_public\_access\_enabled](#input\_container\_app\_blob\_storage\_public\_access\_enabled) | Should the Azure Storage Account have Public visibility? | `bool` | `false` | no |
 | <a name="input_container_app_environment_internal_load_balancer_enabled"></a> [container\_app\_environment\_internal\_load\_balancer\_enabled](#input\_container\_app\_environment\_internal\_load\_balancer\_enabled) | Should the Container Environment operate in Internal Load Balancing Mode? | `bool` | `false` | no |
+| <a name="input_container_app_identities"></a> [container\_app\_identities](#input\_container\_app\_identities) | Identities to assign to container app | <pre>object({<br>    type : string<br>    identity_ids : list(string)<br>  })</pre> | `null` | no |
 | <a name="input_container_apps_allow_ips_inbound"></a> [container\_apps\_allow\_ips\_inbound](#input\_container\_apps\_allow\_ips\_inbound) | Restricts access to the Container Apps by creating a network security group rule that only allow inbound traffic from the provided list of IPs | `list(string)` | `[]` | no |
 | <a name="input_container_apps_infra_subnet_service_endpoints"></a> [container\_apps\_infra\_subnet\_service\_endpoints](#input\_container\_apps\_infra\_subnet\_service\_endpoints) | Endpoints to assign to infra subnet | `list(string)` | `[]` | no |
 | <a name="input_container_command"></a> [container\_command](#input\_container\_command) | Container command | `list(any)` | `[]` | no |

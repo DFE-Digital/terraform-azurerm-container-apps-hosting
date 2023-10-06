@@ -902,3 +902,22 @@ variable "container_apps_infra_subnet_service_endpoints" {
   type        = list(string)
   default     = []
 }
+
+variable "container_app_identities" {
+  description = "Identities to assign to container app"
+  type = object({
+    type : string
+    identity_ids : list(string)
+  })
+  default = null
+
+  validation {
+    condition     = try(length(var.container_app_identities.type) > 0, var.container_app_identities == null)
+    error_message = "Identity type must not be null or empty"
+  }
+
+  validation {
+    condition     = try(length(var.container_app_identities.identity_ids) > 0, var.container_app_identities == null)
+    error_message = "At least one identity ID must be supplied"
+  }
+}
