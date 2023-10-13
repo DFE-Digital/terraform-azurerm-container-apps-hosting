@@ -24,7 +24,7 @@ locals {
   redis_cache_subnet_cidr                                  = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 4)
   postgresql_subnet_cidr                                   = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 5)
   container_app_environment_internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
-  container_apps_infra_subnet_service_endpoints            = distinct(concat(local.launch_in_vnet && local.enable_container_app_blob_storage ? ["Microsoft.Storage"] : [], var.container_apps_infra_subnet_service_endpoints))
+  container_apps_infra_subnet_service_endpoints            = distinct(concat(local.launch_in_vnet && local.enable_storage_account ? ["Microsoft.Storage"] : [], var.container_apps_infra_subnet_service_endpoints))
 
   # Azure Container Registry
   enable_container_registry = var.enable_container_registry
@@ -132,18 +132,21 @@ locals {
   } : {}
 
   # Storage Account
-  enable_container_app_blob_storage                = var.enable_container_app_blob_storage
-  container_app_blob_storage_public_access_enabled = var.container_app_blob_storage_public_access_enabled
-  container_app_blob_storage_ipv4_allow_list = concat(
-    azurerm_container_app.container_apps["main"].outbound_ip_addresses,
-    var.container_app_blob_storage_ipv4_allow_list
-  )
+  enable_storage_account                = local.enable_container_app_blob_storage || local.enable_container_app_file_share
+  storage_account_ipv4_allow_list       = var.storage_account_ipv4_allow_list
+  storage_account_public_access_enabled = var.storage_account_public_access_enabled
+  storage_account_file_share_quota_gb   = var.storage_account_file_share_quota_gb
+  # Storage Account / Container
+  enable_container_app_blob_storage = var.enable_container_app_blob_storage
   container_app_blob_storage_sas_secret = local.enable_container_app_blob_storage ? [
     {
       name  = "connectionstrings--blobstorage",
       value = "${azurerm_storage_account.container_app[0].primary_blob_endpoint}${azurerm_storage_container.container_app[0].name}${data.azurerm_storage_account_blob_container_sas.container_app[0].sas}"
     }
   ] : []
+  # Storage Account / File Share
+  enable_container_app_file_share     = var.enable_container_app_file_share
+  container_app_file_share_mount_path = var.container_app_file_share_mount_path
 
   # Azure DNS Zone
   enable_dns_zone      = var.enable_dns_zone

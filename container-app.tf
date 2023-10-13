@@ -9,6 +9,17 @@ resource "azurerm_container_app_environment" "container_app_env" {
   tags = local.tags
 }
 
+resource "azurerm_container_app_environment_storage" "container_app_env" {
+  count = local.enable_container_app_file_share ? 1 : 0
+
+  name                         = "${local.resource_prefix}containerappstorage"
+  container_app_environment_id = azurerm_container_app_environment.container_app_env.id
+  account_name                 = azurerm_storage_account.container_app[0].name
+  share_name                   = azurerm_storage_share.container_app[0].name
+  access_key                   = azurerm_storage_account.container_app[0].primary_access_key
+  access_mode                  = "ReadWrite"
+}
+
 resource "azurerm_container_app" "container_apps" {
   for_each = toset(concat(
     ["main"],
@@ -69,14 +80,13 @@ resource "azurerm_container_app" "container_apps" {
   }
 
   dynamic "identity" {
-    for_each = local.container_app_identities != {} ? [1] : []
+    for_each = local.container_app_identities != null ? [1] : []
 
     content {
       type         = local.container_app_identities.type
       identity_ids = local.container_app_identities.identity_ids
     }
   }
-
 
   registry {
     server               = local.registry_server
@@ -91,6 +101,16 @@ resource "azurerm_container_app" "container_apps" {
       cpu     = local.container_cpu
       memory  = "${local.container_memory}Gi"
       command = each.value == "worker" ? local.worker_container_command : local.container_command
+
+      dynamic "volume_mounts" {
+        for_each = local.enable_container_app_file_share ? [1] : []
+
+        content {
+          name = azurerm_storage_share.container_app[0].name
+          path = local.container_app_file_share_mount_path
+        }
+      }
+
       dynamic "liveness_probe" {
         for_each = each.value == "main" && local.enable_container_health_probe ? [1] : []
 
@@ -101,6 +121,7 @@ resource "azurerm_container_app" "container_apps" {
           path             = lookup(local.container_health_probe, "path", null)
         }
       }
+
       dynamic "env" {
         for_each = { for i, v in concat(
           [
@@ -147,8 +168,19 @@ resource "azurerm_container_app" "container_apps" {
         }
       }
     }
+
     min_replicas = each.value == "worker" ? local.worker_container_min_replicas : local.container_min_replicas
     max_replicas = each.value == "worker" ? local.worker_container_max_replicas : local.container_max_replicas
+
+    dynamic "volume" {
+      for_each = local.enable_container_app_file_share ? [1] : []
+
+      content {
+        name         = azurerm_storage_share.container_app[0].name
+        storage_name = azurerm_storage_share.container_app[0].name
+        storage_type = "AzureFile"
+      }
+    }
   }
 
   tags = local.tags
