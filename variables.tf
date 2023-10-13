@@ -839,14 +839,32 @@ variable "enable_container_app_blob_storage" {
   default     = false
 }
 
-variable "container_app_blob_storage_public_access_enabled" {
+variable "enable_container_app_file_share" {
+  description = "Create an Azure Storage Account and File Share to be mounted to the Container Apps"
+  type        = bool
+  default     = false
+}
+
+variable "storage_account_public_access_enabled" {
   description = "Should the Azure Storage Account have Public visibility?"
   type        = bool
   default     = false
 }
 
-variable "container_app_blob_storage_ipv4_allow_list" {
-  description = "A list of public IPv4 address to grant access to the Blob Storage Account"
+variable "storage_account_file_share_quota_gb" {
+  description = "The maximum size of the share, in gigabytes."
+  type        = number
+  default     = 2
+}
+
+variable "container_app_file_share_mount_path" {
+  description = "A path inside your container where the File Share will be mounted to"
+  type        = string
+  default     = "/srv/app/storage"
+}
+
+variable "storage_account_ipv4_allow_list" {
+  description = "A list of public IPv4 address to grant access to the Storage Account"
   type        = list(string)
   default     = []
 }

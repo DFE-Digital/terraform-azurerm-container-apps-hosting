@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "container_app" {
-  count = local.enable_container_app_blob_storage ? 1 : 0
+  count = local.enable_storage_account ? 1 : 0
 
   name                          = "${replace(local.resource_prefix, "-", "")}storage"
   resource_group_name           = local.resource_group.name
@@ -8,23 +8,19 @@ resource "azurerm_storage_account" "container_app" {
   account_replication_type      = "LRS"
   min_tls_version               = "TLS1_2"
   enable_https_traffic_only     = true
-  public_network_access_enabled = local.container_app_blob_storage_public_access_enabled
+  public_network_access_enabled = local.storage_account_public_access_enabled
 
   tags = local.tags
 }
 
 resource "azurerm_storage_account_network_rules" "container_app" {
-  count = local.enable_container_app_blob_storage ? 1 : 0
+  count = local.enable_storage_account ? 1 : 0
 
   storage_account_id         = azurerm_storage_account.container_app[0].id
   default_action             = "Deny"
   bypass                     = ["AzureServices"]
   virtual_network_subnet_ids = [azurerm_subnet.container_apps_infra_subnet[0].id]
-  ip_rules                   = local.container_app_blob_storage_ipv4_allow_list
-
-  private_link_access {
-    endpoint_resource_id = azurerm_container_app.container_apps["main"].id
-  }
+  ip_rules                   = local.storage_account_ipv4_allow_list
 }
 
 resource "azurerm_storage_container" "container_app" {
@@ -32,8 +28,14 @@ resource "azurerm_storage_container" "container_app" {
 
   name                 = "${local.resource_prefix}-storage"
   storage_account_name = azurerm_storage_account.container_app[0].name
-  # https://learn.microsoft.com/en-us/azure/storage/blobs/anonymous-read-access-configure?tabs=portal#about-anonymous-public-read-access
-  container_access_type = local.container_app_blob_storage_public_access_enabled ? "blob" : "private"
+}
+
+resource "azurerm_storage_share" "container_app" {
+  count = local.enable_container_app_file_share ? 1 : 0
+
+  name                 = "${local.resource_prefix}-storage"
+  storage_account_name = azurerm_storage_account.container_app[0].name
+  quota                = local.storage_account_file_share_quota_gb
 }
 
 resource "azurerm_monitor_diagnostic_setting" "container_app" {
