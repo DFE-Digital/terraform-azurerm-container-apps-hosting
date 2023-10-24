@@ -97,7 +97,7 @@ resource "azurerm_container_app" "container_apps" {
   template {
     container {
       name    = each.value
-      image   = "${local.registry_server}/${local.image_name}:${local.image_tag}"
+      image   = local.use_external_container_registry ? local.registry_custom_image_url : "${local.registry_server}/${local.image_name}:${local.image_tag}"
       cpu     = local.container_cpu
       memory  = "${local.container_memory}Gi"
       command = each.value == "worker" ? local.worker_container_command : local.container_command
