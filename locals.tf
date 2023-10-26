@@ -27,12 +27,12 @@ locals {
   container_apps_infra_subnet_service_endpoints            = distinct(concat(local.launch_in_vnet && local.enable_storage_account ? ["Microsoft.Storage"] : [], var.container_apps_infra_subnet_service_endpoints))
 
   # Azure Container Registry
-  enable_container_registry = var.enable_container_registry
+  enable_container_registry       = var.enable_container_registry
   use_external_container_registry = var.use_external_container_registry_url
-  registry_server           = local.enable_container_registry ? azurerm_container_registry.acr[0].login_server : var.registry_server
-  registry_username         = local.enable_container_registry ? azurerm_container_registry.acr[0].admin_username : var.registry_username
-  registry_password         = local.enable_container_registry ? azurerm_container_registry.acr[0].admin_password : var.registry_password
-  registry_custom_image_url = var.registry_custom_image_url
+  registry_server                 = local.enable_container_registry ? azurerm_container_registry.acr[0].login_server : var.registry_server
+  registry_username               = local.enable_container_registry ? azurerm_container_registry.acr[0].admin_username : var.registry_username
+  registry_password               = local.enable_container_registry ? azurerm_container_registry.acr[0].admin_password : var.registry_password
+  registry_custom_image_url       = var.registry_custom_image_url
 
   # SQL Server
   enable_mssql_database              = var.enable_mssql_database
