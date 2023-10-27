@@ -106,7 +106,7 @@ resource "azurerm_container_app" "container_apps" {
         for_each = local.enable_container_app_file_share ? [1] : []
 
         content {
-          name = azurerm_storage_share.container_app[0].name
+          name = azurerm_container_app_environment_storage.container_app_env[0].name
           path = local.container_app_file_share_mount_path
         }
       }
@@ -176,8 +176,8 @@ resource "azurerm_container_app" "container_apps" {
       for_each = local.enable_container_app_file_share ? [1] : []
 
       content {
-        name         = azurerm_storage_share.container_app[0].name
-        storage_name = azurerm_storage_share.container_app[0].name
+        name         = azurerm_container_app_environment_storage.container_app_env[0].name
+        storage_name = azurerm_container_app_environment_storage.container_app_env[0].name
         storage_type = "AzureFile"
       }
     }
