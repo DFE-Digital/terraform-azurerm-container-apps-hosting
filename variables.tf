@@ -319,6 +319,12 @@ variable "container_port" {
   default     = 80
 }
 
+variable "container_app_name_override" {
+  type        = string
+  description = "A custom name for the Container App"
+  default     = ""
+}
+
 variable "enable_container_health_probe" {
   description = "Enable liveness probes for the Container"
   type        = bool

@@ -26,7 +26,7 @@ resource "azurerm_container_app" "container_apps" {
     local.enable_worker_container ? ["worker"] : [],
   ))
 
-  name                         = each.value == "worker" ? "${local.resource_prefix}-${local.image_name}-worker" : "${local.resource_prefix}-${local.image_name}"
+  name                         = each.value == "worker" ? "${local.container_app_name}-worker" : local.container_app_name
   container_app_environment_id = azurerm_container_app_environment.container_app_env.id
   resource_group_name          = local.resource_group.name
   revision_mode                = "Single"
