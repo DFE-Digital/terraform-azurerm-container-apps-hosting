@@ -195,7 +195,7 @@ jobs:
           ref: ${{ github.ref }}
 
       - name: Setup node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.cypress-tests-node-version }}
 
