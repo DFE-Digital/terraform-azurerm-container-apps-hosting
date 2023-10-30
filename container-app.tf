@@ -21,26 +21,18 @@ resource "azurerm_container_app_environment_storage" "container_app_env" {
 }
 
 resource "azurerm_container_app" "container_apps" {
-  for_each = toset(concat(
-    ["main"],
-    local.enable_worker_container ? ["worker"] : [],
-  ))
-
-  name                         = each.value == "worker" ? "${local.container_app_name}-worker" : local.container_app_name
+  name                         = local.container_app_name
   container_app_environment_id = azurerm_container_app_environment.container_app_env.id
   resource_group_name          = local.resource_group.name
   revision_mode                = "Single"
 
-  dynamic "ingress" {
-    for_each = each.value == "main" ? [1] : []
+  ingress {
+    external_enabled = true
+    target_port      = local.container_port
 
-    content {
-      external_enabled = true
-      target_port      = local.container_port
-      traffic_weight {
-        percentage      = 100
-        latest_revision = true
-      }
+    traffic_weight {
+      percentage      = 100
+      latest_revision = true
     }
   }
 
@@ -96,11 +88,11 @@ resource "azurerm_container_app" "container_apps" {
 
   template {
     container {
-      name    = each.value
+      name    = "main"
       image   = local.use_external_container_registry ? local.registry_custom_image_url : "${local.registry_server}/${local.image_name}:${local.image_tag}"
       cpu     = local.container_cpu
       memory  = "${local.container_memory}Gi"
-      command = each.value == "worker" ? local.worker_container_command : local.container_command
+      command = local.container_command
 
       dynamic "volume_mounts" {
         for_each = local.enable_container_app_file_share ? [1] : []
@@ -112,7 +104,7 @@ resource "azurerm_container_app" "container_apps" {
       }
 
       dynamic "liveness_probe" {
-        for_each = each.value == "main" && local.enable_container_health_probe ? [1] : []
+        for_each = local.enable_container_health_probe ? [1] : []
 
         content {
           interval_seconds = lookup(local.container_health_probe, "interval_seconds")
@@ -169,8 +161,65 @@ resource "azurerm_container_app" "container_apps" {
       }
     }
 
-    min_replicas = each.value == "worker" ? local.worker_container_min_replicas : local.container_min_replicas
-    max_replicas = each.value == "worker" ? local.worker_container_max_replicas : local.container_max_replicas
+    dynamic "container" {
+      for_each = local.enable_worker_container ? [1] : []
+
+      content {
+        name    = "worker"
+        image   = local.use_external_container_registry ? local.registry_custom_image_url : "${local.registry_server}/${local.image_name}:${local.image_tag}"
+        cpu     = local.container_cpu
+        memory  = "${local.container_memory}Gi"
+        command = local.worker_container_command
+
+        dynamic "volume_mounts" {
+          for_each = local.enable_container_app_file_share ? [1] : []
+
+          content {
+            name = azurerm_container_app_environment_storage.container_app_env[0].name
+            path = local.container_app_file_share_mount_path
+          }
+        }
+
+        dynamic "env" {
+          for_each = { for i, v in concat(
+            local.enable_container_app_blob_storage ?
+            [
+              {
+                "name" : "ConnectionStrings__BlobStorage",
+                "secretRef" : "connectionstrings--blobstorage"
+              }
+            ] : [],
+            local.enable_redis_cache ?
+            [
+              {
+                "name" : "ConnectionStrings__Redis",
+                "secretRef" : "connectionstrings--redis"
+              }
+            ] : [],
+            [
+              for env_name, env_value in local.container_environment_variables : {
+                name  = env_name
+                value = env_value
+              }
+            ],
+            [
+              for env_name, env_value in nonsensitive(local.container_secret_environment_variables) : {
+                name      = env_name
+                secretRef = lower(replace(env_name, "_", "-"))
+              }
+          ]) : v.name => v }
+
+          content {
+            name        = env.value["name"]
+            secret_name = lookup(env.value, "secretRef", null)
+            value       = lookup(env.value, "value", null)
+          }
+        }
+      }
+    }
+
+    min_replicas = local.container_min_replicas
+    max_replicas = local.container_max_replicas
 
     dynamic "volume" {
       for_each = local.enable_container_app_file_share ? [1] : []

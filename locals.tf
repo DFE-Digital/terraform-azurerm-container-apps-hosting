@@ -65,8 +65,8 @@ locals {
   postgresql_firewall_ipv4_allow = merge(
     {
       "container-app" = {
-        start_ip_address = azurerm_container_app.container_apps["main"].outbound_ip_addresses[0]
-        end_ip_address   = azurerm_container_app.container_apps["main"].outbound_ip_addresses[0]
+        start_ip_address = azurerm_container_app.container_apps.outbound_ip_addresses[0]
+        end_ip_address   = azurerm_container_app.container_apps.outbound_ip_addresses[0]
       }
     },
     var.postgresql_firewall_ipv4_allow
@@ -99,7 +99,7 @@ locals {
   container_command                      = var.container_command
   container_environment_variables        = var.container_environment_variables
   container_secret_environment_variables = var.container_secret_environment_variables
-  container_fqdn                         = azurerm_container_app.container_apps["main"].ingress[0].fqdn
+  container_fqdn                         = azurerm_container_app.container_apps.ingress[0].fqdn
   container_app_identities               = var.container_app_identities
   container_app_name_override            = var.container_app_name_override
   container_app_name                     = local.container_app_name_override == "" ? "${local.resource_prefix}-${local.image_name}" : local.container_app_name_override
@@ -135,10 +135,8 @@ locals {
   }
   container_health_probe = lookup(local.container_health_probes, local.container_health_probe_protocol, null)
   # Container App / Sidecar
-  enable_worker_container       = var.enable_worker_container
-  worker_container_command      = var.worker_container_command
-  worker_container_min_replicas = var.worker_container_min_replicas
-  worker_container_max_replicas = var.worker_container_max_replicas
+  enable_worker_container  = var.enable_worker_container
+  worker_container_command = var.worker_container_command
   # Container app / Custom
   custom_container_apps = var.custom_container_apps
   custom_container_apps_cdn_frontdoor_custom_domain_dns_names = local.enable_cdn_frontdoor ? {
@@ -237,13 +235,8 @@ locals {
   monitor_http_availability_fqdn = local.enable_cdn_frontdoor ? (
     length(local.cdn_frontdoor_custom_domains) >= 1 ? local.cdn_frontdoor_custom_domains[0] : azurerm_cdn_frontdoor_endpoint.endpoint[0].host_name
   ) : local.container_fqdn
-  monitor_http_availability_url = "https://${local.monitor_http_availability_fqdn}${local.monitor_endpoint_healthcheck}"
-  monitor_default_container_id  = { "default_id" = azurerm_container_app.container_apps["main"].id }
-  monitor_worker_container_id   = local.enable_worker_container ? { "worker_id" = azurerm_container_app.container_apps["worker"].id } : {}
-  monitor_container_ids = merge(
-    local.monitor_default_container_id,
-    local.monitor_worker_container_id,
-  )
+  monitor_http_availability_url  = "https://${local.monitor_http_availability_fqdn}${local.monitor_endpoint_healthcheck}"
+  monitor_container_ids          = { "default_id" = azurerm_container_app.container_apps.id }
   monitor_enable_slack_webhook   = var.monitor_enable_slack_webhook
   monitor_slack_webhook_receiver = var.monitor_slack_webhook_receiver
   monitor_slack_channel          = var.monitor_slack_channel
