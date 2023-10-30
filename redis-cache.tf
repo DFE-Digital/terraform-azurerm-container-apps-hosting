@@ -18,7 +18,11 @@ resource "azurerm_redis_cache" "default" {
   ) : null
 
   redis_configuration {
-    enable_authentication = true
+    enable_authentication           = true
+    maxmemory_reserved              = local.redis_config.maxmemory_reserved
+    maxmemory_delta                 = local.redis_config.maxmemory_delta
+    maxmemory_policy                = local.redis_config.maxfragmentationmemory_reserved
+    maxfragmentationmemory_reserved = local.redis_config.maxmemory_policy
   }
 
   patch_schedule {

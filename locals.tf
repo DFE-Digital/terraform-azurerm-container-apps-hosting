@@ -78,6 +78,14 @@ locals {
   redis_cache_patch_schedule_day       = var.redis_cache_patch_schedule_day
   redis_cache_patch_schedule_hour      = var.redis_cache_patch_schedule_hour
   redis_cache_firewall_ipv4_allow_list = var.redis_cache_firewall_ipv4_allow_list
+  # Azure Cache for Redis/Configuration
+  redis_config_defaults = {
+    maxmemory_reserved              = local.redis_cache_sku == "Basic" ? 2 : local.redis_cache_sku == "Standard" ? 50 : local.redis_cache_sku == "Premium" ? 200 : null
+    maxmemory_delta                 = local.redis_cache_sku == "Basic" ? 2 : local.redis_cache_sku == "Standard" ? 50 : local.redis_cache_sku == "Premium" ? 200 : null
+    maxfragmentationmemory_reserved = local.redis_cache_sku == "Basic" ? 2 : local.redis_cache_sku == "Standard" ? 50 : local.redis_cache_sku == "Premium" ? 200 : null
+    maxmemory_policy                = "volatile-lru"
+  }
+  redis_config = merge(local.redis_config_defaults, var.redis_config)
 
   # Container App
   container_cpu                          = var.container_cpu
