@@ -278,6 +278,17 @@ variable "redis_cache_firewall_ipv4_allow_list" {
   default     = []
 }
 
+variable "redis_config" {
+  description = "Overrides for Redis Cache Configuration options"
+  type = object({
+    maxmemory_reserved : optional(number),
+    maxmemory_delta : optional(number),
+    maxfragmentationmemory_reserved : optional(number),
+    maxmemory_policy : optional(string),
+  })
+  default = {}
+}
+
 variable "image_name" {
   description = "Image name"
   type        = string

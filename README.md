@@ -809,6 +809,7 @@ jobs:
 | <a name="input_redis_cache_patch_schedule_hour"></a> [redis\_cache\_patch\_schedule\_hour](#input\_redis\_cache\_patch\_schedule\_hour) | Redis Cache patch schedule hour | `number` | `18` | no |
 | <a name="input_redis_cache_sku"></a> [redis\_cache\_sku](#input\_redis\_cache\_sku) | Redis Cache SKU | `string` | `"Basic"` | no |
 | <a name="input_redis_cache_version"></a> [redis\_cache\_version](#input\_redis\_cache\_version) | Redis Cache version | `number` | `6` | no |
+| <a name="input_redis_config"></a> [redis\_config](#input\_redis\_config) | Overrides for Redis Cache Configuration options | <pre>object({<br>    maxmemory_reserved : optional(number),<br>    maxmemory_delta : optional(number),<br>    maxfragmentationmemory_reserved : optional(number),<br>    maxmemory_policy : optional(string),<br>  })</pre> | `{}` | no |
 | <a name="input_registry_custom_image_url"></a> [registry\_custom\_image\_url](#input\_registry\_custom\_image\_url) | Custom image registry url (required if `use_external_container_registry` is true) | `string` | `""` | no |
 | <a name="input_registry_password"></a> [registry\_password](#input\_registry\_password) | Container registry password (required if `enable_container_registry` is false) | `string` | `""` | no |
 | <a name="input_registry_server"></a> [registry\_server](#input\_registry\_server) | Container registry server (required if `enable_container_registry` is false) | `string` | `""` | no |
