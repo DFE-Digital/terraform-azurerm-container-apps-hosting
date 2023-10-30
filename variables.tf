@@ -84,6 +84,24 @@ variable "registry_password" {
   default     = ""
 }
 
+variable "registry_sku" {
+  description = "The SKU name of the container registry. Possible values are 'Basic', 'Standard' and 'Premium'."
+  type        = string
+  default     = "Standard"
+}
+
+variable "registry_retention_days" {
+  description = "The number of days to retain an untagged manifest after which it gets purged"
+  type        = number
+  default     = 7
+}
+
+variable "enable_registry_retention_policy" {
+  description = "Boolean value that indicates whether the policy is enabled"
+  type        = bool
+  default     = true
+}
+
 variable "enable_mssql_database" {
   description = "Set to true to create an Azure SQL server/database, with a private endpoint within the virtual network"
   type        = bool
