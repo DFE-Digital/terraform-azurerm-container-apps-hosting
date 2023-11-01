@@ -186,12 +186,19 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "exceptions" {
 
   criteria {
     query = <<-QUERY
-      exceptions
-        | where timestamp > ago(5min)
-        | project cloud_RoleInstance, type, outerMessage, innermostMessage
-        | summarize ErrorCount=count() by cloud_RoleInstance, type, outerMessage, innermostMessage
-        | project ErrorCount, cloud_RoleInstance, type, outerMessage, innermostMessage
-        | order by ErrorCount desc
+      requests
+        | where toint(resultCode) >= 500
+        | where timestamp > ago(5m)
+        | join exceptions on operation_Id
+        | project timestamp, itemId, name, url, type, outerMessage, appName,
+            linkToAppInsights = strcat(
+              "https://portal.azure.com/#blade/AppInsightsExtension/DetailsV2Blade/DataModel/",
+              url_encode(strcat('{"eventId":"', itemId, '","timestamp":"', timestamp, '"}')),
+              "/ComponentId/",
+              url_encode(strcat('{"Name":"', split(appName, "/", 8)[0], '","ResourceGroup":"', split(appName, "/", 4)[0], '","SubscriptionId":"', split(appName, "/", 2)[0], '"}'))
+            )
+        | order by timestamp desc
+        | project-away timestamp, itemId, appName
       QUERY
 
     time_aggregation_method = "Count"
@@ -199,13 +206,13 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "exceptions" {
     operator                = "GreaterThanOrEqual"
 
     dimension {
-      name     = "ErrorCount"
+      name     = "name"
       operator = "Include"
       values   = ["*"]
     }
 
     dimension {
-      name     = "cloud_RoleInstance"
+      name     = "url"
       operator = "Include"
       values   = ["*"]
     }
@@ -223,7 +230,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "exceptions" {
     }
 
     dimension {
-      name     = "innermostMessage"
+      name     = "linkToAppInsights"
       operator = "Include"
       values   = ["*"]
     }
