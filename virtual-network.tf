@@ -226,14 +226,7 @@ resource "azurerm_private_dns_a_record" "redis_cache_private_endpoint" {
   tags                = local.tags
 }
 
-resource "azurerm_subnet_route_table_association" "containerinstances_subnet" {
-  count = local.enable_mssql_database ? (
-    local.launch_in_vnet ? 1 : 0
-  ) : 0
-
-  subnet_id      = azurerm_subnet.container_instances_subnet[0].id
-  route_table_id = azurerm_route_table.default[0].id
-}
+# PostgreSQL Server Networking
 
 resource "azurerm_subnet" "postgresql_subnet" {
   count = local.enable_private_endpoint_postgres ? 1 : 0
@@ -261,6 +254,8 @@ resource "azurerm_subnet_route_table_association" "postgresql_subnet" {
   subnet_id      = azurerm_subnet.postgresql_subnet[0].id
   route_table_id = azurerm_route_table.default[0].id
 }
+
+# PostgreSQL Server Networking / Private Endpoint
 
 resource "azurerm_private_dns_zone" "postgresql_private_link" {
   count = local.enable_private_endpoint_postgres ? 1 : 0
