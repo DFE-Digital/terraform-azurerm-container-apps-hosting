@@ -116,10 +116,5 @@ resource "azurerm_monitor_diagnostic_setting" "default_redis_cache" {
 
   metric {
     category = "AllMetrics"
-
-    retention_policy {
-      enabled = true
-      days    = 7
-    }
   }
 }

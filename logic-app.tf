@@ -106,10 +106,5 @@ resource "azurerm_monitor_diagnostic_setting" "webhook" {
 
   metric {
     category = "AllMetrics"
-
-    retention_policy {
-      enabled = true
-      days    = 7
-    }
   }
 }
