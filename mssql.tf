@@ -76,26 +76,6 @@ resource "azurerm_mssql_database_extended_auditing_policy" "default" {
   retention_in_days                       = 90
 }
 
-resource "azurerm_private_endpoint" "default_mssql" {
-  count = local.enable_mssql_database ? (
-    local.launch_in_vnet ? 1 : 0
-  ) : 0
-
-  name                = "${local.resource_prefix}defaultmssql"
-  location            = local.resource_group.location
-  resource_group_name = local.resource_group.name
-  subnet_id           = azurerm_subnet.mssql_private_endpoint_subnet[0].id
-
-  private_service_connection {
-    name                           = "${local.resource_prefix}defaultmssqlconnection"
-    private_connection_resource_id = azurerm_mssql_server.default[0].id
-    subresource_names              = ["sqlServer"]
-    is_manual_connection           = false
-  }
-
-  tags = local.tags
-}
-
 resource "azurerm_mssql_firewall_rule" "default_mssql" {
   for_each = local.enable_mssql_database ? toset(local.mssql_firewall_ipv4_allow_list) : []
 
@@ -106,14 +86,12 @@ resource "azurerm_mssql_firewall_rule" "default_mssql" {
 }
 
 resource "azurerm_private_dns_a_record" "mssql_private_endpoint" {
-  count = local.enable_mssql_database ? (
-    local.launch_in_vnet ? 1 : 0
-  ) : 0
+  count = local.enable_private_endpoint_mssql ? 1 : 0
 
   name                = "@"
   zone_name           = azurerm_private_dns_zone.mssql_private_link[0].name
   resource_group_name = local.resource_group.name
   ttl                 = 300
-  records             = [azurerm_private_endpoint.default_mssql[0].private_service_connection[0].private_ip_address]
+  records             = [azurerm_private_endpoint.default["mssql"].private_service_connection[0].private_ip_address]
   tags                = local.tags
 }
