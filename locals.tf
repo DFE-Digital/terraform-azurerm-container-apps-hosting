@@ -21,6 +21,7 @@ locals {
   mssql_private_endpoint_subnet_cidr                       = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 1)
   container_instances_subnet_cidr                          = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 2)
   redis_cache_private_endpoint_subnet_cidr                 = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 3)
+  registry_subnet_cidr                                     = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 3)
   redis_cache_subnet_cidr                                  = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 4)
   postgresql_subnet_cidr                                   = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 5)
   container_app_environment_internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
@@ -59,11 +60,20 @@ locals {
       subresource_names : ["postgresqlServer"]
     }
   }] : []
+  enable_private_endpoint_registry = local.registry_sku == "Premium" ? 1 : 0
+  private_endpoint_registry = local.enable_private_endpoint_registry ? [{
+    "registry" : {
+      resource_group : local.resource_group,
+      subnet_id : azurerm_subnet.registry_private_endpoint_subnet[0].id,
+      resource_id : azurerm_container_registry.acr[0].id,
+    }
+  }] : []
   custom_private_endpoints = var.custom_private_endpoints
   private_endpoints = concat(
     local.private_endpoint_redis,
     local.private_endpoint_mssql,
     local.private_endpoint_postgres,
+    local.private_endpoint_registry,
     local.custom_private_endpoints,
   )
 
