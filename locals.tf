@@ -29,49 +29,47 @@ locals {
   enable_private_endpoint_redis = local.enable_redis_cache ? (
     local.launch_in_vnet ? true : false
   ) : false
-  private_endpoint_redis = local.enable_private_endpoint_redis ? [{
+  private_endpoint_redis = local.enable_private_endpoint_redis ? {
     "rediscache" : {
       resource_group : local.resource_group,
       subnet_id : azurerm_subnet.redis_cache_subnet[0].id,
       resource_id : azurerm_redis_cache.default[0].id,
       subresource_names : ["redisCache"]
     }
-  }] : []
+  } : {}
   enable_private_endpoint_mssql = local.enable_mssql_database ? (
     local.launch_in_vnet ? true : false
   ) : false
-  private_endpoint_mssql = local.enable_private_endpoint_mssql ? [{
+  private_endpoint_mssql = local.enable_private_endpoint_mssql ? {
     "mssql" : {
       resource_group : local.resource_group,
       subnet_id : azurerm_subnet.mssql_private_endpoint_subnet[0].id,
       resource_id : azurerm_mssql_server.default[0].id,
       subresource_names : ["sqlServer"]
     }
-  }] : []
+  } : {}
   enable_private_endpoint_postgres = local.enable_postgresql_database && local.launch_in_vnet && local.postgresql_network_connectivity_method == "private" ? true : false
-  private_endpoint_postgres = local.enable_private_endpoint_postgres ? [{
+  private_endpoint_postgres = local.enable_private_endpoint_postgres ? {
     "postgres" : {
       resource_group : local.resource_group,
       subnet_id : azurerm_subnet.postgresql_subnet[0].id,
       resource_id : azurerm_postgresql_flexible_server.default[0].id,
       subresource_names : ["postgresqlServer"]
     }
-  }] : []
+  } : {}
   enable_private_endpoint_registry = local.registry_sku == "Premium" ? true : false
-  private_endpoint_registry = local.enable_private_endpoint_registry ? [{
+  private_endpoint_registry = local.enable_private_endpoint_registry ? {
     "registry" : {
       resource_group : local.resource_group,
       subnet_id : azurerm_subnet.registry_private_endpoint_subnet[0].id,
       resource_id : azurerm_container_registry.acr[0].id,
     }
-  }] : []
-  custom_private_endpoints = var.custom_private_endpoints
-  private_endpoints = concat(
+  } : {}
+  private_endpoints = merge(
     local.private_endpoint_redis,
     local.private_endpoint_mssql,
     local.private_endpoint_postgres,
     local.private_endpoint_registry,
-    local.custom_private_endpoints,
   )
 
   # Azure Container Registry
