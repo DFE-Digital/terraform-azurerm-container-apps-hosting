@@ -48,7 +48,7 @@ locals {
       subresource_names : ["sqlServer"]
     }
   }] : []
-  enable_private_endpoint_postgres = local.enable_postgresql_database && local.launch_in_vnet && local.postgresql_network_connectivity_method == "private" ? 1 : 0
+  enable_private_endpoint_postgres = local.enable_postgresql_database && local.launch_in_vnet && local.postgresql_network_connectivity_method == "private" ? true : false
   private_endpoint_postgres = local.enable_private_endpoint_postgres ? [{
     "postgres" : {
       resource_group : local.resource_group,
@@ -57,7 +57,7 @@ locals {
       subresource_names : ["postgresqlServer"]
     }
   }] : []
-  enable_private_endpoint_registry = local.registry_sku == "Premium" ? 1 : 0
+  enable_private_endpoint_registry = local.registry_sku == "Premium" ? true : false
   private_endpoint_registry = local.enable_private_endpoint_registry ? [{
     "registry" : {
       resource_group : local.resource_group,
