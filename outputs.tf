@@ -18,6 +18,11 @@ output "azurerm_dns_zone_name_servers" {
   description = "Name servers of the DNS Zone"
 }
 
+output "azurerm_container_registry" {
+  value       = local.enable_container_registry ? azurerm_container_registry.acr[0] : null
+  description = "Container Registry"
+}
+
 output "cdn_frontdoor_dns_records" {
   value = local.cdn_frontdoor_custom_domains_create_dns_records == false ? concat([
     for domain in local.cdn_frontdoor_custom_domain_dns_names : {

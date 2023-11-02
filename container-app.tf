@@ -92,6 +92,7 @@ resource "azurerm_container_app" "container_apps" {
     server               = local.registry_server
     username             = local.registry_username
     password_secret_name = "acr-password"
+    identity             = local.registry_identity_id
   }
 
   template {
