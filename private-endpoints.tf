@@ -9,8 +9,8 @@ resource "azurerm_private_endpoint" "default" {
   private_service_connection {
     name                           = "${local.resource_prefix}${each.key}connection"
     private_connection_resource_id = each.value.resource_id
-    subresource_names              = each.value.subresource_names
-    is_manual_connection           = each.value.is_manual_connection
+    subresource_names              = lookup(each.value, "subresource_names", [])
+    is_manual_connection           = lookup(each.value, "is_manual_connection", false)
   }
 
   tags = local.tags
