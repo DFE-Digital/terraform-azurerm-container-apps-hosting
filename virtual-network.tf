@@ -89,6 +89,7 @@ resource "azurerm_subnet_network_security_group_association" "container_apps_inf
   network_security_group_id = azurerm_network_security_group.container_apps_infra[0].id
 }
 
+# SQL Server Networking
 
 resource "azurerm_subnet" "mssql_private_endpoint_subnet" {
   count = local.enable_mssql_database ? (
@@ -103,18 +104,16 @@ resource "azurerm_subnet" "mssql_private_endpoint_subnet" {
 }
 
 resource "azurerm_subnet_route_table_association" "mssql_private_endpoint_subnet" {
-  count = local.enable_mssql_database ? (
-    local.launch_in_vnet ? 1 : 0
-  ) : 0
+  count = local.enable_private_endpoint_mssql ? 1 : 0
 
   subnet_id      = azurerm_subnet.mssql_private_endpoint_subnet[0].id
   route_table_id = azurerm_route_table.default[0].id
 }
 
+# SQL Server Networking / Private Endpoint
+
 resource "azurerm_private_dns_zone" "mssql_private_link" {
-  count = local.enable_mssql_database ? (
-    local.launch_in_vnet ? 1 : 0
-  ) : 0
+  count = local.enable_private_endpoint_mssql ? 1 : 0
 
   name                = "${local.resource_prefix}.database.windows.net"
   resource_group_name = local.resource_group.name
@@ -122,15 +121,24 @@ resource "azurerm_private_dns_zone" "mssql_private_link" {
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "mssql_private_link" {
-  count = local.enable_mssql_database ? (
-    local.launch_in_vnet ? 1 : 0
-  ) : 0
+  count = local.enable_private_endpoint_mssql ? 1 : 0
 
   name                  = "${local.resource_prefix}mssqlprivatelink"
   resource_group_name   = local.resource_group.name
   private_dns_zone_name = azurerm_private_dns_zone.mssql_private_link[0].name
   virtual_network_id    = local.virtual_network.id
   tags                  = local.tags
+}
+
+resource "azurerm_private_dns_a_record" "mssql_private_endpoint" {
+  count = local.enable_private_endpoint_mssql ? 1 : 0
+
+  name                = "@"
+  zone_name           = azurerm_private_dns_zone.mssql_private_link[0].name
+  resource_group_name = local.resource_group.name
+  ttl                 = 300
+  records             = [azurerm_private_endpoint.default["mssql"].private_service_connection[0].private_ip_address]
+  tags                = local.tags
 }
 
 # Redis Networking

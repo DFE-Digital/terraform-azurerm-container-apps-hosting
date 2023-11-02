@@ -84,14 +84,3 @@ resource "azurerm_mssql_firewall_rule" "default_mssql" {
   start_ip_address = each.value
   end_ip_address   = each.value
 }
-
-resource "azurerm_private_dns_a_record" "mssql_private_endpoint" {
-  count = local.enable_private_endpoint_mssql ? 1 : 0
-
-  name                = "@"
-  zone_name           = azurerm_private_dns_zone.mssql_private_link[0].name
-  resource_group_name = local.resource_group.name
-  ttl                 = 300
-  records             = [azurerm_private_endpoint.default["mssql"].private_service_connection[0].private_ip_address]
-  tags                = local.tags
-}
