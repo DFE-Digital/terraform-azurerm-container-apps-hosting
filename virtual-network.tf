@@ -20,6 +20,8 @@ resource "azurerm_route_table" "default" {
   tags                          = local.tags
 }
 
+# Container App Networking
+
 resource "azurerm_subnet" "container_apps_infra_subnet" {
   count = local.launch_in_vnet ? 1 : 0
 
@@ -37,6 +39,39 @@ resource "azurerm_subnet_route_table_association" "container_apps_infra_subnet" 
   subnet_id      = azurerm_subnet.container_apps_infra_subnet[0].id
   route_table_id = azurerm_route_table.default[0].id
 }
+
+resource "azurerm_subnet" "container_instances_subnet" {
+  count = local.enable_mssql_database ? (
+    local.launch_in_vnet ? 1 : 0
+  ) : 0
+
+  name                                      = "${local.resource_prefix}containerinstances"
+  virtual_network_name                      = local.virtual_network.name
+  resource_group_name                       = local.resource_group.name
+  address_prefixes                          = [local.container_instances_subnet_cidr]
+  private_endpoint_network_policies_enabled = true
+
+  delegation {
+    name = "ACIDelegationService"
+    service_delegation {
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/action",
+      ]
+      name = "Microsoft.ContainerInstance/containerGroups"
+    }
+  }
+}
+
+resource "azurerm_subnet_route_table_association" "containerinstances_subnet" {
+  count = local.enable_mssql_database ? (
+    local.launch_in_vnet ? 1 : 0
+  ) : 0
+
+  subnet_id      = azurerm_subnet.container_instances_subnet[0].id
+  route_table_id = azurerm_route_table.default[0].id
+}
+
+# Container App Networking / Security
 
 resource "azurerm_network_security_group" "container_apps_infra" {
   count = local.launch_in_vnet ? 1 : 0
