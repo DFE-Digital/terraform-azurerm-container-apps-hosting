@@ -23,6 +23,7 @@ locals {
   registry_subnet_cidr                                     = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 3)
   redis_cache_subnet_cidr                                  = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 4)
   postgresql_subnet_cidr                                   = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 5)
+  storage_subnet_cidr                                      = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 5)
   container_app_environment_internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
   container_apps_infra_subnet_service_endpoints            = distinct(concat(local.launch_in_vnet && local.enable_storage_account ? ["Microsoft.Storage"] : [], var.container_apps_infra_subnet_service_endpoints))
   # Networking / Private Endpoints
@@ -65,11 +66,21 @@ locals {
       resource_id : azurerm_container_registry.acr[0].id,
     }
   } : {}
+  enable_private_endpoint_storage = local.enable_storage_account && local.enable_container_app_blob_storage ? true : false
+  private_endpoint_storage = local.enable_private_endpoint_storage ? {
+    "storage" : {
+      resource_group : local.resource_group,
+      subnet_id : azurerm_subnet.storage_private_endpoint_subnet[0].id,
+      resource_id : azurerm_storage_account.container_app[0].id,
+      subresource_names : ["blob"]
+    }
+  } : {}
   private_endpoints = merge(
     local.private_endpoint_redis,
     local.private_endpoint_mssql,
     local.private_endpoint_postgres,
     local.private_endpoint_registry,
+    local.private_endpoint_storage,
   )
 
   # Azure Container Registry
@@ -198,8 +209,11 @@ locals {
   } : {}
 
   # Storage Account
-  enable_storage_account                = local.enable_container_app_blob_storage || local.enable_container_app_file_share
-  storage_account_ipv4_allow_list       = var.storage_account_ipv4_allow_list
+  enable_storage_account = local.enable_container_app_blob_storage || local.enable_container_app_file_share
+  storage_account_ipv4_allow_list = concat(
+    var.storage_account_ipv4_allow_list,
+    [azurerm_container_app.container_apps["main"].outbound_ip_addresses[0]]
+  )
   storage_account_public_access_enabled = var.storage_account_public_access_enabled
   storage_account_file_share_quota_gb   = var.storage_account_file_share_quota_gb
   # Storage Account / Container

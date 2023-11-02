@@ -335,3 +335,53 @@ resource "azurerm_private_dns_a_record" "registry_private_link" {
   records             = [azurerm_private_endpoint.default["registry"].private_service_connection[0].private_ip_address]
   tags                = local.tags
 }
+
+# Storage Account Networking
+
+resource "azurerm_subnet" "storage_private_endpoint_subnet" {
+  count = local.enable_private_endpoint_storage ? 1 : 0
+
+  name                                      = "${local.resource_prefix}storageprivateendpoint"
+  virtual_network_name                      = local.virtual_network.name
+  resource_group_name                       = local.resource_group.name
+  address_prefixes                          = [local.storage_subnet_cidr]
+  private_endpoint_network_policies_enabled = true
+}
+
+resource "azurerm_subnet_route_table_association" "storage_private_endpoint_subnet" {
+  count = local.enable_private_endpoint_storage ? 1 : 0
+
+  subnet_id      = azurerm_subnet.storage_private_endpoint_subnet[0].id
+  route_table_id = azurerm_route_table.default[0].id
+}
+
+# Storage Account Networking / Private Endpoint
+
+resource "azurerm_private_dns_zone" "storage_private_link" {
+  count = local.enable_private_endpoint_storage ? 1 : 0
+
+  name                = "${azurerm_storage_account.container_app[0].name}.blob.core.windows.net"
+  resource_group_name = local.resource_group.name
+  tags                = local.tags
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "storage_private_link" {
+  count = local.enable_private_endpoint_storage ? 1 : 0
+
+  name                  = "${local.resource_prefix}storageprivatelink"
+  resource_group_name   = local.resource_group.name
+  private_dns_zone_name = azurerm_private_dns_zone.storage_private_link[0].name
+  virtual_network_id    = local.virtual_network.id
+  tags                  = local.tags
+}
+
+resource "azurerm_private_dns_a_record" "storage_private_link" {
+  count = local.enable_private_endpoint_storage ? 1 : 0
+
+  name                = "@"
+  zone_name           = azurerm_private_dns_zone.storage_private_link[0].name
+  resource_group_name = local.resource_group.name
+  ttl                 = 300
+  records             = [azurerm_private_endpoint.default["storage"].private_service_connection[0].private_ip_address]
+  tags                = local.tags
+}
