@@ -20,7 +20,6 @@ locals {
   container_apps_infra_subnet_cidr                         = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 0)
   mssql_private_endpoint_subnet_cidr                       = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 1)
   container_instances_subnet_cidr                          = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 2)
-  redis_cache_private_endpoint_subnet_cidr                 = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 3)
   registry_subnet_cidr                                     = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 3)
   redis_cache_subnet_cidr                                  = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 4)
   postgresql_subnet_cidr                                   = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 5)
@@ -28,9 +27,7 @@ locals {
   container_apps_infra_subnet_service_endpoints            = distinct(concat(local.launch_in_vnet && local.enable_storage_account ? ["Microsoft.Storage"] : [], var.container_apps_infra_subnet_service_endpoints))
   # Networking / Private Endpoints
   enable_private_endpoint_redis = local.enable_redis_cache ? (
-    local.launch_in_vnet ? (
-      local.redis_cache_sku == "Premium" ? false : true
-    ) : false
+    local.launch_in_vnet ? true : false
   ) : false
   private_endpoint_redis = local.enable_private_endpoint_redis ? [{
     "rediscache" : {
