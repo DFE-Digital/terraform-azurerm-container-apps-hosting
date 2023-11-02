@@ -200,7 +200,7 @@ resource "azurerm_subnet_route_table_association" "redis_cache_subnet" {
 resource "azurerm_private_dns_zone" "redis_cache_private_link" {
   count = local.enable_private_endpoint_redis ? 1 : 0
 
-  name                = "${local.resource_prefix}.redis.cache.windows.net"
+  name                = "${azurerm_redis_cache.default[0].name}.redis.cache.windows.net"
   resource_group_name = local.resource_group.name
   tags                = local.tags
 }
