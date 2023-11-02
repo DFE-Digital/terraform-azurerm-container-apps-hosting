@@ -1010,18 +1010,3 @@ variable "container_app_identities" {
     error_message = "At least one identity ID must be supplied"
   }
 }
-
-variable "custom_private_endpoints" {
-  description = "A list of Private Endpoint objects"
-  type = list(map(object({
-    resource_group : object({
-      id : string,
-      name : string
-    }),
-    subnet_id : string,
-    resource_id : string,
-    subresource_names : optional(list(string), []),
-    is_manual_connection : optional(bool, false)
-  })))
-  default = []
-}

@@ -20,51 +20,67 @@ locals {
   container_apps_infra_subnet_cidr                         = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 0)
   mssql_private_endpoint_subnet_cidr                       = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 1)
   container_instances_subnet_cidr                          = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 2)
-  redis_cache_private_endpoint_subnet_cidr                 = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 3)
+  registry_subnet_cidr                                     = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 3)
   redis_cache_subnet_cidr                                  = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 4)
   postgresql_subnet_cidr                                   = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 5)
+  storage_subnet_cidr                                      = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 5)
   container_app_environment_internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
   container_apps_infra_subnet_service_endpoints            = distinct(concat(local.launch_in_vnet && local.enable_storage_account ? ["Microsoft.Storage"] : [], var.container_apps_infra_subnet_service_endpoints))
   # Networking / Private Endpoints
   enable_private_endpoint_redis = local.enable_redis_cache ? (
-    local.launch_in_vnet ? (
-      local.redis_cache_sku == "Premium" ? false : true
-    ) : false
+    local.launch_in_vnet ? true : false
   ) : false
-  private_endpoint_redis = local.enable_private_endpoint_redis ? [{
+  private_endpoint_redis = local.enable_private_endpoint_redis ? {
     "rediscache" : {
       resource_group : local.resource_group,
       subnet_id : azurerm_subnet.redis_cache_subnet[0].id,
       resource_id : azurerm_redis_cache.default[0].id,
       subresource_names : ["redisCache"]
     }
-  }] : []
+  } : {}
   enable_private_endpoint_mssql = local.enable_mssql_database ? (
     local.launch_in_vnet ? true : false
   ) : false
-  private_endpoint_mssql = local.enable_private_endpoint_mssql ? [{
+  private_endpoint_mssql = local.enable_private_endpoint_mssql ? {
     "mssql" : {
       resource_group : local.resource_group,
       subnet_id : azurerm_subnet.mssql_private_endpoint_subnet[0].id,
       resource_id : azurerm_mssql_server.default[0].id,
       subresource_names : ["sqlServer"]
     }
-  }] : []
-  enable_private_endpoint_postgres = local.enable_postgresql_database && local.launch_in_vnet && local.postgresql_network_connectivity_method == "private" ? 1 : 0
-  private_endpoint_postgres = local.enable_private_endpoint_postgres ? [{
+  } : {}
+  enable_private_endpoint_postgres = local.enable_postgresql_database && local.launch_in_vnet && local.postgresql_network_connectivity_method == "private" ? true : false
+  private_endpoint_postgres = local.enable_private_endpoint_postgres ? {
     "postgres" : {
       resource_group : local.resource_group,
       subnet_id : azurerm_subnet.postgresql_subnet[0].id,
       resource_id : azurerm_postgresql_flexible_server.default[0].id,
       subresource_names : ["postgresqlServer"]
     }
-  }] : []
-  custom_private_endpoints = var.custom_private_endpoints
-  private_endpoints = concat(
+  } : {}
+  enable_private_endpoint_registry = local.registry_sku == "Premium" ? true : false
+  private_endpoint_registry = local.enable_private_endpoint_registry ? {
+    "registry" : {
+      resource_group : local.resource_group,
+      subnet_id : azurerm_subnet.registry_private_endpoint_subnet[0].id,
+      resource_id : azurerm_container_registry.acr[0].id,
+    }
+  } : {}
+  enable_private_endpoint_storage = local.enable_storage_account && local.enable_container_app_blob_storage ? true : false
+  private_endpoint_storage = local.enable_private_endpoint_storage ? {
+    "storage" : {
+      resource_group : local.resource_group,
+      subnet_id : azurerm_subnet.storage_private_endpoint_subnet[0].id,
+      resource_id : azurerm_storage_account.container_app[0].id,
+      subresource_names : ["blob"]
+    }
+  } : {}
+  private_endpoints = merge(
     local.private_endpoint_redis,
     local.private_endpoint_mssql,
     local.private_endpoint_postgres,
-    local.custom_private_endpoints,
+    local.private_endpoint_registry,
+    local.private_endpoint_storage,
   )
 
   # Azure Container Registry
@@ -193,8 +209,11 @@ locals {
   } : {}
 
   # Storage Account
-  enable_storage_account                = local.enable_container_app_blob_storage || local.enable_container_app_file_share
-  storage_account_ipv4_allow_list       = var.storage_account_ipv4_allow_list
+  enable_storage_account = local.enable_container_app_blob_storage || local.enable_container_app_file_share
+  storage_account_ipv4_allow_list = concat(
+    var.storage_account_ipv4_allow_list,
+    [azurerm_container_app.container_apps["main"].outbound_ip_addresses[0]]
+  )
   storage_account_public_access_enabled = var.storage_account_public_access_enabled
   storage_account_file_share_quota_gb   = var.storage_account_file_share_quota_gb
   # Storage Account / Container

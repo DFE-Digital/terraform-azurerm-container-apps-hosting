@@ -49,20 +49,3 @@ resource "azurerm_container_registry" "acr" {
     }
   }
 }
-
-resource "azurerm_private_endpoint" "acr" {
-  count = local.registry_sku == "Premium" ? 1 : 0
-
-  name                = "${local.resource_prefix}defaultacr"
-  resource_group_name = local.resource_group.name
-  location            = local.resource_group.location
-  subnet_id           = azurerm_subnet.container_apps_infra_subnet[0].id
-
-  private_service_connection {
-    name                           = "${local.resource_prefix}defaultacrconnection"
-    private_connection_resource_id = azurerm_container_registry.acr[0].id
-    is_manual_connection           = false
-  }
-
-  tags = local.tags
-}

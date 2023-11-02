@@ -34,25 +34,13 @@ resource "azurerm_redis_cache" "default" {
 }
 
 resource "azurerm_redis_firewall_rule" "container_app_default_static_ip" {
-  count = local.enable_redis_cache ? 1 : 0
+  for_each = local.enable_redis_cache ? azurerm_container_app.container_apps : {}
 
-  name                = "${replace(local.resource_prefix, "-", "")}containerapp"
+  name                = "${replace(local.resource_prefix, "-", "")}fw${each.key}"
   redis_cache_name    = azurerm_redis_cache.default[0].name
   resource_group_name = local.resource_group.name
-  start_ip            = azurerm_container_app.container_apps["main"].outbound_ip_addresses[0]
-  end_ip              = azurerm_container_app.container_apps["main"].outbound_ip_addresses[0]
-}
-
-resource "azurerm_redis_firewall_rule" "container_app_worker_static_ip" {
-  count = local.enable_redis_cache ? (
-    local.enable_worker_container ? 1 : 0
-  ) : 0
-
-  name                = "${replace(local.resource_prefix, "-", "")}containerappworker"
-  redis_cache_name    = azurerm_redis_cache.default[0].name
-  resource_group_name = local.resource_group.name
-  start_ip            = azurerm_container_app.container_apps["worker"].outbound_ip_addresses[0]
-  end_ip              = azurerm_container_app.container_apps["worker"].outbound_ip_addresses[0]
+  start_ip            = each.value.outbound_ip_addresses[0]
+  end_ip              = each.value.outbound_ip_addresses[0]
 }
 
 resource "azurerm_redis_firewall_rule" "default" {
@@ -63,38 +51,6 @@ resource "azurerm_redis_firewall_rule" "default" {
   resource_group_name = local.resource_group.name
   start_ip            = each.value
   end_ip              = each.value
-}
-
-resource "azurerm_private_endpoint" "default_redis_cache" {
-  count = local.enable_redis_cache ? (
-    local.launch_in_vnet ? (
-      local.redis_cache_sku == "Premium" ? 0 : 1
-    ) : 0
-  ) : 0
-
-  name                = "${local.resource_prefix}defaultrediscache"
-  location            = local.resource_group.location
-  resource_group_name = local.resource_group.name
-  subnet_id           = azurerm_subnet.redis_cache_private_endpoint_subnet[0].id
-
-  private_service_connection {
-    name                           = "${local.resource_prefix}defaultrediscacheconnection"
-    private_connection_resource_id = azurerm_redis_cache.default[0].id
-    subresource_names              = ["redisCache"]
-    is_manual_connection           = false
-  }
-  tags = local.tags
-}
-
-resource "azurerm_private_dns_a_record" "redis_cache_private_endpoint" {
-  count = local.enable_private_endpoint_redis ? 1 : 0
-
-  name                = "@"
-  zone_name           = azurerm_private_dns_zone.redis_cache_private_link[0].name
-  resource_group_name = local.resource_group.name
-  ttl                 = 300
-  records             = [azurerm_private_endpoint.default["rediscache"].private_service_connection[0].private_ip_address]
-  tags                = local.tags
 }
 
 resource "azurerm_monitor_diagnostic_setting" "default_redis_cache" {
