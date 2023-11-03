@@ -23,10 +23,10 @@ resource "azurerm_storage_account_network_rules" "container_app" {
   ip_rules                   = local.storage_account_ipv4_allow_list
 
   dynamic "private_link_access" {
-    for_each = azurerm_container_app.container_apps
+    for_each = local.enable_private_endpoint_storage ? [1] : []
 
     content {
-      endpoint_resource_id = private_link_access.value.id
+      endpoint_resource_id = azurerm_private_endpoint.default["storage"].id
     }
   }
 }
