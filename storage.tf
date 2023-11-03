@@ -21,14 +21,6 @@ resource "azurerm_storage_account_network_rules" "container_app" {
   bypass                     = ["AzureServices"]
   virtual_network_subnet_ids = [azurerm_subnet.container_apps_infra_subnet[0].id]
   ip_rules                   = local.storage_account_ipv4_allow_list
-
-  dynamic "private_link_access" {
-    for_each = local.enable_private_endpoint_storage ? [1] : []
-
-    content {
-      endpoint_resource_id = azurerm_private_endpoint.default["storage"].id
-    }
-  }
 }
 
 resource "azurerm_storage_container" "container_app" {
