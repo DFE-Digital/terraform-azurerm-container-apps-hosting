@@ -43,7 +43,7 @@ resource "azurerm_dns_a_record" "frontdoor_custom_domain" {
   name                = trim(each.value, ".") == "" ? "@" : trim(each.value, ".")
   zone_name           = azurerm_dns_zone.default[0].name
   resource_group_name = local.resource_group.name
-  ttl                 = 300
+  ttl                 = 60
   target_resource_id  = azurerm_cdn_frontdoor_endpoint.endpoint[0].id
 
   tags = local.tags
@@ -70,7 +70,7 @@ resource "azurerm_dns_a_record" "custom_container_frontdoor_custom_domain" {
   name                = trim(each.value, ".") == "" ? "@" : trim(each.value, ".")
   zone_name           = azurerm_dns_zone.default[0].name
   resource_group_name = local.resource_group.name
-  ttl                 = 300
+  ttl                 = 60
   target_resource_id  = azurerm_cdn_frontdoor_endpoint.custom_container_apps[each.key].id
 
   tags = local.tags
