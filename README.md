@@ -480,56 +480,6 @@ module "azure_container_apps_hosting" {
 }
 ```
 
-### GitHub Action
-
-You can optinally add a GitHub workflow into your project, using the Reusable GitHub worklow within this repo.
-
-This workflow will build a Docker image, and push it to ACR, then restart the Container app.
-
-You can also conditionally run Cypress tests
-
-```yml
-name: Deploy To Environment
-
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-    inputs:
-      environment:
-        type: environment
-        description: "Choose an environment to deploy to"
-        required: true
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-
-jobs:
-  deploy-to-environment:
-    uses: DFE-Digital/terraform-azurerm-container-apps-hosting/.github/workflows/build-push-and-deploy-to-environment.yml@v1.1.0
-    with:
-      docker-image-name: "my-app"                 # Required
-      docker-build-file-name: "Dockerfile"        # Optional
-      docker-build-context: "."                   # Optional
-      cypress-tests-enabled: false                # Optional
-      cypress-tests-working-directory: "./"       # Optional
-      cypress-tests-screenshot-path: "./"         # Optional
-      cypress-tests-node-version: "18.x"          # Optional
-      environment-name-development: "development" # Optional
-      environment-name-staging: "staging"         # Optional
-      environment-name-prod: "prod"               # Optional
-    secrets:
-      azure-acr-client-id: ${{ secrets.AZURE_ACR_CLIENT_ID }}                       # Required
-      azure-acr-secret: ${{ secrets.AZURE_ACR_SECRET }}                             # Required
-      azure-acr-url: ${{ secrets.AZURE_ACR_URL }}                                   # Required
-      azure-aca-credentials: ${{ secrets.AZURE_ACA_CREDENTIALS }}                   # Required
-      azure-aca-name: ${{ secrets.AZURE_ACA_NAME }}                                 # Required
-      azure-aca-resource-group: ${{ secrets.AZURE_ACA_RESOURCE_GROUP }}             # Required
-      cypress-tests-development-run-command: "npm run cy:run -- --env foo='bar'"    # Optional
-      cypress-tests-staging-run-command: "npm run cy:run -- --env foo='bar'"        # Optional
-```
-
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
