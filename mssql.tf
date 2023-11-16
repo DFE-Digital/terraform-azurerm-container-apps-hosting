@@ -10,6 +10,13 @@ resource "azurerm_storage_account" "mssql_security_storage" {
   tags                     = local.tags
 }
 
+resource "azurerm_storage_container" "mssql_security_storage" {
+  count = local.enable_mssql_database ? 1 : 0
+
+  name                 = "${local.resource_prefix}-mssqlsec"
+  storage_account_name = azurerm_storage_account.mssql_security_storage[0].name
+}
+
 resource "azurerm_mssql_server" "default" {
   count = local.enable_mssql_database ? 1 : 0
 
@@ -83,4 +90,25 @@ resource "azurerm_mssql_firewall_rule" "default_mssql" {
   server_id        = azurerm_mssql_server.default[0].id
   start_ip_address = each.value
   end_ip_address   = each.value
+}
+
+resource "azurerm_mssql_server_security_alert_policy" "default" {
+  count = local.enable_mssql_database && local.enable_mssql_vulnerability_assessment ? 1 : 0
+
+  resource_group_name = local.resource_group.name
+  server_name         = azurerm_mssql_server.default[0].name
+  state               = "Enabled"
+}
+
+resource "azurerm_mssql_server_vulnerability_assessment" "default" {
+  count = local.enable_mssql_database && local.enable_mssql_vulnerability_assessment ? 1 : 0
+
+  server_security_alert_policy_id = azurerm_mssql_server_security_alert_policy.default[0].id
+  storage_container_path          = "${azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint}${azurerm_storage_container.mssql_security_storage[0].name}/"
+  storage_account_access_key      = azurerm_storage_account.mssql_security_storage[0].primary_access_key
+
+  recurring_scans {
+    enabled                   = true
+    email_subscription_admins = true
+  }
 }
