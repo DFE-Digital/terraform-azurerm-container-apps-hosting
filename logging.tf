@@ -34,6 +34,26 @@ resource "azurerm_eventhub_namespace" "container_app" {
   tags                = local.tags
 }
 
+resource "azurerm_monitor_diagnostic_setting" "event_hub" {
+  count = local.enable_monitoring && local.enable_event_hub ? 1 : 0
+
+  name               = "${local.resource_prefix}-eventhub-diag"
+  target_resource_id = azurerm_eventhub_namespace.container_app[0].id
+
+  log_analytics_workspace_id     = azurerm_log_analytics_workspace.container_app.id
+  log_analytics_destination_type = "Dedicated"
+
+  eventhub_name = azurerm_eventhub.container_app[0].name
+
+  enabled_log {
+    category_group = "AllLogs"
+  }
+
+  metric {
+    category = "AllMetrics"
+  }
+}
+
 resource "azurerm_eventhub" "container_app" {
   count               = local.enable_event_hub ? 1 : 0
   name                = "${local.resource_prefix}containerapp"
