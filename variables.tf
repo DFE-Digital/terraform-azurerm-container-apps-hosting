@@ -193,6 +193,12 @@ variable "mssql_version" {
   default     = "12.0"
 }
 
+variable "enable_mssql_vulnerability_assessment" {
+  description = "Vulnerability assessment can discover, track, and help you remediate potential database vulnerabilities"
+  type        = bool
+  default     = true
+}
+
 variable "enable_postgresql_database" {
   type        = bool
   description = "Set to true to create an Azure Postgres server/database, with a private endpoint within the virtual network"

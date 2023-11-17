@@ -100,17 +100,18 @@ locals {
   registry_identity_id             = local.registry_use_managed_identity ? azurerm_container_registry.acr[0].identity[0].principal_id : null
 
   # SQL Server
-  enable_mssql_database              = var.enable_mssql_database
-  mssql_server_admin_password        = var.mssql_server_admin_password
-  mssql_sku_name                     = var.mssql_sku_name
-  mssql_max_size_gb                  = var.mssql_max_size_gb
-  mssql_database_name                = var.mssql_database_name
-  mssql_firewall_ipv4_allow_list     = var.mssql_firewall_ipv4_allow_list
-  mssql_azuread_admin_username       = var.mssql_azuread_admin_username
-  mssql_azuread_admin_object_id      = var.mssql_azuread_admin_object_id
-  mssql_azuread_auth_only            = var.mssql_azuread_auth_only
-  mssql_version                      = var.mssql_version
-  mssql_server_public_access_enabled = var.mssql_server_public_access_enabled
+  enable_mssql_database                 = var.enable_mssql_database
+  mssql_server_admin_password           = var.mssql_server_admin_password
+  mssql_sku_name                        = var.mssql_sku_name
+  mssql_max_size_gb                     = var.mssql_max_size_gb
+  mssql_database_name                   = var.mssql_database_name
+  mssql_firewall_ipv4_allow_list        = var.mssql_firewall_ipv4_allow_list
+  mssql_azuread_admin_username          = var.mssql_azuread_admin_username
+  mssql_azuread_admin_object_id         = var.mssql_azuread_admin_object_id
+  mssql_azuread_auth_only               = var.mssql_azuread_auth_only
+  mssql_version                         = var.mssql_version
+  mssql_server_public_access_enabled    = var.mssql_server_public_access_enabled
+  enable_mssql_vulnerability_assessment = var.enable_mssql_vulnerability_assessment
 
   # Postgres Server
   enable_postgresql_database             = var.enable_postgresql_database
