@@ -98,6 +98,8 @@ resource "azurerm_mssql_server_security_alert_policy" "default" {
   resource_group_name = local.resource_group.name
   server_name         = azurerm_mssql_server.default[0].name
   state               = "Enabled"
+  email_account_admins       = true
+  email_addresses            = local.monitor_email_receivers
 }
 
 resource "azurerm_mssql_server_vulnerability_assessment" "default" {
@@ -110,5 +112,6 @@ resource "azurerm_mssql_server_vulnerability_assessment" "default" {
   recurring_scans {
     enabled                   = true
     email_subscription_admins = true
+    emails                    = local.monitor_email_receivers
   }
 }
