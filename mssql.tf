@@ -95,9 +95,9 @@ resource "azurerm_mssql_firewall_rule" "default_mssql" {
 resource "azurerm_mssql_server_security_alert_policy" "default" {
   count = local.enable_mssql_database && local.enable_mssql_vulnerability_assessment ? 1 : 0
 
-  resource_group_name = local.resource_group.name
-  server_name         = azurerm_mssql_server.default[0].name
-  state               = "Enabled"
+  resource_group_name        = local.resource_group.name
+  server_name                = azurerm_mssql_server.default[0].name
+  state                      = "Enabled"
   email_account_admins       = true
   email_addresses            = local.monitor_email_receivers
   retention_days             = 90
