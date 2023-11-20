@@ -291,6 +291,10 @@ locals {
   enable_logstash_consumer                  = var.enable_logstash_consumer
   eventhub_export_log_analytics_table_names = var.eventhub_export_log_analytics_table_names
 
+  # Application Insights
+  enable_app_insights_integration = var.enable_app_insights_integration
+  app_insights_retention_days     = var.app_insights_retention_days
+
   # Azure Monitor
   enable_monitoring = var.enable_monitoring
   # Azure Monitor / Logic App Workflow

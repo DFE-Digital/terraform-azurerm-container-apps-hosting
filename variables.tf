@@ -790,6 +790,18 @@ variable "eventhub_export_log_analytics_table_names" {
   default     = []
 }
 
+variable "enable_app_insights_integration" {
+  description = "Deploy an App Insights instance and connect your Container Apps to it"
+  type        = bool
+  default     = true
+}
+
+variable "app_insights_retention_days" {
+  description = "Number of days to retain App Insights data for (Default: 2 years)"
+  type        = number
+  default     = 730
+}
+
 variable "enable_monitoring" {
   description = "Create an App Insights instance and notification group for the Container App"
   type        = bool
