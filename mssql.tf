@@ -100,6 +100,9 @@ resource "azurerm_mssql_server_security_alert_policy" "default" {
   state               = "Enabled"
   email_account_admins       = true
   email_addresses            = local.monitor_email_receivers
+  retention_days             = 90
+  storage_endpoint           = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
+  storage_account_access_key = azurerm_storage_account.mssql_security_storage[0].primary_access_key
 }
 
 resource "azurerm_mssql_server_vulnerability_assessment" "default" {
