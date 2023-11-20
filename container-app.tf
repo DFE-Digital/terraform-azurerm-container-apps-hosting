@@ -45,20 +45,23 @@ resource "azurerm_container_app" "container_apps" {
   }
 
   dynamic "secret" {
-    for_each = { for i, v in concat([
-      {
-        "name" : "acr-password",
-        "value" : local.registry_password
-      },
-      {
-        "name" : "applicationinsights--connectionstring",
-        "value" : azurerm_application_insights.main.connection_string
-      },
-      {
-        "name" : "applicationinsights--instrumentationkey",
-        "value" : azurerm_application_insights.main.instrumentation_key
-      },
+    for_each = { for i, v in concat(
+      [
+        {
+          "name" : "acr-password",
+          "value" : local.registry_password
+        }
       ],
+      local.enable_app_insights_integration ? [
+        {
+          name  = "applicationinsights--connectionstring",
+          value = azurerm_application_insights.main[0].connection_string
+        },
+        {
+          name  = "applicationinsights--instrumentationkey",
+          value = azurerm_application_insights.main[0].instrumentation_key
+        }
+      ] : [],
       local.enable_redis_cache ? [
         {
           name  = "connectionstrings--redis",
@@ -125,7 +128,7 @@ resource "azurerm_container_app" "container_apps" {
 
       dynamic "env" {
         for_each = { for i, v in concat(
-          [
+          local.enable_app_insights_integration ? [
             {
               "name" : "ApplicationInsights__ConnectionString",
               "secretRef" : "applicationinsights--connectionstring"
@@ -134,7 +137,7 @@ resource "azurerm_container_app" "container_apps" {
               "name" : "ApplicationInsights__InstrumentationKey",
               "secretRef" : "applicationinsights--instrumentationkey"
             }
-          ],
+          ] : [],
           local.enable_container_app_blob_storage ?
           [
             {

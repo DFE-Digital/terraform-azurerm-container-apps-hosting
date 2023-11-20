@@ -74,7 +74,7 @@ resource "azurerm_application_insights_standard_web_test" "tls" {
 
     header {
       name  = "X-AppInsights-TlsExpiryTest"
-      value = azurerm_application_insights.main.name
+      value = azurerm_application_insights.main[0].name
     }
   }
 

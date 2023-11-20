@@ -97,7 +97,7 @@ resource "azurerm_monitor_metric_alert" "memory" {
 resource "azurerm_monitor_scheduled_query_rules_alert_v2" "exceptions" {
   count = local.enable_monitoring && local.enable_app_insights_integration ? 1 : 0
 
-  name                 = "${azurerm_application_insights.main.name}-exceptions"
+  name                 = "${azurerm_application_insights.main[0].name}-exceptions"
   resource_group_name  = local.resource_group.name
   location             = local.resource_group.location
   evaluation_frequency = "PT5M"

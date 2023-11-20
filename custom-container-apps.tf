@@ -20,16 +20,17 @@ resource "azurerm_container_app" "custom_container_apps" {
   }
 
   dynamic "secret" {
-    for_each = { for i, v in concat([
-      {
-        "name" : "applicationinsights--connectionstring",
-        "value" : azurerm_application_insights.main.connection_string
-      },
-      {
-        "name" : "applicationinsights--instrumentationkey",
-        "value" : azurerm_application_insights.main.instrumentation_key
-      },
-      ],
+    for_each = { for i, v in concat(
+      local.enable_app_insights_integration ? [
+        {
+          name  = "applicationinsights--connectionstring",
+          value = azurerm_application_insights.main[0].connection_string
+        },
+        {
+          name  = "applicationinsights--instrumentationkey",
+          value = azurerm_application_insights.main[0].instrumentation_key
+        }
+      ] : [],
       each.value.secrets
     ) : v.name => v }
 
@@ -65,7 +66,7 @@ resource "azurerm_container_app" "custom_container_apps" {
       }
       dynamic "env" {
         for_each = { for i, v in concat(
-          [
+          local.enable_app_insights_integration ? [
             {
               "name" : "ApplicationInsights__ConnectionString",
               "secretRef" : "applicationinsights--connectionstring"
@@ -74,7 +75,7 @@ resource "azurerm_container_app" "custom_container_apps" {
               "name" : "ApplicationInsights__InstrumentationKey",
               "secretRef" : "applicationinsights--instrumentationkey"
             }
-          ],
+          ] : [],
           each.value.env,
         ) : v.name => v }
 
