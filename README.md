@@ -495,7 +495,7 @@ module "azure_container_apps_hosting" {
 | Name | Version |
 |------|---------|
 | <a name="provider_azapi"></a> [azapi](#provider\_azapi) | 1.10.0 |
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.79.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.81.0 |
 
 ## Resources
 
