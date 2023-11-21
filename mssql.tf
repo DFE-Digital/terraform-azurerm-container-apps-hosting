@@ -1,13 +1,28 @@
 resource "azurerm_storage_account" "mssql_security_storage" {
   count = local.enable_mssql_database ? 1 : 0
 
-  name                     = "${replace(local.resource_prefix, "-", "")}mssqlsec"
-  resource_group_name      = local.resource_group.name
-  location                 = local.resource_group.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  min_tls_version          = "TLS1_2"
-  tags                     = local.tags
+  name                      = "${replace(local.resource_prefix, "-", "")}mssqlsec"
+  resource_group_name       = local.resource_group.name
+  location                  = local.resource_group.location
+  account_tier              = "Standard"
+  account_replication_type  = "LRS"
+  min_tls_version           = "TLS1_2"
+  tags                      = local.tags
+  enable_https_traffic_only = true
+}
+
+resource "azurerm_storage_account_network_rules" "mssql_security_storage" {
+  count = local.enable_mssql_database ? 1 : 0
+
+  storage_account_id         = azurerm_storage_account.mssql_security_storage[0].id
+  default_action             = "Deny"
+  bypass                     = ["AzureServices"]
+  virtual_network_subnet_ids = []
+  ip_rules                   = local.mssql_firewall_ipv4_allow_list
+
+  private_link_access {
+    endpoint_resource_id = azurerm_mssql_server.default[0].id
+  }
 }
 
 resource "azurerm_storage_container" "mssql_security_storage" {
