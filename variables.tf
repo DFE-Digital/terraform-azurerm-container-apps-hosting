@@ -928,6 +928,12 @@ variable "enable_container_app_blob_storage" {
   default     = false
 }
 
+variable "container_app_blob_storage_public_access_enabled" {
+  description = "Enable anonymous public read access to blobs in Azure Storage?"
+  type        = bool
+  default     = false
+}
+
 variable "enable_container_app_file_share" {
   description = "Create an Azure Storage Account and File Share to be mounted to the Container Apps"
   type        = bool
