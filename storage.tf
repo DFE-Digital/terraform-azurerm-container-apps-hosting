@@ -1,14 +1,15 @@
 resource "azurerm_storage_account" "container_app" {
   count = local.enable_storage_account ? 1 : 0
 
-  name                          = "${replace(local.resource_prefix, "-", "")}storage"
-  resource_group_name           = local.resource_group.name
-  location                      = local.resource_group.location
-  account_tier                  = "Standard"
-  account_replication_type      = "LRS"
-  min_tls_version               = "TLS1_2"
-  enable_https_traffic_only     = true
-  public_network_access_enabled = local.storage_account_public_access_enabled
+  name                            = "${replace(local.resource_prefix, "-", "")}storage"
+  resource_group_name             = local.resource_group.name
+  location                        = local.resource_group.location
+  account_tier                    = "Standard"
+  account_replication_type        = "LRS"
+  min_tls_version                 = "TLS1_2"
+  enable_https_traffic_only       = true
+  public_network_access_enabled   = local.storage_account_public_access_enabled
+  allow_nested_items_to_be_public = local.enable_container_app_blob_storage
 
   tags = local.tags
 }

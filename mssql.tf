@@ -1,14 +1,16 @@
 resource "azurerm_storage_account" "mssql_security_storage" {
   count = local.enable_mssql_database ? 1 : 0
 
-  name                      = "${replace(local.resource_prefix, "-", "")}mssqlsec"
-  resource_group_name       = local.resource_group.name
-  location                  = local.resource_group.location
-  account_tier              = "Standard"
-  account_replication_type  = "LRS"
-  min_tls_version           = "TLS1_2"
-  tags                      = local.tags
-  enable_https_traffic_only = true
+  name                            = "${replace(local.resource_prefix, "-", "")}mssqlsec"
+  resource_group_name             = local.resource_group.name
+  location                        = local.resource_group.location
+  account_tier                    = "Standard"
+  account_replication_type        = "LRS"
+  min_tls_version                 = "TLS1_2"
+  tags                            = local.tags
+  enable_https_traffic_only       = true
+  public_network_access_enabled   = false
+  allow_nested_items_to_be_public = false
 }
 
 resource "azurerm_storage_account_network_rules" "mssql_security_storage" {
