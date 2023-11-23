@@ -9,7 +9,7 @@ resource "azurerm_storage_account" "container_app" {
   min_tls_version                 = "TLS1_2"
   enable_https_traffic_only       = true
   public_network_access_enabled   = local.storage_account_public_access_enabled
-  allow_nested_items_to_be_public = local.enable_container_app_blob_storage
+  allow_nested_items_to_be_public = local.container_app_blob_storage_public_access_enabled
 
   tags = local.tags
 }

@@ -225,6 +225,7 @@ locals {
       value = "${azurerm_storage_account.container_app[0].primary_blob_endpoint}${azurerm_storage_container.container_app[0].name}${data.azurerm_storage_account_blob_container_sas.container_app[0].sas}"
     }
   ] : []
+  container_app_blob_storage_public_access_enabled = local.enable_container_app_blob_storage == false ? false : var.container_app_blob_storage_public_access_enabled
   # Storage Account / File Share
   enable_container_app_file_share     = var.enable_container_app_file_share
   container_app_file_share_mount_path = var.container_app_file_share_mount_path
