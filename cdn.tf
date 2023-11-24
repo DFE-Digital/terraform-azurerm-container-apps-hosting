@@ -377,8 +377,4 @@ resource "azurerm_monitor_diagnostic_setting" "cdn" {
       category = "FrontdoorHealthProbeLog"
     }
   }
-
-  metric {
-    category = "AllMetrics"
-  }
 }

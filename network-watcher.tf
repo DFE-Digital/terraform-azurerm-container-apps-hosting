@@ -37,26 +37,6 @@ resource "azurerm_log_analytics_workspace" "default_network_watcher_nsg_flow_log
   tags = local.tags
 }
 
-resource "azurerm_monitor_diagnostic_setting" "default_network_watcher_nsg_flow_logs" {
-  count = local.network_watcher_name != "" && local.enable_network_watcher_traffic_analytics ? 1 : 0
-
-  name               = "${local.resource_prefix}-nwnsgd-diag"
-  target_resource_id = azurerm_storage_account.default_network_watcher_nsg_flow_logs[0].id
-
-  log_analytics_workspace_id     = azurerm_log_analytics_workspace.default_network_watcher_nsg_flow_logs[0].id
-  log_analytics_destination_type = "Dedicated"
-
-  metric {
-    category = "Capacity"
-    enabled  = true
-  }
-
-  metric {
-    category = "Transaction"
-    enabled  = true
-  }
-}
-
 resource "azurerm_network_watcher_flow_log" "default_network_watcher_nsg" {
   for_each = local.network_watcher_name != "" ? local.network_security_group_ids : {}
 
@@ -92,7 +72,7 @@ resource "azurerm_storage_account_network_rules" "default_network_watcher_nsg_fl
 
   storage_account_id = azurerm_storage_account.default_network_watcher_nsg_flow_logs[0].id
   default_action     = "Deny"
-  bypass             = ["AzureServices", "Logging", "Metrics"]
+  bypass             = ["AzureServices"]
 
   dynamic "private_link_access" {
     for_each = azurerm_network_watcher_flow_log.default_network_watcher_nsg
