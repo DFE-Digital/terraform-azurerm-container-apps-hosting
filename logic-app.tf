@@ -103,8 +103,4 @@ resource "azurerm_monitor_diagnostic_setting" "webhook" {
   enabled_log {
     category = "WorkflowRuntime"
   }
-
-  metric {
-    category = "AllMetrics"
-  }
 }

@@ -46,11 +46,7 @@ resource "azurerm_monitor_diagnostic_setting" "event_hub" {
   eventhub_name = azurerm_eventhub.container_app[0].name
 
   enabled_log {
-    category_group = "AllLogs"
-  }
-
-  metric {
-    category = "AllMetrics"
+    category_group = "Audit"
   }
 }
 
