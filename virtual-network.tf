@@ -355,31 +355,62 @@ resource "azurerm_subnet_route_table_association" "storage_private_endpoint_subn
   route_table_id = azurerm_route_table.default[0].id
 }
 
-# Storage Account Networking / Private Endpoint
+# Storage Account Networking / Private Endpoint / Blob
 
-resource "azurerm_private_dns_zone" "storage_private_link" {
-  count = local.enable_private_endpoint_storage ? 1 : 0
+resource "azurerm_private_dns_zone" "storage_private_link_blob" {
+  count = local.enable_private_endpoint_storage && local.enable_container_app_blob_storage ? 1 : 0
 
   name                = "${azurerm_storage_account.container_app[0].name}.blob.core.windows.net"
   resource_group_name = local.resource_group.name
   tags                = local.tags
 }
 
-resource "azurerm_private_dns_zone_virtual_network_link" "storage_private_link" {
-  count = local.enable_private_endpoint_storage ? 1 : 0
+resource "azurerm_private_dns_zone_virtual_network_link" "storage_private_link_blob" {
+  count = local.enable_private_endpoint_storage && local.enable_container_app_blob_storage ? 1 : 0
 
-  name                  = "${local.resource_prefix}storageprivatelink"
+  name                  = "${local.resource_prefix}storageprivatelinkblob"
   resource_group_name   = local.resource_group.name
-  private_dns_zone_name = azurerm_private_dns_zone.storage_private_link[0].name
+  private_dns_zone_name = azurerm_private_dns_zone.storage_private_link_blob[0].name
   virtual_network_id    = local.virtual_network.id
   tags                  = local.tags
 }
 
-resource "azurerm_private_dns_a_record" "storage_private_link" {
-  count = local.enable_private_endpoint_storage ? 1 : 0
+resource "azurerm_private_dns_a_record" "storage_private_link_blob" {
+  count = local.enable_private_endpoint_storage && local.enable_container_app_blob_storage ? 1 : 0
 
   name                = "@"
-  zone_name           = azurerm_private_dns_zone.storage_private_link[0].name
+  zone_name           = azurerm_private_dns_zone.storage_private_link_blob[0].name
+  resource_group_name = local.resource_group.name
+  ttl                 = 300
+  records             = [azurerm_private_endpoint.default["storage"].private_service_connection[0].private_ip_address]
+  tags                = local.tags
+}
+
+# Storage Account Networking / Private Endpoint / File
+
+resource "azurerm_private_dns_zone" "storage_private_link_file" {
+  count = local.enable_private_endpoint_storage && local.enable_container_app_file_share ? 1 : 0
+
+  name                = "${azurerm_storage_account.container_app[0].name}.file.core.windows.net"
+  resource_group_name = local.resource_group.name
+  tags                = local.tags
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "storage_private_link_file" {
+  count = local.enable_private_endpoint_storage && local.enable_container_app_file_share ? 1 : 0
+
+  name                  = "${local.resource_prefix}storageprivatelinkfile"
+  resource_group_name   = local.resource_group.name
+  private_dns_zone_name = azurerm_private_dns_zone.storage_private_link_file[0].name
+  virtual_network_id    = local.virtual_network.id
+  tags                  = local.tags
+}
+
+resource "azurerm_private_dns_a_record" "storage_private_link_file" {
+  count = local.enable_private_endpoint_storage && local.enable_container_app_file_share ? 1 : 0
+
+  name                = "@"
+  zone_name           = azurerm_private_dns_zone.storage_private_link_file[0].name
   resource_group_name = local.resource_group.name
   ttl                 = 300
   records             = [azurerm_private_endpoint.default["storage"].private_service_connection[0].private_ip_address]

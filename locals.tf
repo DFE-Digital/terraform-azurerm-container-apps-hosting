@@ -66,13 +66,16 @@ locals {
       resource_id : azurerm_container_registry.acr[0].id,
     }
   } : {}
-  enable_private_endpoint_storage = local.enable_storage_account && local.enable_container_app_blob_storage ? true : false
+  enable_private_endpoint_storage = local.enable_storage_account ? true : false
   private_endpoint_storage = local.enable_private_endpoint_storage ? {
     "storage" : {
       resource_group : local.resource_group,
       subnet_id : azurerm_subnet.storage_private_endpoint_subnet[0].id,
       resource_id : azurerm_storage_account.container_app[0].id,
-      subresource_names : ["blob"]
+      subresource_names : merge(
+        local.enable_container_app_blob_storage ? ["blob"] : [],
+        local.enable_container_app_file_share ? ["file"] : [],
+      )
     }
   } : {}
   private_endpoints = merge(
