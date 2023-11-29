@@ -43,7 +43,7 @@ resource "azurerm_monitor_diagnostic_setting" "blob" {
   count = local.enable_container_app_blob_storage ? 1 : 0
 
   name                           = "${local.resource_prefix}-storage-blob-diag"
-  target_resource_id             = azurerm_storage_container.container_app[0].id
+  target_resource_id             = azurerm_storage_container.container_app[0].resource_manager_id
   log_analytics_workspace_id     = azurerm_log_analytics_workspace.container_app.id
   log_analytics_destination_type = "Dedicated"
   eventhub_name                  = local.enable_event_hub ? azurerm_eventhub.container_app[0].name : null
