@@ -72,7 +72,7 @@ locals {
       resource_group : local.resource_group,
       subnet_id : azurerm_subnet.storage_private_endpoint_subnet[0].id,
       resource_id : azurerm_storage_account.container_app[0].id,
-      subresource_names : merge(
+      subresource_names : concat(
         local.enable_container_app_blob_storage ? ["blob"] : [],
         local.enable_container_app_file_share ? ["file"] : [],
       )
