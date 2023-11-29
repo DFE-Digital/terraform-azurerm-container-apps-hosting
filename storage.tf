@@ -39,20 +39,6 @@ resource "azurerm_storage_share" "container_app" {
   quota                = local.storage_account_file_share_quota_gb
 }
 
-resource "azurerm_monitor_diagnostic_setting" "blob" {
-  count = local.enable_container_app_blob_storage ? 1 : 0
-
-  name                           = "${local.resource_prefix}-storage-blob-diag"
-  target_resource_id             = azurerm_storage_container.container_app[0].resource_manager_id
-  log_analytics_workspace_id     = azurerm_log_analytics_workspace.container_app.id
-  log_analytics_destination_type = "Dedicated"
-  eventhub_name                  = local.enable_event_hub ? azurerm_eventhub.container_app[0].name : null
-
-  enabled_log {
-    category_group = "Audit"
-  }
-}
-
 resource "azurerm_monitor_diagnostic_setting" "files" {
   count = local.enable_container_app_file_share ? 1 : 0
 
