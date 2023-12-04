@@ -853,7 +853,7 @@ variable "monitor_endpoint_healthcheck" {
 variable "monitor_tls_expiry" {
   description = "Enable or disable daily TLS expiry check"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "alarm_tls_expiry_days_remaining" {
