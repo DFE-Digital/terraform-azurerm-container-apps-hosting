@@ -83,6 +83,15 @@ resource "azurerm_container_app" "container_apps" {
   }
 
   dynamic "identity" {
+    for_each = local.registry_use_managed_identity ? [1] : []
+
+    content {
+      type         = "UserAssigned"
+      identity_ids = [azurerm_user_assigned_identity.containerapp[0].id]
+    }
+  }
+
+  dynamic "identity" {
     for_each = local.container_app_identities != null ? [1] : []
 
     content {
@@ -93,9 +102,9 @@ resource "azurerm_container_app" "container_apps" {
 
   registry {
     server               = local.registry_server
-    username             = local.registry_username
-    password_secret_name = "acr-password"
-    identity             = local.registry_identity_id
+    username             = local.registry_use_managed_identity == false ? local.registry_username : null
+    password_secret_name = local.registry_use_managed_identity == false ? "acr-password" : null
+    identity             = local.registry_use_managed_identity ? azurerm_user_assigned_identity.containerapp[0].id : null
   }
 
   template {

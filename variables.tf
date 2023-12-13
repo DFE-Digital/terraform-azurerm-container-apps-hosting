@@ -121,9 +121,15 @@ variable "registry_ipv4_allow_list" {
 }
 
 variable "registry_use_managed_identity" {
-  description = "Authenticate the Container App environment with the Container Registry using a Managed Identity instead of using access keys"
+  description = "Create a User-Assigned Managed Identity for the Container App. Note: If you do not have 'Microsoft.Authorization/roleAssignments/write' permission, you will need to manually assign the 'AcrPull' Role to the identity"
   type        = bool
   default     = false
+}
+
+variable "registry_managed_identity_assign_role" {
+  description = "Assign the 'AcrPull' Role to the Container App User-Assigned Managed Identity. Note: If you do not have 'Microsoft.Authorization/roleAssignments/write' permission, you will need to manually assign the 'AcrPull' Role to the identity"
+  type        = bool
+  default     = true
 }
 
 variable "enable_mssql_database" {
