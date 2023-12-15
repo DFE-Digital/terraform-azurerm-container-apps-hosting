@@ -55,3 +55,8 @@ output "container_fqdn" {
   description = "FQDN for the Container App"
   value       = local.container_fqdn
 }
+
+output "container_app_managed_identity" {
+  description = "User-Assigned Managed Identity assigned to the Container App"
+  value       = local.registry_use_managed_identity ? azurerm_user_assigned_identity.containerapp[0] : null
+}

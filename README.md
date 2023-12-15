@@ -615,6 +615,7 @@ module "azure_container_apps_hosting" {
 | [azurerm_redis_firewall_rule.container_app_default_static_ip](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/redis_firewall_rule) | resource |
 | [azurerm_redis_firewall_rule.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/redis_firewall_rule) | resource |
 | [azurerm_resource_group.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
+| [azurerm_role_assignment.acrpull](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_route_table.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/route_table) | resource |
 | [azurerm_storage_account.container_app](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
 | [azurerm_storage_account.default_network_watcher_nsg_flow_logs](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
@@ -640,6 +641,7 @@ module "azure_container_apps_hosting" {
 | [azurerm_subnet_route_table_association.redis_cache_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
 | [azurerm_subnet_route_table_association.registry_private_endpoint_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
 | [azurerm_subnet_route_table_association.storage_private_endpoint_subnet](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
+| [azurerm_user_assigned_identity.containerapp](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_virtual_network.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
 | [azapi_resource_action.existing_logic_app_workflow_callback_url](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_action) | data source |
 | [azurerm_logic_app_workflow.existing_logic_app_workflow](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/logic_app_workflow) | data source |
@@ -785,12 +787,13 @@ module "azure_container_apps_hosting" {
 | <a name="input_registry_admin_enabled"></a> [registry\_admin\_enabled](#input\_registry\_admin\_enabled) | Do you want to enable access key based authentication for your Container Registry? | `bool` | `true` | no |
 | <a name="input_registry_custom_image_url"></a> [registry\_custom\_image\_url](#input\_registry\_custom\_image\_url) | Custom image registry url (required if `use_external_container_registry` is true) | `string` | `""` | no |
 | <a name="input_registry_ipv4_allow_list"></a> [registry\_ipv4\_allow\_list](#input\_registry\_ipv4\_allow\_list) | List of IPv4 CIDR blocks that require access to the Container Registry | `list(string)` | `[]` | no |
+| <a name="input_registry_managed_identity_assign_role"></a> [registry\_managed\_identity\_assign\_role](#input\_registry\_managed\_identity\_assign\_role) | Assign the 'AcrPull' Role to the Container App User-Assigned Managed Identity. Note: If you do not have 'Microsoft.Authorization/roleAssignments/write' permission, you will need to manually assign the 'AcrPull' Role to the identity | `bool` | `true` | no |
 | <a name="input_registry_password"></a> [registry\_password](#input\_registry\_password) | Container registry password (required if `enable_container_registry` is false) | `string` | `""` | no |
 | <a name="input_registry_public_access_enabled"></a> [registry\_public\_access\_enabled](#input\_registry\_public\_access\_enabled) | Should your Container Registry be publicly accessible? | `bool` | `true` | no |
 | <a name="input_registry_retention_days"></a> [registry\_retention\_days](#input\_registry\_retention\_days) | The number of days to retain an untagged manifest after which it gets purged | `number` | `7` | no |
 | <a name="input_registry_server"></a> [registry\_server](#input\_registry\_server) | Container registry server (required if `enable_container_registry` is false) | `string` | `""` | no |
 | <a name="input_registry_sku"></a> [registry\_sku](#input\_registry\_sku) | The SKU name of the container registry. Possible values are 'Basic', 'Standard' and 'Premium'. | `string` | `"Standard"` | no |
-| <a name="input_registry_use_managed_identity"></a> [registry\_use\_managed\_identity](#input\_registry\_use\_managed\_identity) | Authenticate the Container App environment with the Container Registry using a Managed Identity instead of using access keys | `bool` | `false` | no |
+| <a name="input_registry_use_managed_identity"></a> [registry\_use\_managed\_identity](#input\_registry\_use\_managed\_identity) | Create a User-Assigned Managed Identity for the Container App. Note: If you do not have 'Microsoft.Authorization/roleAssignments/write' permission, you will need to manually assign the 'AcrPull' Role to the identity | `bool` | `false` | no |
 | <a name="input_registry_username"></a> [registry\_username](#input\_registry\_username) | Container registry username (required if `enable_container_registry` is false) | `string` | `""` | no |
 | <a name="input_restrict_container_apps_to_cdn_inbound_only"></a> [restrict\_container\_apps\_to\_cdn\_inbound\_only](#input\_restrict\_container\_apps\_to\_cdn\_inbound\_only) | Restricts access to the Container Apps by creating a network security group rule that only allows 'AzureFrontDoor.Backend' inbound, and attaches it to the subnet of the container app environment. | `bool` | `true` | no |
 | <a name="input_storage_account_file_share_quota_gb"></a> [storage\_account\_file\_share\_quota\_gb](#input\_storage\_account\_file\_share\_quota\_gb) | The maximum size of the share, in gigabytes. | `number` | `2` | no |
@@ -813,6 +816,7 @@ module "azure_container_apps_hosting" {
 | <a name="output_azurerm_log_analytics_workspace_container_app"></a> [azurerm\_log\_analytics\_workspace\_container\_app](#output\_azurerm\_log\_analytics\_workspace\_container\_app) | Container App Log Analytics Workspace |
 | <a name="output_azurerm_resource_group_default"></a> [azurerm\_resource\_group\_default](#output\_azurerm\_resource\_group\_default) | Default Azure Resource Group |
 | <a name="output_cdn_frontdoor_dns_records"></a> [cdn\_frontdoor\_dns\_records](#output\_cdn\_frontdoor\_dns\_records) | Azure Front Door DNS Records that must be created manually |
+| <a name="output_container_app_managed_identity"></a> [container\_app\_managed\_identity](#output\_container\_app\_managed\_identity) | User-Assigned Managed Identity assigned to the Container App |
 | <a name="output_container_fqdn"></a> [container\_fqdn](#output\_container\_fqdn) | FQDN for the Container App |
 | <a name="output_networking"></a> [networking](#output\_networking) | IDs for various VNet resources if created |
 <!-- END_TF_DOCS -->
