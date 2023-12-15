@@ -32,11 +32,27 @@ module "azure_container_apps_hosting" {
 
   # Create an Azure Container Registry and connect it to the Container App Environment
   enable_container_registry = true
-
+  # registry_ipv4_allow_list = [ "8.8.8.8/32" ]
   ## Specify the connection details for an existing Container Registry if 'enable_container_registry' is false
-  # registry_server   = ""
-  # registry_username = ""
-  # registry_password = ""
+  # use_external_container_registry_url = true
+  # registry_server                     = ""
+  # registry_username                   = ""
+  # registry_password                   = ""
+  ## Specify a custom URL to pull the image from if 'use_external_container_registry_url' is false
+  # registry_custom_image_url = "https://name.azurecr.io/image:tag"
+  ## Change the SKU of ACR from "Standard"
+  # registry_sku = "Premium"
+  ## Change the retention period (only applicable to Premium SKU)
+  # enable_registry_retention_policy = true
+  # registry_retention_days          = 90
+  ## Disable admin username and access keys if authenticating using a service principal
+  # registry_admin_enabled = false
+  ## If you dont need a public registry, set this to false to prevent internet access
+  # registry_public_access_enabled = false
+  ## If 'registry_admin_enabled' is disabled, you can create a User Assigned Managed Identity to authenticate with ACR
+  # registry_use_managed_identity = true
+  ## The UAMI needs the 'AcrPull' role assignment which can be done manually or applied with terraform
+  # registry_managed_identity_assign_role = false
 
   ## Specify a custom name for the Container App
   # container_app_name_override = "my-awesome-app"
