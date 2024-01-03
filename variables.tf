@@ -205,6 +205,12 @@ variable "enable_mssql_vulnerability_assessment" {
   default     = true
 }
 
+variable "mssql_managed_identity_assign_role" {
+  description = "Assign the 'Storage Blob Data Contributor' Role to the SQL Server User-Assigned Managed Identity. Note: If you do not have 'Microsoft.Authorization/roleAssignments/write' permission, you will need to manually assign the 'Storage Blob Data Contributor' Role to the identity"
+  type        = bool
+  default     = true
+}
+
 variable "enable_postgresql_database" {
   type        = bool
   description = "Set to true to create an Azure Postgres server/database, with a private endpoint within the virtual network"
