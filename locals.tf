@@ -115,6 +115,7 @@ locals {
   mssql_version                         = var.mssql_version
   mssql_server_public_access_enabled    = var.mssql_server_public_access_enabled
   enable_mssql_vulnerability_assessment = var.enable_mssql_vulnerability_assessment
+  mssql_managed_identity_assign_role    = var.mssql_managed_identity_assign_role
 
   # Postgres Server
   enable_postgresql_database             = var.enable_postgresql_database
