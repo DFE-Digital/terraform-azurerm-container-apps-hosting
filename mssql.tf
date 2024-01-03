@@ -80,6 +80,8 @@ resource "azurerm_mssql_server" "default" {
     }
   }
 
+  primary_user_assigned_identity_id = local.enable_mssql_vulnerability_assessment ? azurerm_user_assigned_identity.mssql[0].id : null
+
   tags = local.tags
 }
 
