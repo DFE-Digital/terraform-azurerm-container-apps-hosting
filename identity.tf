@@ -7,7 +7,7 @@ resource "azurerm_user_assigned_identity" "containerapp" {
   tags                = local.tags
 }
 
-resource "azurerm_role_assignment" "acrpull" {
+resource "azurerm_role_assignment" "containerapp_acrpull" {
   count = local.registry_use_managed_identity && local.registry_managed_identity_assign_role ? 1 : 0
 
   scope                = azurerm_container_registry.acr[0].id
