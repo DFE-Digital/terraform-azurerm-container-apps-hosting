@@ -49,7 +49,7 @@ resource "azurerm_container_app" "container_apps" {
       [
         {
           "name" : "acr-password",
-          "value" : local.registry_password
+          "value" : local.registry_use_managed_identity && !local.registry_admin_enabled ? "not-in-use" : local.registry_password
         }
       ],
       local.enable_app_insights_integration ? [
