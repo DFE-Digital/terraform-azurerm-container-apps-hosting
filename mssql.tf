@@ -67,16 +67,12 @@ resource "azurerm_mssql_server" "default" {
     }
   }
 
-  dynamic "identity" {
-    for_each = local.enable_mssql_vulnerability_assessment ? [1] : []
-
-    content {
-      type         = "UserAssigned"
-      identity_ids = [azurerm_user_assigned_identity.mssql[0].id]
-    }
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.mssql[0].id]
   }
 
-  primary_user_assigned_identity_id = local.enable_mssql_vulnerability_assessment ? azurerm_user_assigned_identity.mssql[0].id : null
+  primary_user_assigned_identity_id = azurerm_user_assigned_identity.mssql[0].id
 
   tags = local.tags
 }
