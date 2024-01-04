@@ -123,29 +123,20 @@ resource "azurerm_mssql_firewall_rule" "default_mssql" {
   end_ip_address   = each.value
 }
 
-resource "azurerm_mssql_server_security_alert_policy" "default" {
+# "Express Configuration" for SQL Server vulnerability assessments is not yet
+# supported in the azurerm provider. The "azurerm_mssql_server_vulnerability_assessment"
+# resource only supports the classic configuration which requires a storage account.
+# Instead, we can use AzApi to enable the "Express" (modern) option which does not rely
+# on a storage account.
+resource "azapi_update_resource" "mssql_vulnerability_assessment" {
   count = local.enable_mssql_database && local.enable_mssql_vulnerability_assessment ? 1 : 0
 
-  resource_group_name        = local.resource_group.name
-  server_name                = azurerm_mssql_server.default[0].name
-  state                      = "Enabled"
-  email_account_admins       = true
-  email_addresses            = local.monitor_email_receivers
-  retention_days             = 90
-  storage_endpoint           = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
-  storage_account_access_key = azurerm_storage_account.mssql_security_storage[0].primary_access_key
-}
-
-resource "azurerm_mssql_server_vulnerability_assessment" "default" {
-  count = local.enable_mssql_database && local.enable_mssql_vulnerability_assessment ? 1 : 0
-
-  server_security_alert_policy_id = azurerm_mssql_server_security_alert_policy.default[0].id
-  storage_container_path          = "${azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint}${azurerm_storage_container.mssql_security_storage[0].name}/"
-  storage_account_access_key      = azurerm_storage_account.mssql_security_storage[0].primary_access_key
-
-  recurring_scans {
-    enabled                   = true
-    email_subscription_admins = true
-    emails                    = local.monitor_email_receivers
-  }
+  type      = "Microsoft.Sql/servers/sqlVulnerabilityAssessments@2023-05-01-preview"
+  name      = azurerm_mssql_server.default[0].name
+  parent_id = azurerm_mssql_server.default[0].id
+  body = jsonencode({
+    properties = {
+      state = "Enabled"
+    }
+  })
 }
