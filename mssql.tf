@@ -16,7 +16,7 @@ resource "azurerm_storage_account" "mssql_security_storage" {
 resource "azurerm_storage_account_network_rules" "mssql_security_storage" {
   count = local.enable_mssql_database ? 1 : 0
 
-  storage_account_id         = azurerm_storage_account.mssql_security_storage[0].id
+  storage_account_id = azurerm_storage_account.mssql_security_storage[0].id
   # If Vulnerability Assessment is enabled, then there is not currently a way to
   # store reports in a Storage Account that is protected by a Firewall.
   # Inbound traffic must be permitted to the Storage Account
@@ -83,9 +83,9 @@ resource "azurerm_mssql_server" "default" {
 resource "azurerm_mssql_server_extended_auditing_policy" "default" {
   count = local.enable_mssql_database ? 1 : 0
 
-  server_id                               = azurerm_mssql_server.default[0].id
-  storage_endpoint                        = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
-  retention_in_days                       = 90
+  server_id         = azurerm_mssql_server.default[0].id
+  storage_endpoint  = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
+  retention_in_days = 90
 }
 
 resource "azurerm_mssql_database" "default" {
@@ -109,9 +109,9 @@ resource "azurerm_mssql_database" "default" {
 resource "azurerm_mssql_database_extended_auditing_policy" "default" {
   count = local.enable_mssql_database ? 1 : 0
 
-  database_id                             = azurerm_mssql_database.default[0].id
-  storage_endpoint                        = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
-  retention_in_days                       = 90
+  database_id       = azurerm_mssql_database.default[0].id
+  storage_endpoint  = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
+  retention_in_days = 90
 }
 
 resource "azurerm_mssql_firewall_rule" "default_mssql" {
