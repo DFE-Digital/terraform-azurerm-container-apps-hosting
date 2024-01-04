@@ -21,10 +21,6 @@ resource "azurerm_storage_account_network_rules" "mssql_security_storage" {
   bypass                     = ["AzureServices"]
   virtual_network_subnet_ids = []
   ip_rules                   = local.mssql_firewall_ipv4_allow_list
-
-  private_link_access {
-    endpoint_resource_id = azurerm_mssql_server.default[0].id
-  }
 }
 
 resource "azurerm_storage_container" "mssql_security_storage" {
