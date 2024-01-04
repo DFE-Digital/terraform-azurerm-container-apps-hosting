@@ -17,7 +17,7 @@ resource "azurerm_role_assignment" "containerapp_acrpull" {
 }
 
 resource "azurerm_user_assigned_identity" "mssql" {
-  count = local.enable_mssql_vulnerability_assessment ? 1 : 0
+  count = local.enable_mssql_database ? 1 : 0
 
   location            = local.resource_group.location
   name                = "${local.resource_prefix}-uami-mssql"
@@ -26,7 +26,7 @@ resource "azurerm_user_assigned_identity" "mssql" {
 }
 
 resource "azurerm_role_assignment" "mssql_storageblobdatacontributor" {
-  count = local.enable_mssql_vulnerability_assessment && local.mssql_managed_identity_assign_role ? 1 : 0
+  count = local.enable_mssql_database && local.mssql_managed_identity_assign_role ? 1 : 0
 
   scope                = azurerm_storage_account.mssql_security_storage[0].id
   role_definition_name = "Storage Blob Data Contributor"
