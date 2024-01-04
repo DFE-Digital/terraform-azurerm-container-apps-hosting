@@ -95,11 +95,9 @@ resource "azurerm_mssql_database" "default" {
   max_size_gb = local.mssql_max_size_gb
 
   threat_detection_policy {
-    state                      = "Enabled"
-    email_account_admins       = "Enabled"
-    retention_days             = 90
-    storage_endpoint           = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
-    storage_account_access_key = azurerm_storage_account.mssql_security_storage[0].primary_access_key
+    state                = "Enabled"
+    email_account_admins = "Enabled"
+    retention_days       = 90
   }
 
   tags = local.tags
