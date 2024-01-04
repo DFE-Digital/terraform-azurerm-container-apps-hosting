@@ -17,7 +17,10 @@ resource "azurerm_storage_account_network_rules" "mssql_security_storage" {
   count = local.enable_mssql_database ? 1 : 0
 
   storage_account_id         = azurerm_storage_account.mssql_security_storage[0].id
-  default_action             = "Deny"
+  # If Vulnerability Assessment is enabled, then there is not currently a way to
+  # store reports in a Storage Account that is protected by a Firewall.
+  # Inbound traffic must be permitted to the Storage Account
+  default_action             = local.enable_mssql_vulnerability_assessment ? "Allow" : "Deny"
   bypass                     = ["AzureServices"]
   virtual_network_subnet_ids = []
   ip_rules                   = local.mssql_firewall_ipv4_allow_list
