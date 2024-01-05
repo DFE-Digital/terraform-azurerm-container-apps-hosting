@@ -9,22 +9,21 @@ resource "azurerm_storage_account" "mssql_security_storage" {
   min_tls_version                 = "TLS1_2"
   tags                            = local.tags
   enable_https_traffic_only       = true
-  public_network_access_enabled   = false
+  public_network_access_enabled   = local.enable_mssql_vulnerability_assessment ? true : false
   allow_nested_items_to_be_public = false
 }
 
 resource "azurerm_storage_account_network_rules" "mssql_security_storage" {
   count = local.enable_mssql_database ? 1 : 0
 
-  storage_account_id         = azurerm_storage_account.mssql_security_storage[0].id
-  default_action             = "Deny"
+  storage_account_id = azurerm_storage_account.mssql_security_storage[0].id
+  # If Vulnerability Assessment is enabled, then there is not currently a way to
+  # store reports in a Storage Account that is protected by a Firewall.
+  # Inbound traffic must be permitted to the Storage Account
+  default_action             = local.enable_mssql_vulnerability_assessment ? "Allow" : "Deny"
   bypass                     = ["AzureServices"]
   virtual_network_subnet_ids = []
   ip_rules                   = local.mssql_firewall_ipv4_allow_list
-
-  private_link_access {
-    endpoint_resource_id = azurerm_mssql_server.default[0].id
-  }
 }
 
 resource "azurerm_storage_container" "mssql_security_storage" {
@@ -71,16 +70,12 @@ resource "azurerm_mssql_server" "default" {
     }
   }
 
-  dynamic "identity" {
-    for_each = local.enable_mssql_vulnerability_assessment ? [1] : []
-
-    content {
-      type         = "UserAssigned"
-      identity_ids = [azurerm_user_assigned_identity.mssql[0].id]
-    }
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.mssql[0].id]
   }
 
-  primary_user_assigned_identity_id = local.enable_mssql_vulnerability_assessment ? azurerm_user_assigned_identity.mssql[0].id : null
+  primary_user_assigned_identity_id = azurerm_user_assigned_identity.mssql[0].id
 
   tags = local.tags
 }
@@ -88,11 +83,9 @@ resource "azurerm_mssql_server" "default" {
 resource "azurerm_mssql_server_extended_auditing_policy" "default" {
   count = local.enable_mssql_database ? 1 : 0
 
-  server_id                               = azurerm_mssql_server.default[0].id
-  storage_endpoint                        = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
-  storage_account_access_key              = azurerm_storage_account.mssql_security_storage[0].primary_access_key
-  storage_account_access_key_is_secondary = false
-  retention_in_days                       = 90
+  server_id         = azurerm_mssql_server.default[0].id
+  storage_endpoint  = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
+  retention_in_days = 90
 }
 
 resource "azurerm_mssql_database" "default" {
@@ -105,11 +98,9 @@ resource "azurerm_mssql_database" "default" {
   max_size_gb = local.mssql_max_size_gb
 
   threat_detection_policy {
-    state                      = "Enabled"
-    email_account_admins       = "Enabled"
-    retention_days             = 90
-    storage_endpoint           = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
-    storage_account_access_key = azurerm_storage_account.mssql_security_storage[0].primary_access_key
+    state                = "Enabled"
+    email_account_admins = "Enabled"
+    retention_days       = 90
   }
 
   tags = local.tags
@@ -118,11 +109,9 @@ resource "azurerm_mssql_database" "default" {
 resource "azurerm_mssql_database_extended_auditing_policy" "default" {
   count = local.enable_mssql_database ? 1 : 0
 
-  database_id                             = azurerm_mssql_database.default[0].id
-  storage_endpoint                        = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
-  storage_account_access_key              = azurerm_storage_account.mssql_security_storage[0].primary_access_key
-  storage_account_access_key_is_secondary = false
-  retention_in_days                       = 90
+  database_id       = azurerm_mssql_database.default[0].id
+  storage_endpoint  = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
+  retention_in_days = 90
 }
 
 resource "azurerm_mssql_firewall_rule" "default_mssql" {
@@ -134,29 +123,34 @@ resource "azurerm_mssql_firewall_rule" "default_mssql" {
   end_ip_address   = each.value
 }
 
-resource "azurerm_mssql_server_security_alert_policy" "default" {
-  count = local.enable_mssql_database && local.enable_mssql_vulnerability_assessment ? 1 : 0
+# "Express Configuration" for SQL Server vulnerability assessments is not yet
+# supported in the azurerm provider. The "azurerm_mssql_server_vulnerability_assessment"
+# resource only supports the classic configuration which requires a storage account.
+# Instead, we can use AzApi to enable the "Express" (modern) option which does not rely
+# on a storage account.
+# GitHub issue: https://github.com/hashicorp/terraform-provider-azurerm/issues/19971
+resource "azapi_update_resource" "mssql_vulnerability_assessment" {
+  count = local.enable_mssql_database ? 1 : 0
 
-  resource_group_name        = local.resource_group.name
-  server_name                = azurerm_mssql_server.default[0].name
-  state                      = "Enabled"
-  email_account_admins       = true
-  email_addresses            = local.monitor_email_receivers
-  retention_days             = 90
-  storage_endpoint           = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
-  storage_account_access_key = azurerm_storage_account.mssql_security_storage[0].primary_access_key
+  type      = "Microsoft.Sql/servers/sqlVulnerabilityAssessments@2023-05-01-preview"
+  name      = azurerm_mssql_server.default[0].name
+  parent_id = azurerm_mssql_server.default[0].id
+  body = jsonencode({
+    properties = {
+      state = local.enable_mssql_vulnerability_assessment ? "Enabled" : "Disabled"
+    }
+  })
 }
 
-resource "azurerm_mssql_server_vulnerability_assessment" "default" {
-  count = local.enable_mssql_database && local.enable_mssql_vulnerability_assessment ? 1 : 0
+resource "azapi_update_resource" "mssql_threat_protection" {
+  count = local.enable_mssql_database ? 1 : 0
 
-  server_security_alert_policy_id = azurerm_mssql_server_security_alert_policy.default[0].id
-  storage_container_path          = "${azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint}${azurerm_storage_container.mssql_security_storage[0].name}/"
-  storage_account_access_key      = azurerm_storage_account.mssql_security_storage[0].primary_access_key
-
-  recurring_scans {
-    enabled                   = true
-    email_subscription_admins = true
-    emails                    = local.monitor_email_receivers
-  }
+  type      = "Microsoft.Sql/servers/advancedThreatProtectionSettings@2023-05-01-preview"
+  name      = azurerm_mssql_server.default[0].name
+  parent_id = azurerm_mssql_server.default[0].id
+  body = jsonencode({
+    properties = {
+      state = local.enable_mssql_vulnerability_assessment ? "Enabled" : "Disabled"
+    }
+  })
 }
