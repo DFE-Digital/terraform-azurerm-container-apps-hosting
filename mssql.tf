@@ -129,14 +129,27 @@ resource "azurerm_mssql_firewall_rule" "default_mssql" {
 # Instead, we can use AzApi to enable the "Express" (modern) option which does not rely
 # on a storage account.
 resource "azapi_update_resource" "mssql_vulnerability_assessment" {
-  count = local.enable_mssql_database && local.enable_mssql_vulnerability_assessment ? 1 : 0
+  count = local.enable_mssql_database ? 1 : 0
 
   type      = "Microsoft.Sql/servers/sqlVulnerabilityAssessments@2023-05-01-preview"
   name      = azurerm_mssql_server.default[0].name
   parent_id = azurerm_mssql_server.default[0].id
   body = jsonencode({
     properties = {
-      state = "Enabled"
+      state = local.enable_mssql_vulnerability_assessment ? "Enabled" : "Disabled"
+    }
+  })
+}
+
+resource "azapi_update_resource" "mssql_threat_protection" {
+  count = local.enable_mssql_database ? 1 : 0
+
+  type      = "Microsoft.Sql/servers/advancedThreatProtectionSettings@2023-05-01-preview"
+  name      = azurerm_mssql_server.default[0].name
+  parent_id = azurerm_mssql_server.default[0].id
+  body = jsonencode({
+    properties = {
+      state = local.enable_mssql_vulnerability_assessment ? "Enabled" : "Disabled"
     }
   })
 }
