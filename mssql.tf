@@ -9,7 +9,7 @@ resource "azurerm_storage_account" "mssql_security_storage" {
   min_tls_version                 = "TLS1_2"
   tags                            = local.tags
   enable_https_traffic_only       = true
-  public_network_access_enabled   = false
+  public_network_access_enabled   = local.enable_mssql_vulnerability_assessment ? true : false
   allow_nested_items_to_be_public = false
 }
 
