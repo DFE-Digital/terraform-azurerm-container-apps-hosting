@@ -128,6 +128,7 @@ resource "azurerm_mssql_firewall_rule" "default_mssql" {
 # resource only supports the classic configuration which requires a storage account.
 # Instead, we can use AzApi to enable the "Express" (modern) option which does not rely
 # on a storage account.
+# GitHub issue: https://github.com/hashicorp/terraform-provider-azurerm/issues/19971
 resource "azapi_update_resource" "mssql_vulnerability_assessment" {
   count = local.enable_mssql_database ? 1 : 0
 
