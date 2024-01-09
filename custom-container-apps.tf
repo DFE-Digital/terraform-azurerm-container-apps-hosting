@@ -40,6 +40,15 @@ resource "azurerm_container_app" "custom_container_apps" {
     }
   }
 
+  dynamic "identity" {
+    for_each = length(each.value.identity) > 0 ? [1] : []
+
+    content {
+      type         = identity.value.type
+      identity_ids = identity.value.identity_ids
+    }
+  }
+
   registry {
     server               = each.value.registry.server != "" ? each.value.registry.server : local.registry_server
     username             = each.value.registry.identity == "" ? each.value.registry.username != "" ? each.value.registry.username : local.registry_username : null

@@ -991,6 +991,10 @@ variable "custom_container_apps" {
       })
       cdn_frontdoor_custom_domain = optional(string, "")
     }), null)
+    identity = optional(list(object({
+      type         = string
+      identity_ids = list(string)
+    })), [])
     secrets = optional(list(object({
       name  = string
       value = string
