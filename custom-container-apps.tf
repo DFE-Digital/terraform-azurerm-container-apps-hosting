@@ -41,7 +41,7 @@ resource "azurerm_container_app" "custom_container_apps" {
   }
 
   dynamic "identity" {
-    for_each = length(each.value.identity) > 0 ? [1] : []
+    for_each = each.value.identity
 
     content {
       type         = identity.value.type
