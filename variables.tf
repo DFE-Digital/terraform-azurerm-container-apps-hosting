@@ -402,6 +402,12 @@ variable "container_scale_out_rule_end" {
   default     = "0 18 * * *"
 }
 
+variable "container_scale_http_concurrency" {
+  description = "When the number of concurrent HTTP requests exceeds this value, then another replica is added. Replicas continue to add to the pool up to the max-replicas amount."
+  type        = number
+  default     = 10
+}
+
 variable "container_port" {
   description = "Container port"
   type        = number

@@ -185,6 +185,11 @@ resource "azurerm_container_app" "container_apps" {
     min_replicas = each.value == "worker" ? local.worker_container_min_replicas : local.container_min_replicas
     max_replicas = each.value == "worker" ? local.worker_container_max_replicas : local.container_max_replicas
 
+    http_scale_rule {
+      name                = "scale-up-down-http-requests"
+      concurrent_requests = local.container_scale_http_concurrency
+    }
+
     dynamic "custom_scale_rule" {
       for_each = local.container_scale_out_at_defined_time ? [1] : []
 

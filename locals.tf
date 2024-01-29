@@ -205,6 +205,7 @@ locals {
   container_scale_out_at_defined_time = var.container_scale_out_at_defined_time
   container_scale_out_rule_start      = var.container_scale_out_rule_start
   container_scale_out_rule_end        = var.container_scale_out_rule_end
+  container_scale_http_concurrency    = var.container_scale_http_concurrency
   # Container App / Sidecar
   enable_worker_container       = var.enable_worker_container
   worker_container_command      = var.worker_container_command
