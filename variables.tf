@@ -384,6 +384,24 @@ variable "container_max_replicas" {
   default     = 2
 }
 
+variable "container_scale_out_at_defined_time" {
+  description = "Should the Container App scale out to the max-replicas during a specified time window?"
+  type        = bool
+  default     = false
+}
+
+variable "container_scale_out_rule_start" {
+  description = "Specify a time using Linux cron format that represents the start of the scale-out window. Defaults to 08:00"
+  type        = string
+  default     = "0 8 * * *"
+}
+
+variable "container_scale_out_rule_end" {
+  description = "Specify a time using Linux cron format that represents the end of the scale-out window. Defaults to 18:00"
+  type        = string
+  default     = "0 18 * * *"
+}
+
 variable "container_port" {
   description = "Container port"
   type        = number

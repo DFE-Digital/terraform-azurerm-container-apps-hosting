@@ -185,6 +185,21 @@ resource "azurerm_container_app" "container_apps" {
     min_replicas = each.value == "worker" ? local.worker_container_min_replicas : local.container_min_replicas
     max_replicas = each.value == "worker" ? local.worker_container_max_replicas : local.container_max_replicas
 
+    dynamic "custom_scale_rule" {
+      for_each = local.container_scale_out_at_defined_time ? [1] : []
+
+      content {
+        name             = "scale-down-out-of-hours"
+        custom_rule_type = "cron"
+        metadata = {
+          timezone        = "Europe/London"
+          start           = local.container_scale_out_rule_start
+          end             = local.container_scale_out_rule_end
+          desiredReplicas = each.value == "worker" ? local.worker_container_max_replicas : local.container_max_replicas
+        }
+      }
+    }
+
     dynamic "volume" {
       for_each = local.enable_container_app_file_share ? [1] : []
 
