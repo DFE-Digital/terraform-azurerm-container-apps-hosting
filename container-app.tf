@@ -9,6 +9,17 @@ resource "azurerm_container_app_environment" "container_app_env" {
   tags = local.tags
 }
 
+resource "azurerm_monitor_diagnostic_setting" "container_app_env" {
+  name                       = "${local.resource_prefix}-containerapp-diag"
+  target_resource_id         = azurerm_container_app_environment.container_app_env.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.container_app.id
+  eventhub_name              = local.enable_event_hub ? azurerm_eventhub.container_app[0].name : null
+
+  enabled_log {
+    category_group = "Audit"
+  }
+}
+
 resource "azurerm_container_app_environment_storage" "container_app_env" {
   count = local.enable_container_app_file_share ? 1 : 0
 
