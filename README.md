@@ -126,12 +126,12 @@ module "azure_container_apps_hosting" {
   container_max_replicas = 10
 
   # Maximum number of concurrent HTTP requests before a new replica is created
-  container_scale_rule_concurrent_request_count = 100
+  container_scale_http_concurrency = 100
 
   ## Enable out-of-hours scale down to reduce resource usage
-  # container_scale_rule_scale_down_out_of_hours = false
-  # container_scale_rule_out_of_hours_start      = "0 23 * * *" # Must be a valid cron time
-  # container_scale_rule_out_of_hours_end        = "0 6 * * *" # Must be a valid cron time
+  # container_scale_out_at_defined_time = false
+  # container_scale_out_rule_start      = "0 9 * * *" # Must be a valid cron time
+  # container_scale_out_rule_end        = "0 17 * * *" # Must be a valid cron time
 
   # Enable a Liveness probe that checks to ensure the Container is responding. If this fails, the Container is restarted
   enable_container_health_probe   = true
