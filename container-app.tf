@@ -139,9 +139,9 @@ resource "azurerm_container_app" "container_apps" {
         for_each = each.value == "main" && local.enable_container_health_probe ? [1] : []
 
         content {
-          interval_seconds = lookup(local.container_health_probe, "interval_seconds")
-          transport        = lookup(local.container_health_probe, "transport")
-          port             = lookup(local.container_health_probe, "port")
+          interval_seconds = lookup(local.container_health_probe, "interval_seconds", null)
+          transport        = lookup(local.container_health_probe, "transport", null)
+          port             = lookup(local.container_health_probe, "port", local.container_port)
           path             = lookup(local.container_health_probe, "path", null)
         }
       }
