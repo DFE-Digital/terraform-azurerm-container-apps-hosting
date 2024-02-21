@@ -49,11 +49,15 @@ resource "azurerm_container_app" "custom_container_apps" {
     }
   }
 
-  registry {
-    server               = each.value.registry.server != "" ? each.value.registry.server : local.registry_server
-    username             = each.value.registry.identity == "" ? each.value.registry.username != "" ? each.value.registry.username : local.registry_username : null
-    password_secret_name = each.value.registry.identity == "" ? each.value.registry.password_secret_name != "" ? each.value.registry.password_secret_name : "acr-password" : null
-    identity             = each.value.registry.identity != "" ? each.value.registry.identity : null
+  dynamic "registry" {
+    for_each = each.value.registry != null ? [1] : []
+
+    content {
+      server               = each.value.registry.server != "" ? each.value.registry.server : local.registry_server
+      username             = each.value.registry.identity == "" ? each.value.registry.username != "" ? each.value.registry.username : local.registry_username : null
+      password_secret_name = each.value.registry.identity == "" ? each.value.registry.password_secret_name != "" ? each.value.registry.password_secret_name : "acr-password" : null
+      identity             = each.value.registry.identity != "" ? each.value.registry.identity : null
+    }
   }
 
   template {
