@@ -1016,6 +1016,11 @@ variable "custom_container_apps" {
       cdn_frontdoor_custom_domain               = optional(string, "")
       cdn_frontdoor_origin_fqdn_override        = optional(string, "")
       cdn_frontdoor_origin_host_header_override = optional(string, "")
+      enable_cdn_frontdoor_health_probe         = optional(bool, false)
+      cdn_frontdoor_health_probe_protocol       = optional(string, "")
+      cdn_frontdoor_health_probe_interval       = optional(number, 120)
+      cdn_frontdoor_health_probe_request_type   = optional(string, "")
+      cdn_frontdoor_health_probe_path           = optional(string, "")
     }), null)
     identity = optional(list(object({
       type         = string

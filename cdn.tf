@@ -18,6 +18,7 @@ resource "azurerm_cdn_frontdoor_origin_group" "group" {
 
   dynamic "health_probe" {
     for_each = local.enable_cdn_frontdoor_health_probe ? [0] : []
+
     content {
       protocol            = local.cdn_frontdoor_health_probe_protocol
       interval_in_seconds = local.cdn_frontdoor_health_probe_interval
@@ -36,6 +37,17 @@ resource "azurerm_cdn_frontdoor_origin_group" "custom_container_apps" {
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.cdn[0].id
 
   load_balancing {}
+
+  dynamic "health_probe" {
+    for_each = each.value.ingress.enable_cdn_frontdoor_health_probe ? [0] : []
+
+    content {
+      protocol            = each.value.ingress.cdn_frontdoor_health_probe_protocol
+      interval_in_seconds = each.value.ingress.cdn_frontdoor_health_probe_interval
+      request_type        = each.value.ingress.cdn_frontdoor_health_probe_request_type
+      path                = each.value.ingress.cdn_frontdoor_health_probe_path
+    }
+  }
 }
 
 resource "azurerm_cdn_frontdoor_origin" "origin" {
