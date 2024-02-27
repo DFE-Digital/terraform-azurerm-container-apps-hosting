@@ -18,6 +18,7 @@ resource "azurerm_cdn_frontdoor_origin_group" "group" {
 
   dynamic "health_probe" {
     for_each = local.enable_cdn_frontdoor_health_probe ? [0] : []
+
     content {
       protocol            = local.cdn_frontdoor_health_probe_protocol
       interval_in_seconds = local.cdn_frontdoor_health_probe_interval
@@ -36,6 +37,17 @@ resource "azurerm_cdn_frontdoor_origin_group" "custom_container_apps" {
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.cdn[0].id
 
   load_balancing {}
+
+  dynamic "health_probe" {
+    for_each = each.value.ingress.enable_cdn_frontdoor_health_probe ? [0] : []
+
+    content {
+      protocol            = each.value.ingress.cdn_frontdoor_health_probe_protocol
+      interval_in_seconds = each.value.ingress.cdn_frontdoor_health_probe_interval
+      request_type        = each.value.ingress.cdn_frontdoor_health_probe_request_type
+      path                = each.value.ingress.cdn_frontdoor_health_probe_path
+    }
+  }
 }
 
 resource "azurerm_cdn_frontdoor_origin" "origin" {
@@ -60,8 +72,8 @@ resource "azurerm_cdn_frontdoor_origin" "custom_container_apps" {
   cdn_frontdoor_origin_group_id  = azurerm_cdn_frontdoor_origin_group.custom_container_apps[each.key].id
   enabled                        = true
   certificate_name_check_enabled = true
-  host_name                      = azurerm_container_app.custom_container_apps[each.key].ingress[0].fqdn
-  origin_host_header             = azurerm_container_app.custom_container_apps[each.key].ingress[0].fqdn
+  host_name                      = each.value.ingress.cdn_frontdoor_origin_fqdn_override != "" ? each.value.ingress.cdn_frontdoor_origin_fqdn_override : azurerm_container_app.custom_container_apps[each.key].ingress[0].fqdn
+  origin_host_header             = each.value.ingress.cdn_frontdoor_origin_host_header_override != "" ? each.value.ingress.cdn_frontdoor_origin_host_header_override : azurerm_container_app.custom_container_apps[each.key].ingress[0].fqdn
   http_port                      = local.cdn_frontdoor_origin_http_port
   https_port                     = local.cdn_frontdoor_origin_https_port
 
@@ -150,7 +162,7 @@ resource "azurerm_cdn_frontdoor_route" "custom_container_apps" {
   cdn_frontdoor_rule_set_ids    = local.ruleset_ids
   enabled                       = true
 
-  forwarding_protocol    = local.cdn_frontdoor_forwarding_protocol
+  forwarding_protocol    = each.value.ingress.cdn_frontdoor_forwarding_protocol_override != "" ? each.value.ingress.cdn_frontdoor_forwarding_protocol_override : local.cdn_frontdoor_forwarding_protocol
   https_redirect_enabled = true
   patterns_to_match      = ["/*"]
   supported_protocols    = ["Http", "Https"]
