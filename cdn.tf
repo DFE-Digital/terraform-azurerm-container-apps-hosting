@@ -162,7 +162,7 @@ resource "azurerm_cdn_frontdoor_route" "custom_container_apps" {
   cdn_frontdoor_rule_set_ids    = local.ruleset_ids
   enabled                       = true
 
-  forwarding_protocol    = local.cdn_frontdoor_forwarding_protocol
+  forwarding_protocol    = each.value.ingress.cdn_frontdoor_forwarding_protocol_override != "" ? each.value.ingress.cdn_frontdoor_forwarding_protocol_override : local.cdn_frontdoor_forwarding_protocol
   https_redirect_enabled = true
   patterns_to_match      = ["/*"]
   supported_protocols    = ["Http", "Https"]
