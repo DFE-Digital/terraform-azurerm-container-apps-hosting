@@ -94,6 +94,58 @@ resource "azurerm_monitor_metric_alert" "memory" {
   tags = local.tags
 }
 
+resource "azurerm_monitor_metric_alert" "sql_cpu" {
+  count = local.enable_monitoring && local.enable_mssql_database ? 1 : 0
+
+  name                = "${local.resource_prefix}-sql-cpu"
+  resource_group_name = local.resource_group.name
+  scopes              = [azurerm_mssql_database.default[0].id]
+  description         = "Action will be triggered when SQL CPU usage is higher than a defined threshold for longer than 5 minutes"
+  window_size         = "PT5M"
+  frequency           = "PT5M"
+  severity            = 2
+
+  criteria {
+    metric_namespace = "Microsoft.Sql/servers/databases"
+    metric_name      = "cpu_percent"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 80
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.main[0].id
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_monitor_metric_alert" "sql_dtu" {
+  count = local.enable_monitoring && local.enable_mssql_database ? 1 : 0
+
+  name                = "${local.resource_prefix}-sql-dtu"
+  resource_group_name = local.resource_group.name
+  scopes              = [azurerm_mssql_database.default[0].id]
+  description         = "Action will be triggered when SQL DTU usage is higher than a defined threshold for longer than 5 minutes"
+  window_size         = "PT5M"
+  frequency           = "PT5M"
+  severity            = 2
+
+  criteria {
+    metric_namespace = "Microsoft.Sql/servers/databases"
+    metric_name      = "dtu_consumption_percent"
+    aggregation      = "Average"
+    operator         = "GreaterThan"
+    threshold        = 80
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.main[0].id
+  }
+
+  tags = local.tags
+}
+
 resource "azurerm_monitor_scheduled_query_rules_alert_v2" "exceptions" {
   count = local.enable_monitoring && local.enable_app_insights_integration ? 1 : 0
 
