@@ -117,7 +117,7 @@ resource "azurerm_mssql_database_extended_auditing_policy" "default" {
 resource "azurerm_mssql_firewall_rule" "default_mssql" {
   for_each = local.enable_mssql_database ? toset(local.mssql_firewall_ipv4_allow_list) : []
 
-  name             = "${replace(local.resource_prefix, "-", "")}fw${each.key}"
+  name             = lookup(each.value, "name", "${replace(local.resource_prefix, "-", "")}fw${each.key}")
   server_id        = azurerm_mssql_server.default[0].id
   start_ip_address = lookup(each.value, "start_ip_address", each.value)
   end_ip_address   = lookup(each.value, "end_ip_address", each.value)
