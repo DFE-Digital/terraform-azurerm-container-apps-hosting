@@ -119,8 +119,8 @@ resource "azurerm_mssql_firewall_rule" "default_mssql" {
 
   name             = "${replace(local.resource_prefix, "-", "")}fw${each.key}"
   server_id        = azurerm_mssql_server.default[0].id
-  start_ip_address = each.value
-  end_ip_address   = each.value
+  start_ip_address = lookup(each.value, "start_ip_address", each.value)
+  end_ip_address   = lookup(each.value, "end_ip_address", each.value)
 }
 
 # "Express Configuration" for SQL Server vulnerability assessments is not yet
