@@ -205,6 +205,12 @@ variable "enable_mssql_vulnerability_assessment" {
   default     = true
 }
 
+variable "mssql_security_storage_firewall_ipv4_allow_list" {
+  description = "Additional IP addresses to add to the Storage Account that holds the Vulnerability Assessments"
+  type        = list(string)
+  default     = []
+}
+
 variable "mssql_managed_identity_assign_role" {
   description = "Assign the 'Storage Blob Data Contributor' Role to the SQL Server User-Assigned Managed Identity. Note: If you do not have 'Microsoft.Authorization/roleAssignments/write' permission, you will need to manually assign the 'Storage Blob Data Contributor' Role to the identity"
   type        = bool

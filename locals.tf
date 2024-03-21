@@ -103,19 +103,20 @@ locals {
   registry_managed_identity_assign_role = var.registry_managed_identity_assign_role
 
   # SQL Server
-  enable_mssql_database                 = var.enable_mssql_database
-  mssql_server_admin_password           = var.mssql_server_admin_password
-  mssql_sku_name                        = var.mssql_sku_name
-  mssql_max_size_gb                     = var.mssql_max_size_gb
-  mssql_database_name                   = var.mssql_database_name
-  mssql_firewall_ipv4_allow_list        = var.mssql_firewall_ipv4_allow_list
-  mssql_azuread_admin_username          = var.mssql_azuread_admin_username
-  mssql_azuread_admin_object_id         = var.mssql_azuread_admin_object_id
-  mssql_azuread_auth_only               = var.mssql_azuread_auth_only
-  mssql_version                         = var.mssql_version
-  mssql_server_public_access_enabled    = var.mssql_server_public_access_enabled
-  enable_mssql_vulnerability_assessment = var.enable_mssql_vulnerability_assessment
-  mssql_managed_identity_assign_role    = var.mssql_managed_identity_assign_role
+  enable_mssql_database                           = var.enable_mssql_database
+  mssql_server_admin_password                     = var.mssql_server_admin_password
+  mssql_sku_name                                  = var.mssql_sku_name
+  mssql_max_size_gb                               = var.mssql_max_size_gb
+  mssql_database_name                             = var.mssql_database_name
+  mssql_firewall_ipv4_allow_list                  = var.mssql_firewall_ipv4_allow_list
+  mssql_azuread_admin_username                    = var.mssql_azuread_admin_username
+  mssql_azuread_admin_object_id                   = var.mssql_azuread_admin_object_id
+  mssql_azuread_auth_only                         = var.mssql_azuread_auth_only
+  mssql_version                                   = var.mssql_version
+  mssql_server_public_access_enabled              = var.mssql_server_public_access_enabled
+  enable_mssql_vulnerability_assessment           = var.enable_mssql_vulnerability_assessment
+  mssql_security_storage_firewall_ipv4_allow_list = var.mssql_security_storage_firewall_ipv4_allow_list
+  mssql_managed_identity_assign_role              = var.mssql_managed_identity_assign_role
 
   # Postgres Server
   enable_postgresql_database             = var.enable_postgresql_database

@@ -23,7 +23,7 @@ resource "azurerm_storage_account_network_rules" "mssql_security_storage" {
   default_action             = local.enable_mssql_vulnerability_assessment ? "Allow" : "Deny"
   bypass                     = ["AzureServices"]
   virtual_network_subnet_ids = []
-  ip_rules                   = local.mssql_firewall_ipv4_allow_list
+  ip_rules                   = local.mssql_security_storage_firewall_ipv4_allow_list
 }
 
 resource "azurerm_storage_container" "mssql_security_storage" {
@@ -115,7 +115,7 @@ resource "azurerm_mssql_database_extended_auditing_policy" "default" {
 }
 
 resource "azurerm_mssql_firewall_rule" "default_mssql" {
-  for_each = local.enable_mssql_database ? toset(local.mssql_firewall_ipv4_allow_list) : []
+  for_each = local.enable_mssql_database ? local.mssql_firewall_ipv4_allow_list : []
 
   name             = lookup(each.value, "name", "${replace(local.resource_prefix, "-", "")}fw${each.key}")
   server_id        = azurerm_mssql_server.default[0].id
