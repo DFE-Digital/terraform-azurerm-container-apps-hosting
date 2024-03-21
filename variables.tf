@@ -183,8 +183,12 @@ variable "mssql_database_name" {
 
 variable "mssql_firewall_ipv4_allow_list" {
   description = "A list of IPv4 Addresses that require remote access to the MSSQL Server"
-  type        = list(any)
-  default     = []
+  type = list(object({
+    "ip_address" : optional(string, null),
+    "start_ip_range" : optional(string, null),
+    "end_ip_range" : optional(string, null),
+  }))
+  default = []
 }
 
 variable "mssql_server_public_access_enabled" {
