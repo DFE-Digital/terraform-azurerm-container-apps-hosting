@@ -991,6 +991,12 @@ variable "storage_account_public_access_enabled" {
   default     = false
 }
 
+variable "storage_account_shared_access_key_enabled" {
+  description = "Should the storage account permit requests to be authorized with the account access key via Shared Key?"
+  type        = bool
+  default     = true
+}
+
 variable "storage_account_file_share_quota_gb" {
   description = "The maximum size of the share, in gigabytes."
   type        = number
