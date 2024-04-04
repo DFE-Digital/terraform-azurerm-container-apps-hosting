@@ -991,8 +991,14 @@ variable "storage_account_public_access_enabled" {
   default     = false
 }
 
-variable "storage_account_shared_access_key_enabled" {
-  description = "Should the storage account permit requests to be authorized with the account access key via Shared Key?"
+variable "container_app_storage_account_shared_access_key_enabled" {
+  description = "Should the storage account for the container app permit requests to be authorized with the account access key via Shared Key?"
+  type        = bool
+  default     = true
+}
+
+variable "mssql_storage_account_shared_access_key_enabled" {
+  description = "Should the storage account for mssql security permit requests to be authorized with the account access key via Shared Key?"
   type        = bool
   default     = true
 }
