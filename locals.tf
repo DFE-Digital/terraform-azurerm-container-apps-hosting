@@ -228,7 +228,8 @@ locals {
   storage_account_public_access_enabled = var.storage_account_public_access_enabled
   storage_account_file_share_quota_gb   = var.storage_account_file_share_quota_gb
   # Storage Account / Container
-  enable_container_app_blob_storage = var.enable_container_app_blob_storage
+  container_app_storage_account_shared_access_key_enabled = var.container_app_storage_account_shared_access_key_enabled
+  enable_container_app_blob_storage                       = var.enable_container_app_blob_storage
   container_app_blob_storage_sas_secret = local.enable_container_app_blob_storage ? [
     {
       name  = "connectionstrings--blobstorage",
@@ -239,6 +240,8 @@ locals {
   # Storage Account / File Share
   enable_container_app_file_share     = var.enable_container_app_file_share
   container_app_file_share_mount_path = var.container_app_file_share_mount_path
+  # Storage Account / MSSQL Security
+  mssql_security_storage_shared_access_key_enabled = var.mssql_storage_account_shared_access_key_enabled
 
   # Azure DNS Zone
   enable_dns_zone      = var.enable_dns_zone
