@@ -1,10 +1,12 @@
 locals {
   # Global options
-  environment     = var.environment
-  project_name    = var.project_name
-  resource_prefix = "${local.environment}${local.project_name}"
-  azure_location  = var.azure_location
-  tags            = var.tags
+  environment               = var.environment
+  project_name              = var.project_name
+  resource_prefix           = "${local.environment}${local.project_name}"
+  resource_prefix_sha       = sha1(local.resource_prefix)
+  resource_prefix_sha_short = substr(local.resource_prefix_sha, 0, 6)
+  azure_location            = var.azure_location
+  tags                      = var.tags
 
   # Resource Group
   existing_resource_group    = var.existing_resource_group

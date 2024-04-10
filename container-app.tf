@@ -23,7 +23,7 @@ resource "azurerm_monitor_diagnostic_setting" "container_app_env" {
 resource "azurerm_container_app_environment_storage" "container_app_env" {
   count = local.enable_container_app_file_share ? 1 : 0
 
-  name                         = "${local.resource_prefix}containerappstorage"
+  name                         = "${local.resource_prefix_sha_short}-storage"
   container_app_environment_id = azurerm_container_app_environment.container_app_env.id
   account_name                 = azurerm_storage_account.container_app[0].name
   share_name                   = azurerm_storage_share.container_app[0].name
