@@ -382,7 +382,7 @@ resource "azurerm_private_dns_a_record" "storage_private_link_blob" {
   zone_name           = azurerm_private_dns_zone.storage_private_link_blob[0].name
   resource_group_name = local.resource_group.name
   ttl                 = 300
-  records             = [azurerm_private_endpoint.default["storage"].private_service_connection[0].private_ip_address]
+  records             = [azurerm_private_endpoint.default["blob"].private_service_connection[0].private_ip_address]
   tags                = local.tags
 }
 
@@ -413,6 +413,6 @@ resource "azurerm_private_dns_a_record" "storage_private_link_file" {
   zone_name           = azurerm_private_dns_zone.storage_private_link_file[0].name
   resource_group_name = local.resource_group.name
   ttl                 = 300
-  records             = [azurerm_private_endpoint.default["storage"].private_service_connection[0].private_ip_address]
+  records             = [azurerm_private_endpoint.default["file"].private_service_connection[0].private_ip_address]
   tags                = local.tags
 }

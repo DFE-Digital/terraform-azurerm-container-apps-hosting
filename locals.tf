@@ -67,15 +67,20 @@ locals {
     }
   } : {}
   enable_private_endpoint_storage = local.enable_storage_account ? true : false
-  private_endpoint_storage = local.enable_private_endpoint_storage ? {
-    "storage" : {
+  private_endpoint_storage_blob = local.enable_private_endpoint_storage ? {
+    "blob" : {
       resource_group : local.resource_group,
       subnet_id : azurerm_subnet.storage_private_endpoint_subnet[0].id,
       resource_id : azurerm_storage_account.container_app[0].id,
-      subresource_names : concat(
-        local.enable_container_app_blob_storage ? ["blob"] : [],
-        local.enable_container_app_file_share ? ["file"] : [],
-      )
+      subresource_names : ["blob"]
+    }
+  } : {}
+  private_endpoint_storage_file = local.enable_container_app_file_share ? {
+    "file" : {
+      resource_group : local.resource_group,
+      subnet_id : azurerm_subnet.storage_private_endpoint_subnet[0].id,
+      resource_id : azurerm_storage_account.container_app[0].id,
+      subresource_names : ["file"],
     }
   } : {}
   private_endpoints = merge(
@@ -83,7 +88,8 @@ locals {
     local.private_endpoint_mssql,
     local.private_endpoint_postgres,
     local.private_endpoint_registry,
-    local.private_endpoint_storage,
+    local.private_endpoint_storage_blob,
+    local.private_endpoint_storage_file,
   )
 
   # Azure Container Registry
