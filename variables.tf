@@ -1052,12 +1052,12 @@ variable "custom_container_apps" {
       name  = string
       value = string
     })), [])
-    registry = object({
+    registry = optional(object({
       server               = optional(string, "")
       username             = optional(string, "")
       password_secret_name = optional(string, "")
       identity             = optional(string, "")
-    }),
+    }), null),
     image   = string
     cpu     = number
     memory  = number
