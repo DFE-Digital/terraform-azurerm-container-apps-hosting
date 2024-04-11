@@ -31,7 +31,7 @@ resource "azurerm_container_registry" "acr" {
       }
 
       dynamic "ip_rule" {
-        for_each = network_rule_set.value.ip_rules
+        for_each = network_rule_set.value
 
         content {
           action   = "Allow"
