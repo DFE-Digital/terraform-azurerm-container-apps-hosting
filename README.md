@@ -34,12 +34,9 @@ module "azure_container_apps_hosting" {
   enable_container_registry = true
   # registry_ipv4_allow_list = [ "8.8.8.8/32" ]
   ## Specify the connection details for an existing Container Registry if 'enable_container_registry' is false
-  # use_external_container_registry_url = true
   # registry_server                     = ""
   # registry_username                   = ""
   # registry_password                   = ""
-  ## Specify a custom URL to pull the image from if 'use_external_container_registry_url' is false
-  # registry_custom_image_url = "https://name.azurecr.io/image:tag"
   ## Change the SKU of ACR from "Standard"
   # registry_sku = "Premium"
   ## Change the retention period (only applicable to Premium SKU)
@@ -814,7 +811,6 @@ module "azure_container_apps_hosting" {
 | <a name="input_redis_cache_version"></a> [redis\_cache\_version](#input\_redis\_cache\_version) | Redis Cache version | `number` | `6` | no |
 | <a name="input_redis_config"></a> [redis\_config](#input\_redis\_config) | Overrides for Redis Cache Configuration options | <pre>object({<br>    maxmemory_reserved : optional(number),<br>    maxmemory_delta : optional(number),<br>    maxfragmentationmemory_reserved : optional(number),<br>    maxmemory_policy : optional(string),<br>  })</pre> | `{}` | no |
 | <a name="input_registry_admin_enabled"></a> [registry\_admin\_enabled](#input\_registry\_admin\_enabled) | Do you want to enable access key based authentication for your Container Registry? | `bool` | `true` | no |
-| <a name="input_registry_custom_image_url"></a> [registry\_custom\_image\_url](#input\_registry\_custom\_image\_url) | Custom image registry url (required if `use_external_container_registry` is true) | `string` | `""` | no |
 | <a name="input_registry_ipv4_allow_list"></a> [registry\_ipv4\_allow\_list](#input\_registry\_ipv4\_allow\_list) | List of IPv4 CIDR blocks that require access to the Container Registry | `list(string)` | `[]` | no |
 | <a name="input_registry_managed_identity_assign_role"></a> [registry\_managed\_identity\_assign\_role](#input\_registry\_managed\_identity\_assign\_role) | Assign the 'AcrPull' Role to the Container App User-Assigned Managed Identity. Note: If you do not have 'Microsoft.Authorization/roleAssignments/write' permission, you will need to manually assign the 'AcrPull' Role to the identity | `bool` | `true` | no |
 | <a name="input_registry_password"></a> [registry\_password](#input\_registry\_password) | Container registry password (required if `enable_container_registry` is false) | `string` | `""` | no |
@@ -829,7 +825,6 @@ module "azure_container_apps_hosting" {
 | <a name="input_storage_account_ipv4_allow_list"></a> [storage\_account\_ipv4\_allow\_list](#input\_storage\_account\_ipv4\_allow\_list) | A list of public IPv4 address to grant access to the Storage Account | `list(string)` | `[]` | no |
 | <a name="input_storage_account_public_access_enabled"></a> [storage\_account\_public\_access\_enabled](#input\_storage\_account\_public\_access\_enabled) | Should the Azure Storage Account have Public visibility? | `bool` | `false` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to be applied to all resources | `map(string)` | `{}` | no |
-| <a name="input_use_external_container_registry_url"></a> [use\_external\_container\_registry\_url](#input\_use\_external\_container\_registry\_url) | Set to true to use an existing container registry url. The `registry_custom_url` must be set. | `bool` | `false` | no |
 | <a name="input_virtual_network_address_space"></a> [virtual\_network\_address\_space](#input\_virtual\_network\_address\_space) | Virtual Network address space CIDR | `string` | `"172.16.0.0/12"` | no |
 | <a name="input_worker_container_command"></a> [worker\_container\_command](#input\_worker\_container\_command) | Container command for the Worker container. `enable_worker_container` must be set to true for this to have any effect. | `list(string)` | `[]` | no |
 | <a name="input_worker_container_max_replicas"></a> [worker\_container\_max\_replicas](#input\_worker\_container\_max\_replicas) | Worker ontainer max replicas | `number` | `2` | no |

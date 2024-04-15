@@ -96,13 +96,11 @@ locals {
 
   # Azure Container Registry
   enable_container_registry             = var.enable_container_registry
-  use_external_container_registry       = var.use_external_container_registry_url
-  registry_custom_image_url             = var.registry_custom_image_url
   registry_retention_days               = var.registry_retention_days
   enable_registry_retention_policy      = var.enable_registry_retention_policy
-  registry_server                       = local.enable_container_registry ? azurerm_container_registry.acr[0].login_server : var.registry_server
-  registry_username                     = local.enable_container_registry ? azurerm_container_registry.acr[0].admin_username : var.registry_username
-  registry_password                     = local.enable_container_registry ? azurerm_container_registry.acr[0].admin_password : var.registry_password
+  registry_server                       = var.registry_server != "" ? var.registry_server : local.enable_container_registry ? azurerm_container_registry.acr[0].login_server : null
+  registry_username                     = var.registry_username != "" ? var.registry_username : local.enable_container_registry ? azurerm_container_registry.acr[0].admin_username : null
+  registry_password                     = var.registry_password != "" ? var.registry_password : local.enable_container_registry ? azurerm_container_registry.acr[0].admin_password : null
   registry_sku                          = var.registry_sku
   registry_admin_enabled                = var.registry_admin_enabled
   registry_public_access_enabled        = var.registry_public_access_enabled

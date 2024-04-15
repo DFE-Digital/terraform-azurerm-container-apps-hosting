@@ -54,18 +54,6 @@ variable "enable_container_registry" {
   type        = bool
 }
 
-variable "use_external_container_registry_url" {
-  description = "Set to true to use an existing container registry url. The `registry_custom_url` must be set."
-  type        = bool
-  default     = false
-}
-
-variable "registry_custom_image_url" {
-  description = "Custom image registry url (required if `use_external_container_registry` is true)"
-  type        = string
-  default     = ""
-}
-
 variable "registry_server" {
   description = "Container registry server (required if `enable_container_registry` is false)"
   type        = string
