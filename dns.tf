@@ -155,8 +155,8 @@ resource "azurerm_dns_mx_record" "dns_mx_records" {
   dynamic "record" {
     for_each = each.value["records"]
     content {
-      preference = record.preference
-      exchange   = record.exchange
+      preference = record.value.preference
+      exchange   = record.value.exchange
     }
   }
 
