@@ -46,6 +46,12 @@ resource "azurerm_monitor_diagnostic_setting" "mssql_security_storage" {
   enabled_log {
     category_group = "Audit"
   }
+
+  # The below metrics are kept in to avoid a diff in the Terraform Plan output
+  metric {
+    category = "AllMetrics"
+    enabled  = false
+  }
 }
 
 resource "azurerm_mssql_server" "default" {

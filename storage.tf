@@ -52,6 +52,16 @@ resource "azurerm_monitor_diagnostic_setting" "blobs" {
   enabled_log {
     category_group = "Audit"
   }
+
+  # The below metrics are kept in to avoid a diff in the Terraform Plan output
+  metric {
+    category = "Capacity"
+    enabled  = false
+  }
+  metric {
+    category = "Transaction"
+    enabled  = false
+  }
 }
 
 resource "azurerm_monitor_diagnostic_setting" "files" {
@@ -65,6 +75,16 @@ resource "azurerm_monitor_diagnostic_setting" "files" {
 
   enabled_log {
     category_group = "Audit"
+  }
+
+  # The below metrics are kept in to avoid a diff in the Terraform Plan output
+  metric {
+    category = "Capacity"
+    enabled  = false
+  }
+  metric {
+    category = "Transaction"
+    enabled  = false
   }
 }
 

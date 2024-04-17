@@ -389,4 +389,10 @@ resource "azurerm_monitor_diagnostic_setting" "cdn" {
       category = "FrontdoorHealthProbeLog"
     }
   }
+
+  # The below metrics are kept in to avoid a diff in the Terraform Plan output
+  metric {
+    category = "AllMetrics"
+    enabled  = false
+  }
 }

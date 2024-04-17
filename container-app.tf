@@ -18,6 +18,12 @@ resource "azurerm_monitor_diagnostic_setting" "container_app_env" {
   enabled_log {
     category_group = "Audit"
   }
+
+  # The below metrics are kept in to avoid a diff in the Terraform Plan output
+  metric {
+    category = "AllMetrics"
+    enabled  = false
+  }
 }
 
 resource "azurerm_container_app_environment_storage" "container_app_env" {
