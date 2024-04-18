@@ -361,10 +361,9 @@ resource "azurerm_cdn_frontdoor_rule" "remove_response_header" {
 resource "azurerm_monitor_diagnostic_setting" "cdn" {
   count = local.enable_cdn_frontdoor ? 1 : 0
 
-  name                           = "${local.resource_prefix}cdn"
-  target_resource_id             = azurerm_cdn_frontdoor_profile.cdn[0].id
-  log_analytics_workspace_id     = azurerm_log_analytics_workspace.container_app.id
-  log_analytics_destination_type = "AzureDiagnostics"
+  name                       = "${local.resource_prefix}cdn"
+  target_resource_id         = azurerm_cdn_frontdoor_profile.cdn[0].id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.container_app.id
 
   dynamic "enabled_log" {
     for_each = local.cdn_frontdoor_enable_waf_logs ? [1] : []
@@ -388,5 +387,11 @@ resource "azurerm_monitor_diagnostic_setting" "cdn" {
     content {
       category = "FrontdoorHealthProbeLog"
     }
+  }
+
+  # The below metrics are kept in to avoid a diff in the Terraform Plan output
+  metric {
+    category = "AllMetrics"
+    enabled  = false
   }
 }

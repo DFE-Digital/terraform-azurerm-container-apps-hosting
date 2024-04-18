@@ -58,15 +58,18 @@ resource "azurerm_monitor_diagnostic_setting" "default_redis_cache" {
     local.enable_redis_cache ? 1 : 0
   ) : 0
 
-  name               = "${local.resource_prefix}-default-redis-diag"
-  target_resource_id = azurerm_redis_cache.default[0].id
-
-  log_analytics_workspace_id     = azurerm_log_analytics_workspace.container_app.id
-  log_analytics_destination_type = "Dedicated"
-
-  eventhub_name = local.enable_event_hub ? azurerm_eventhub.container_app[0].name : null
+  name                       = "${local.resource_prefix}-default-redis-diag"
+  target_resource_id         = azurerm_redis_cache.default[0].id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.container_app.id
+  eventhub_name              = local.enable_event_hub ? azurerm_eventhub.container_app[0].name : null
 
   enabled_log {
     category = "ConnectedClientList"
+  }
+
+  # The below metrics are kept in to avoid a diff in the Terraform Plan output
+  metric {
+    category = "AllMetrics"
+    enabled  = false
   }
 }

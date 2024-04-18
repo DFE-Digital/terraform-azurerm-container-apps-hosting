@@ -37,14 +37,19 @@ resource "azurerm_storage_container" "mssql_security_storage" {
 resource "azurerm_monitor_diagnostic_setting" "mssql_security_storage" {
   count = local.enable_mssql_database ? 1 : 0
 
-  name                           = "${local.resource_prefix}-mssql-blob-diag"
-  target_resource_id             = "${azurerm_storage_account.mssql_security_storage[0].id}/blobServices/default"
-  log_analytics_workspace_id     = azurerm_log_analytics_workspace.container_app.id
-  log_analytics_destination_type = "Dedicated"
-  eventhub_name                  = local.enable_event_hub ? azurerm_eventhub.container_app[0].name : null
+  name                       = "${local.resource_prefix}-mssql-blob-diag"
+  target_resource_id         = "${azurerm_storage_account.mssql_security_storage[0].id}/blobServices/default"
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.container_app.id
+  eventhub_name              = local.enable_event_hub ? azurerm_eventhub.container_app[0].name : null
 
   enabled_log {
     category_group = "Audit"
+  }
+
+  # The below metrics are kept in to avoid a diff in the Terraform Plan output
+  metric {
+    category = "AllMetrics"
+    enabled  = false
   }
 }
 
