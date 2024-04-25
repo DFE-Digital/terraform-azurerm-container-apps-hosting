@@ -7,7 +7,7 @@ terraform {
     }
     azapi = {
       source  = "Azure/azapi"
-      version = ">= 1.6.0"
+      version = ">= 1.13.0"
     }
     null = {
       source  = "hashicorp/null"
