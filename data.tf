@@ -28,7 +28,7 @@ data "azapi_resource_action" "existing_logic_app_workflow_callback_url" {
 
   resource_id = "${data.azurerm_logic_app_workflow.existing_logic_app_workflow[0].id}/triggers/${data.azurerm_logic_app_workflow.existing_logic_app_workflow[0].name}-trigger"
   action      = "listCallbackUrl"
-  type        = "Microsoft.Logic/workflows/triggers@2018-07-01-preview"
+  type        = "Microsoft.Logic/workflows/triggers@2019-05-01"
 
   depends_on = [
     data.azurerm_logic_app_workflow.existing_logic_app_workflow[0]
