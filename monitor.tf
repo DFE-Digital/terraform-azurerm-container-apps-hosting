@@ -286,7 +286,7 @@ resource "azurerm_monitor_metric_alert" "count" {
   criteria {
     metric_namespace = "microsoft.app/containerapps"
     metric_name      = "Replicas"
-    aggregation      = "Maximum"
+    aggregation      = "Minimum"
     operator         = "LessThan"
     threshold        = 1
   }
