@@ -13,6 +13,13 @@ locals {
   resource_group             = local.existing_resource_group == "" ? azurerm_resource_group.default[0] : data.azurerm_resource_group.existing_resource_group[0]
   enable_resource_group_lock = var.enable_resource_group_lock
 
+  # Key Vault
+  escrow_container_app_secrets_in_key_vault = var.escrow_container_app_secrets_in_key_vault
+  existing_key_vault                        = var.existing_key_vault
+  key_vault                                 = !local.escrow_container_app_secrets_in_key_vault && local.existing_key_vault == "" ? null : local.existing_key_vault == "" ? azurerm_key_vault.default[0] : data.azurerm_key_vault.existing_key_vault[0]
+  key_vault_managed_identity_assign_role    = var.key_vault_managed_identity_assign_role
+  key_vault_access_ipv4                     = var.key_vault_access_ipv4
+
   # Networking
   launch_in_vnet                                           = var.launch_in_vnet
   existing_virtual_network                                 = var.existing_virtual_network
@@ -27,7 +34,11 @@ locals {
   postgresql_subnet_cidr                                   = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 5)
   storage_subnet_cidr                                      = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 6)
   container_app_environment_internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
-  container_apps_infra_subnet_service_endpoints            = distinct(concat(local.launch_in_vnet && local.enable_storage_account ? ["Microsoft.Storage"] : [], var.container_apps_infra_subnet_service_endpoints))
+  container_apps_infra_subnet_service_endpoints = distinct(concat(
+    local.launch_in_vnet && local.enable_storage_account ? ["Microsoft.Storage"] : [],
+    var.container_apps_infra_subnet_service_endpoints,
+    local.escrow_container_app_secrets_in_key_vault ? ["Microsoft.KeyVault"] : []
+  ))
   # Networking / Private Endpoints
   enable_private_endpoint_redis = local.enable_redis_cache ? (
     local.launch_in_vnet ? true : false
@@ -177,6 +188,40 @@ locals {
   container_app_identities               = var.container_app_identities
   container_app_name_override            = var.container_app_name_override
   container_app_name                     = local.container_app_name_override == "" ? "${local.resource_prefix}-${local.image_name}" : local.container_app_name_override
+  container_app_secrets = { for i, v in concat(
+    [
+      {
+        "name" : "acr-password",
+        "value" : local.registry_use_managed_identity && !local.registry_admin_enabled ? "not-in-use" : local.registry_password
+      }
+    ],
+    local.enable_app_insights_integration ? [
+      {
+        name  = "applicationinsights--connectionstring",
+        value = azurerm_application_insights.main[0].connection_string
+      },
+      {
+        name  = "applicationinsights--instrumentationkey",
+        value = azurerm_application_insights.main[0].instrumentation_key
+      }
+    ] : [],
+    local.enable_redis_cache ? [
+      {
+        name  = "connectionstrings--redis",
+        value = azurerm_redis_cache.default[0].primary_connection_string
+      }
+    ] : [],
+    local.container_app_blob_storage_sas_secret,
+    [for env_name, env_value in nonsensitive(local.container_secret_environment_variables) : {
+      name  = lower(replace(env_name, "_", "-"))
+      value = sensitive(env_value)
+      }
+    ]
+  ) : v.name => v }
+  container_app_secrets_in_key_vault = local.escrow_container_app_secrets_in_key_vault ? { for name, secret in local.container_app_secrets : name => {
+    key_vault_secret_id = azurerm_key_vault_secret.secret_app_setting[name].versionless_id
+    name                = secret["name"]
+  } } : {}
   # Container App / Container image
   image_name = var.image_name
   image_tag  = var.image_tag

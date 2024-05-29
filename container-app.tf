@@ -62,40 +62,21 @@ resource "azurerm_container_app" "container_apps" {
   }
 
   dynamic "secret" {
-    for_each = { for i, v in concat(
-      [
-        {
-          "name" : "acr-password",
-          "value" : local.registry_use_managed_identity && !local.registry_admin_enabled ? "not-in-use" : local.registry_password
-        }
-      ],
-      local.enable_app_insights_integration ? [
-        {
-          name  = "applicationinsights--connectionstring",
-          value = azurerm_application_insights.main[0].connection_string
-        },
-        {
-          name  = "applicationinsights--instrumentationkey",
-          value = azurerm_application_insights.main[0].instrumentation_key
-        }
-      ] : [],
-      local.enable_redis_cache ? [
-        {
-          name  = "connectionstrings--redis",
-          value = azurerm_redis_cache.default[0].primary_connection_string
-        }
-      ] : [],
-      local.container_app_blob_storage_sas_secret,
-      [for env_name, env_value in nonsensitive(local.container_secret_environment_variables) : {
-        name  = lower(replace(env_name, "_", "-"))
-        value = sensitive(env_value)
-        }
-      ]
-    ) : v.name => v }
+    for_each = local.escrow_container_app_secrets_in_key_vault ? {} : local.container_app_secrets
 
     content {
       name  = secret.value["name"]
       value = secret.value["value"]
+    }
+  }
+
+  dynamic "secret" {
+    for_each = local.container_app_secrets_in_key_vault
+
+    content {
+      name                = secret.value["name"]
+      key_vault_secret_id = secret.value["key_vault_secret_id"]
+      identity            = azurerm_user_assigned_identity.containerapp[0].id
     }
   }
 
