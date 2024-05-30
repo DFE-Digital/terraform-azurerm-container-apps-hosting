@@ -36,3 +36,10 @@ data "azapi_resource_action" "existing_logic_app_workflow_callback_url" {
 
   response_export_values = ["value"]
 }
+
+data "azurerm_key_vault" "existing_key_vault" {
+  count = local.existing_key_vault == "" ? 0 : 1
+
+  name                = local.existing_key_vault
+  resource_group_name = local.existing_resource_group
+}

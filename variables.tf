@@ -1091,3 +1091,27 @@ variable "container_app_identities" {
     error_message = "At least one identity ID must be supplied"
   }
 }
+
+variable "existing_key_vault" {
+  description = "An existing Key Vault that you want to store Container App secrets in"
+  type        = string
+  default     = ""
+}
+
+variable "escrow_container_app_secrets_in_key_vault" {
+  description = "Set sensitive Container App secrets in Key Vault"
+  type        = bool
+  default     = false
+}
+
+variable "key_vault_managed_identity_assign_role" {
+  description = "Assign the Key Vault Secret User role to the Container App managed identity"
+  type        = bool
+  default     = false
+}
+
+variable "key_vault_access_ipv4" {
+  description = "List of IPv4 Addresses that are permitted to access the Key Vault"
+  type        = list(string)
+  default     = []
+}
