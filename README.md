@@ -12,7 +12,7 @@ This module creates and manages [Azure Container Apps][1], deployed within an [A
 
 ```hcl
 module "azure_container_apps_hosting" {
-  source = "github.com/DFE-Digital/terraform-azurerm-container-apps-hosting?ref=v1.6.3"
+  source = "github.com/DFE-Digital/terraform-azurerm-container-apps-hosting?ref=v1.6.5"
 
   environment    = "dev"
   project_name   = "myproject"
@@ -152,6 +152,12 @@ module "azure_container_apps_hosting" {
   # container_secret_environment_variables = {
   #   "RedirectUri" = "https://www.example.com/signin"
   # }
+
+  ## If you want to secure your Container Secrets further, you can leverage Key Vault with RBAC roles
+  escrow_container_app_secrets_in_key_vault = true # Store all secret environment variables in a Key Vault
+  #existing_key_vault = "my-key-vault" # Set this to the name of an existing Key Vault to prevent the deployment of a new one
+  #key_vault_managed_identity_assign_role = true
+  key_vault_access_ipv4 = [ 8.8.8.8/32 ] # List of IP addresses that are permitted to modify the Key Vault that holds the secrets
 
   ## If your app requires a worker container, you can enable it by setting 'enable_worker_container' to true
   # enable_worker_container       = false
