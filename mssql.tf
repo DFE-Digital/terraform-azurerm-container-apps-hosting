@@ -34,6 +34,30 @@ resource "azurerm_storage_container" "mssql_security_storage" {
   storage_account_name = azurerm_storage_account.mssql_security_storage[0].name
 }
 
+resource "azurerm_storage_management_policy" "mssql_security_storage" {
+  count = local.enable_mssql_database ? 1 : 0
+
+  storage_account_id = azurerm_storage_account.mssql_security_storage[0].id
+
+  rule {
+    name    = "object-lifecycle-policy"
+    enabled = true
+
+    filters {
+      prefix_match = ["${azurerm_storage_container.mssql_security_storage[0].name}/*", "sqldbauditlogs/*", "sqldbtdlogs/*"]
+      blob_types   = ["blockBlob"]
+    }
+
+    actions {
+      base_blob {
+        tier_to_cool_after_days_since_creation_greater_than    = 3
+        tier_to_archive_after_days_since_creation_greater_than = 7
+        delete_after_days_since_creation_greater_than          = 30
+      }
+    }
+  }
+}
+
 resource "azurerm_monitor_diagnostic_setting" "mssql_security_storage" {
   count = local.enable_mssql_database ? 1 : 0
 
