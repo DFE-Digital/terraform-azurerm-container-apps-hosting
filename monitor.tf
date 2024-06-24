@@ -286,9 +286,9 @@ resource "azurerm_monitor_metric_alert" "count" {
   criteria {
     metric_namespace = "microsoft.app/containerapps"
     metric_name      = "Replicas"
-    aggregation      = "Minimum"
+    aggregation      = "Average"
     operator         = "LessThan"
-    threshold        = 1
+    threshold        = each.key == "worker_id" ? local.worker_container_min_replicas : local.container_min_replicas
   }
 
   action {
