@@ -247,9 +247,9 @@ resource "azurerm_cdn_frontdoor_firewall_policy" "waf" {
 
       match_condition {
         match_variable     = "RequestUri"
-        operator           = "RegEx"
+        operator           = "Any"
         negation_condition = false
-        match_values       = ["/.*"]
+        match_values       = []
       }
 
     }
