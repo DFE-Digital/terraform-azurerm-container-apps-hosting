@@ -19,7 +19,7 @@ resource "azurerm_storage_account" "default_network_watcher_nsg_flow_logs" {
   account_replication_type        = "LRS"
   min_tls_version                 = "TLS1_2"
   enable_https_traffic_only       = true
-  public_network_access_enabled   = false
+  public_network_access_enabled   = true
   allow_nested_items_to_be_public = false
 
   tags = local.tags
@@ -88,15 +88,31 @@ resource "azurerm_network_watcher_flow_log" "default_network_watcher_nsg" {
 resource "azurerm_storage_account_network_rules" "default_network_watcher_nsg_flow_logs" {
   count = local.network_watcher_name != "" ? 1 : 0
 
-  storage_account_id = azurerm_storage_account.default_network_watcher_nsg_flow_logs[0].id
-  default_action     = "Deny"
-  bypass             = ["AzureServices"]
+  storage_account_id         = azurerm_storage_account.default_network_watcher_nsg_flow_logs[0].id
+  default_action             = "Deny"
+  bypass                     = ["AzureServices"]
+  virtual_network_subnet_ids = []
+  ip_rules                   = []
+}
 
-  dynamic "private_link_access" {
-    for_each = azurerm_network_watcher_flow_log.default_network_watcher_nsg
+resource "azurerm_monitor_diagnostic_setting" "nsg_flow_logs" {
+  count = local.network_watcher_name != "" ? 1 : 0
 
-    content {
-      endpoint_resource_id = private_link_access.value.id
-    }
+  name                       = "${local.resource_prefix}-storage-nwnsgd-diag"
+  target_resource_id         = "${azurerm_storage_account.default_network_watcher_nsg_flow_logs[0].id}/blobServices/default"
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.default_network_watcher_nsg_flow_logs[0].id
+
+  enabled_log {
+    category_group = "Audit"
+  }
+
+  # The below metrics are kept in to avoid a diff in the Terraform Plan output
+  metric {
+    category = "Capacity"
+    enabled  = false
+  }
+  metric {
+    category = "Transaction"
+    enabled  = false
   }
 }
