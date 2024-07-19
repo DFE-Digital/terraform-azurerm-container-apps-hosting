@@ -19,7 +19,7 @@ resource "azurerm_storage_account" "default_network_watcher_nsg_flow_logs" {
   account_replication_type        = "LRS"
   min_tls_version                 = "TLS1_2"
   enable_https_traffic_only       = true
-  public_network_access_enabled   = false
+  public_network_access_enabled   = true
   allow_nested_items_to_be_public = false
 
   tags = local.tags
@@ -88,15 +88,9 @@ resource "azurerm_network_watcher_flow_log" "default_network_watcher_nsg" {
 resource "azurerm_storage_account_network_rules" "default_network_watcher_nsg_flow_logs" {
   count = local.network_watcher_name != "" ? 1 : 0
 
-  storage_account_id = azurerm_storage_account.default_network_watcher_nsg_flow_logs[0].id
-  default_action     = "Deny"
-  bypass             = ["AzureServices"]
-
-  dynamic "private_link_access" {
-    for_each = azurerm_network_watcher_flow_log.default_network_watcher_nsg
-
-    content {
-      endpoint_resource_id = private_link_access.value.id
-    }
-  }
+  storage_account_id         = azurerm_storage_account.default_network_watcher_nsg_flow_logs[0].id
+  default_action             = "Deny"
+  bypass                     = ["AzureServices"]
+  virtual_network_subnet_ids = []
+  ip_rules                   = []
 }
