@@ -190,7 +190,7 @@ resource "azapi_update_resource" "mssql_threat_protection" {
 
   depends_on = [
     azurerm_mssql_server.default[0]
-	]
+  ]
 }
 
 resource "azapi_update_resource" "mssql_security_storage_key_rotation_reminder" {
