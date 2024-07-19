@@ -190,5 +190,23 @@ resource "azapi_update_resource" "mssql_threat_protection" {
 
   depends_on = [
     azurerm_mssql_server.default[0]
+	]
+}
+
+resource "azapi_update_resource" "mssql_security_storage_key_rotation_reminder" {
+  count = local.enable_mssql_database ? 1 : 0
+
+  type        = "Microsoft.Storage/storageAccounts@2023-01-01"
+  resource_id = azurerm_storage_account.mssql_security_storage[0].id
+  body = jsonencode({
+    properties = {
+      keyPolicy : {
+        keyExpirationPeriodInDays : local.mssql_security_storage_access_key_rotation_reminder_days
+      }
+    }
+  })
+
+  depends_on = [
+    azurerm_storage_account.mssql_security_storage[0]
   ]
 }

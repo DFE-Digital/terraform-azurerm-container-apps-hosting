@@ -1115,3 +1115,21 @@ variable "key_vault_access_ipv4" {
   type        = list(string)
   default     = []
 }
+
+variable "storage_account_access_key_rotation_reminder_days" {
+  description = "Number of days to set for access key rotation reminder on Storage Accounts"
+  type        = number
+  default     = 90
+}
+
+variable "mssql_security_storage_access_key_rotation_reminder_days" {
+  description = "Number of days to set for access key rotation reminder on the SQL Security Storage Account. If not set will default to 'storage_account_access_key_rotation_reminder_days'"
+  type        = number
+  default     = 0
+}
+
+variable "network_watcher_nsg_storage_access_key_rotation_reminder_days" {
+  description = "Number of days to set for access key rotation reminder on the Network Watcher NSG Flow Log Storage Account. If not set will default to 'storage_account_access_key_rotation_reminder_days'"
+  type        = number
+  default     = 0
+}

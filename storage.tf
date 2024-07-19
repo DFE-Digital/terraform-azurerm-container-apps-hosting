@@ -15,6 +15,24 @@ resource "azurerm_storage_account" "container_app" {
   tags = local.tags
 }
 
+resource "azapi_update_resource" "container_app_storage_key_rotation_reminder" {
+  count = local.enable_storage_account ? 1 : 0
+
+  type        = "Microsoft.Storage/storageAccounts@2023-01-01"
+  resource_id = azurerm_storage_account.container_app[0].id
+  body = jsonencode({
+    properties = {
+      keyPolicy : {
+        keyExpirationPeriodInDays : local.storage_account_access_key_rotation_reminder_days
+      }
+    }
+  })
+
+  depends_on = [
+    azurerm_storage_account.container_app[0]
+  ]
+}
+
 resource "azurerm_storage_account_network_rules" "container_app" {
   count = local.enable_storage_account ? 1 : 0
 
