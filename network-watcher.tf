@@ -25,6 +25,24 @@ resource "azurerm_storage_account" "default_network_watcher_nsg_flow_logs" {
   tags = local.tags
 }
 
+resource "azapi_update_resource" "default_network_watcher_nsg_storage_key_rotation_reminder" {
+  count = local.network_watcher_name != "" ? 1 : 0
+
+  type        = "Microsoft.Storage/storageAccounts@2023-01-01"
+  resource_id = azurerm_storage_account.default_network_watcher_nsg_flow_logs[0].id
+  body = jsonencode({
+    properties = {
+      keyPolicy : {
+        keyExpirationPeriodInDays : local.network_watcher_nsg_storage_access_key_rotation_reminder_days
+      }
+    }
+  })
+
+  depends_on = [
+    azurerm_storage_account.default_network_watcher_nsg_flow_logs[0]
+  ]
+}
+
 resource "azurerm_log_analytics_workspace" "default_network_watcher_nsg_flow_logs" {
   count = local.network_watcher_name != "" && local.enable_network_watcher_traffic_analytics ? 1 : 0
 
