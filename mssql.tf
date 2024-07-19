@@ -170,6 +170,10 @@ resource "azapi_update_resource" "mssql_vulnerability_assessment" {
       state = local.enable_mssql_vulnerability_assessment ? "Enabled" : "Disabled"
     }
   })
+
+  depends_on = [
+    azurerm_mssql_server.default[0]
+  ]
 }
 
 resource "azapi_update_resource" "mssql_threat_protection" {
@@ -183,4 +187,8 @@ resource "azapi_update_resource" "mssql_threat_protection" {
       state = local.enable_mssql_vulnerability_assessment ? "Enabled" : "Disabled"
     }
   })
+
+  depends_on = [
+    azurerm_mssql_server.default[0]
+  ]
 }
