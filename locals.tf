@@ -351,6 +351,8 @@ locals {
   cdn_frontdoor_rate_limiting_threshold           = var.cdn_frontdoor_rate_limiting_threshold
   cdn_frontdoor_enable_waf                        = local.enable_cdn_frontdoor && local.cdn_frontdoor_enable_rate_limiting
   cdn_frontdoor_waf_mode                          = var.cdn_frontdoor_waf_mode
+  cdn_frontdoor_waf_custom_rules                  = var.cdn_frontdoor_waf_custom_rules
+  cdn_frontdoor_waf_managed_rulesets              = var.cdn_frontdoor_waf_managed_rulesets
   cdn_frontdoor_rate_limiting_bypass_ip_list      = var.cdn_frontdoor_rate_limiting_bypass_ip_list
 
   # Event Hub
