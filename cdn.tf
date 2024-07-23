@@ -229,7 +229,7 @@ resource "azurerm_cdn_frontdoor_firewall_policy" "waf" {
     content {
       name                           = "RateLimiting"
       enabled                        = true
-      priority                       = 1
+      priority                       = 1000
       rate_limit_duration_in_minutes = local.cdn_frontdoor_rate_limiting_duration_in_minutes
       rate_limit_threshold           = local.cdn_frontdoor_rate_limiting_threshold
       type                           = "RateLimitRule"
