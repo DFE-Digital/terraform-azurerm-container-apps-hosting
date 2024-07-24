@@ -805,6 +805,45 @@ variable "cdn_frontdoor_forwarding_protocol" {
   default     = "HttpsOnly"
 }
 
+variable "cdn_frontdoor_waf_custom_rules" {
+  description = "Map of all Custom rules you want to apply to the CDN WAF"
+  type = map(object({
+    priority : number,
+    action : string
+    match_conditions : map(object({
+      match_variable : string,
+      match_values : optional(list(string), []),
+      operator : optional(string, "Any"),
+      selector : optional(string, null),
+      negation_condition : optional(bool, false),
+    }))
+  }))
+  default = {}
+}
+
+variable "cdn_frontdoor_waf_managed_rulesets" {
+  description = "Map of all Managed rules you want to apply to the CDN WAF, including any overrides, or exclusions"
+  type = map(object({
+    version : string,
+    action : optional(string, "Block"),
+    exclusions : optional(map(object({
+      match_variable : string,
+      operator : string,
+      selector : string
+    })), {})
+    overrides : optional(map(map(object({
+      action : string,
+      enabled : optional(bool, true),
+      exclusions : optional(map(object({
+        match_variable : string,
+        operator : string,
+        selector : string
+      })), {})
+    }))), {})
+  }))
+  default = {}
+}
+
 variable "enable_event_hub" {
   description = "Send Azure Container App logs to an Event Hub sink"
   type        = bool

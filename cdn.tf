@@ -225,10 +225,11 @@ resource "azurerm_cdn_frontdoor_firewall_policy" "waf" {
 
   dynamic "custom_rule" {
     for_each = local.cdn_frontdoor_enable_rate_limiting ? [0] : []
+
     content {
       name                           = "RateLimiting"
       enabled                        = true
-      priority                       = 1
+      priority                       = 1000
       rate_limit_duration_in_minutes = local.cdn_frontdoor_rate_limiting_duration_in_minutes
       rate_limit_threshold           = local.cdn_frontdoor_rate_limiting_threshold
       type                           = "RateLimitRule"
@@ -251,7 +252,77 @@ resource "azurerm_cdn_frontdoor_firewall_policy" "waf" {
         negation_condition = false
         match_values       = []
       }
+    }
+  }
 
+  dynamic "custom_rule" {
+    for_each = local.cdn_frontdoor_waf_custom_rules
+
+    content {
+      name     = custom_rule.key
+      enabled  = true
+      priority = custom_rule.value["priority"]
+      type     = "MatchRule"
+      action   = custom_rule.value["action"]
+
+      dynamic "match_condition" {
+        for_each = custom_rule.value["match_conditions"]
+
+        content {
+          match_variable = match_condition.value["match_variable"]
+          match_values   = match_condition.value["match_values"]
+          operator       = match_condition.value["operator"]
+          selector       = match_condition.value["selector"]
+        }
+      }
+    }
+  }
+
+  dynamic "managed_rule" {
+    for_each = local.cdn_frontdoor_waf_managed_rulesets
+
+    content {
+      type    = managed_rule.key
+      version = managed_rule.value["version"]
+      action  = managed_rule.value["action"]
+
+      dynamic "exclusion" {
+        for_each = managed_rule.value["exclusions"]
+
+        content {
+          match_variable = exclusion.value["match_variable"]
+          operator       = exclusion.value["operator"]
+          selector       = exclusion.value["selector"]
+        }
+      }
+
+      dynamic "override" {
+        for_each = managed_rule.value["overrides"]
+
+        content {
+          rule_group_name = override.key
+
+          dynamic "rule" {
+            for_each = override.value
+
+            content {
+              rule_id = rule.key
+              enabled = rule.value["enabled"]
+              action  = rule.value["action"]
+
+              dynamic "exclusion" {
+                for_each = rule.value["exclusions"]
+
+                content {
+                  match_variable = exclusion.value["match_variable"]
+                  operator       = exclusion.value["operator"]
+                  selector       = exclusion.value["selector"]
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 
