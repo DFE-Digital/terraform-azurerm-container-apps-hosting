@@ -26,6 +26,17 @@ resource "azurerm_storage_account" "container_app" {
     retention_policy {
       days = 7
     }
+
+    dynamic "smb" {
+      for_each = lower(local.container_app_file_share_security_profile) == "security" ? [1] : []
+
+      content {
+        versions                        = ["SMB3.1.1"]
+        authentication_types            = ["Kerberos"]
+        kerberos_ticket_encryption_type = ["AES-256"]
+        channel_encryption_type         = ["AES-256-GCM"]
+      }
+    }
   }
 
   tags = local.tags
