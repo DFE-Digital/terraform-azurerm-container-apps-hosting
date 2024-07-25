@@ -1190,3 +1190,13 @@ variable "create_container_app_blob_storage_sas" {
   type        = bool
   default     = true
 }
+
+variable "container_app_file_share_security_profile" {
+  description = "Choose whether the SMB protocol should be configured for maximum security, or maximum compatibility"
+  type        = string
+  default     = "security"
+  validation {
+    condition     = contains(["security", "compatibility"], lower(var.container_app_file_share_security_profile))
+    error_message = "Valid values for container_app_file_share_security_profile are 'security' or 'compatibility'."
+  }
+}
