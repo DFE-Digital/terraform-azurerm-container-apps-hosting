@@ -34,7 +34,7 @@ resource "azurerm_storage_account" "container_app" {
         versions                        = ["SMB3.1.1"]
         authentication_types            = ["Kerberos"]
         kerberos_ticket_encryption_type = ["AES-256"]
-        channel_encryption_type         = ["AES-256-GCM"]
+        channel_encryption_type         = ["AES-128-GCM", "AES-256-GCM"]
       }
     }
   }
