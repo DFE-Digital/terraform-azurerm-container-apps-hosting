@@ -1172,3 +1172,21 @@ variable "network_watcher_nsg_storage_access_key_rotation_reminder_days" {
   type        = number
   default     = 0
 }
+
+variable "container_app_storage_cross_tenant_replication_enabled" {
+  description = "Should cross Tenant replication be enabled?"
+  type        = bool
+  default     = false
+}
+
+variable "mssql_security_storage_cross_tenant_replication_enabled" {
+  description = "Should cross Tenant replication be enabled?"
+  type        = bool
+  default     = false
+}
+
+variable "create_container_app_blob_storage_sas" {
+  description = "Generate a SAS connection string that is exposed to your App as an environment variable so that it can connect to the Storage Account"
+  type        = bool
+  default     = true
+}

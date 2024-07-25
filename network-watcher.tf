@@ -11,16 +11,26 @@ resource "azurerm_network_watcher" "default" {
 resource "azurerm_storage_account" "default_network_watcher_nsg_flow_logs" {
   count = local.network_watcher_name != "" ? 1 : 0
 
-  name                            = "${replace(local.resource_prefix, "-", "")}nwnsgd"
-  resource_group_name             = local.resource_group.name
-  location                        = local.resource_group.location
-  account_tier                    = "Standard"
-  account_kind                    = "StorageV2"
-  account_replication_type        = "LRS"
-  min_tls_version                 = "TLS1_2"
-  enable_https_traffic_only       = true
-  public_network_access_enabled   = true
-  allow_nested_items_to_be_public = false
+  name                             = "${replace(local.resource_prefix, "-", "")}nwnsgd"
+  resource_group_name              = local.resource_group.name
+  location                         = local.resource_group.location
+  account_tier                     = "Standard"
+  account_kind                     = "StorageV2"
+  account_replication_type         = "LRS"
+  min_tls_version                  = "TLS1_2"
+  enable_https_traffic_only        = true
+  public_network_access_enabled    = true
+  allow_nested_items_to_be_public  = false
+  cross_tenant_replication_enabled = false
+
+  blob_properties {
+    delete_retention_policy {
+      days = 7
+    }
+    container_delete_retention_policy {
+      days = 7
+    }
+  }
 
   tags = local.tags
 }

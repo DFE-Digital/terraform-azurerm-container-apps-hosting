@@ -282,19 +282,22 @@ locals {
   # Storage Account / Container
   container_app_storage_account_shared_access_key_enabled = var.container_app_storage_account_shared_access_key_enabled
   enable_container_app_blob_storage                       = var.enable_container_app_blob_storage
-  container_app_blob_storage_sas_secret = local.enable_container_app_blob_storage ? [
+  create_container_app_blob_storage_sas                   = var.create_container_app_blob_storage_sas
+  container_app_blob_storage_sas_secret = local.create_container_app_blob_storage_sas ? [
     {
       name  = "connectionstrings--blobstorage",
       value = "${azurerm_storage_account.container_app[0].primary_blob_endpoint}${azurerm_storage_container.container_app[0].name}${data.azurerm_storage_account_blob_container_sas.container_app[0].sas}"
     }
   ] : []
-  container_app_blob_storage_public_access_enabled = local.enable_container_app_blob_storage == false ? false : var.container_app_blob_storage_public_access_enabled
+  container_app_blob_storage_public_access_enabled       = local.enable_container_app_blob_storage == false ? false : var.container_app_blob_storage_public_access_enabled
+  container_app_storage_cross_tenant_replication_enabled = var.container_app_storage_cross_tenant_replication_enabled
   # Storage Account / File Share
   enable_container_app_file_share     = var.enable_container_app_file_share
   container_app_file_share_mount_path = var.container_app_file_share_mount_path
   # Storage Account / MSSQL Security
   mssql_security_storage_shared_access_key_enabled         = var.mssql_storage_account_shared_access_key_enabled
   mssql_security_storage_access_key_rotation_reminder_days = var.mssql_security_storage_access_key_rotation_reminder_days != 0 ? var.mssql_security_storage_access_key_rotation_reminder_days : local.storage_account_access_key_rotation_reminder_days
+  mssql_security_storage_cross_tenant_replication_enabled  = var.mssql_security_storage_cross_tenant_replication_enabled
 
   # Azure DNS Zone
   enable_dns_zone      = var.enable_dns_zone
