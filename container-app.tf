@@ -145,7 +145,7 @@ resource "azurerm_container_app" "container_apps" {
               "secretRef" : "applicationinsights--instrumentationkey"
             }
           ] : [],
-          local.enable_container_app_blob_storage ?
+          (length(local.container_app_blob_storage_sas_secret) > 0) ?
           [
             {
               "name" : "ConnectionStrings__BlobStorage",

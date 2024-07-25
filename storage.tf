@@ -1,16 +1,43 @@
 resource "azurerm_storage_account" "container_app" {
   count = local.enable_storage_account ? 1 : 0
 
-  name                            = "${replace(local.resource_prefix, "-", "")}storage"
-  resource_group_name             = local.resource_group.name
-  location                        = local.resource_group.location
-  account_tier                    = "Standard"
-  account_replication_type        = "LRS"
-  min_tls_version                 = "TLS1_2"
-  enable_https_traffic_only       = true
-  public_network_access_enabled   = local.storage_account_public_access_enabled
-  shared_access_key_enabled       = local.container_app_storage_account_shared_access_key_enabled
-  allow_nested_items_to_be_public = local.container_app_blob_storage_public_access_enabled
+  name                             = "${replace(local.resource_prefix, "-", "")}storage"
+  resource_group_name              = local.resource_group.name
+  location                         = local.resource_group.location
+  account_tier                     = "Standard"
+  account_replication_type         = "LRS"
+  min_tls_version                  = "TLS1_2"
+  enable_https_traffic_only        = true
+  public_network_access_enabled    = local.storage_account_public_access_enabled
+  shared_access_key_enabled        = local.container_app_storage_account_shared_access_key_enabled
+  allow_nested_items_to_be_public  = local.container_app_blob_storage_public_access_enabled
+  cross_tenant_replication_enabled = local.container_app_storage_cross_tenant_replication_enabled
+
+  blob_properties {
+    delete_retention_policy {
+      days = 7
+    }
+    container_delete_retention_policy {
+      days = 7
+    }
+  }
+
+  share_properties {
+    retention_policy {
+      days = 7
+    }
+
+    dynamic "smb" {
+      for_each = lower(local.container_app_file_share_security_profile) == "security" ? [1] : []
+
+      content {
+        versions                        = ["SMB3.1.1"]
+        authentication_types            = ["Kerberos"]
+        kerberos_ticket_encryption_type = ["AES-256"]
+        channel_encryption_type         = ["AES-128-GCM", "AES-256-GCM"]
+      }
+    }
+  }
 
   tags = local.tags
 }
@@ -105,7 +132,7 @@ resource "azurerm_monitor_diagnostic_setting" "files" {
 }
 
 data "azurerm_storage_account_blob_container_sas" "container_app" {
-  count = local.enable_container_app_blob_storage ? 1 : 0
+  count = local.create_container_app_blob_storage_sas ? 1 : 0
 
   connection_string = azurerm_storage_account.container_app[0].primary_connection_string
   container_name    = azurerm_storage_container.container_app[0].name
