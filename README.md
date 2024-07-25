@@ -105,11 +105,15 @@ module "azure_container_apps_hosting" {
   # redis_cache_firewall_ipv4_allow_list = [ "8.8.8.8", "1.1.1.1" ]
 
   ## Deploy an Azure Storage Account and connect it to the Container App
-  ## This will expose a 'ConnectionStrings__BlobStorage' environment var to the Container App
   # enable_container_app_blob_storage                = false
   # container_app_blob_storage_public_access_enabled = false
   # container_app_blob_storage_ipv4_allow_list       = [ "8.8.8.8", "1.1.1.1" ]
-
+  ## This will remove the automatically generated 'ConnectionStrings__BlobStorage' environment var from the Container App
+  create_container_app_blob_storage_sas = false
+  ## Deploy a File Share
+  # enable_container_app_file_share = true
+  ## If you need maximum SMB compatibility for your File Share
+  # container_app_file_share_security_profile = "compatibility"
   ## Increase the hardware resources given to each Container
   # container_cpu    = 1 # core count
   # container_memory = 2 # gigabyte
