@@ -283,7 +283,7 @@ locals {
   container_app_storage_account_shared_access_key_enabled = var.container_app_storage_account_shared_access_key_enabled
   enable_container_app_blob_storage                       = var.enable_container_app_blob_storage
   create_container_app_blob_storage_sas                   = var.create_container_app_blob_storage_sas
-  container_app_blob_storage_sas_secret = local.create_container_app_blob_storage_sas ? [
+  container_app_blob_storage_sas_secret = (local.enable_container_app_blob_storage && local.create_container_app_blob_storage_sas) ? [
     {
       name  = "connectionstrings--blobstorage",
       value = "${azurerm_storage_account.container_app[0].primary_blob_endpoint}${azurerm_storage_container.container_app[0].name}${data.azurerm_storage_account_blob_container_sas.container_app[0].sas}"
