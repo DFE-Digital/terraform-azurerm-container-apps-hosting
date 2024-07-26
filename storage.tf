@@ -132,7 +132,7 @@ resource "azurerm_monitor_diagnostic_setting" "files" {
 }
 
 data "azurerm_storage_account_blob_container_sas" "container_app" {
-  count = local.create_container_app_blob_storage_sas ? 1 : 0
+  count = local.enable_storage_account && local.create_container_app_blob_storage_sas ? 1 : 0
 
   connection_string = azurerm_storage_account.container_app[0].primary_connection_string
   container_name    = azurerm_storage_container.container_app[0].name
