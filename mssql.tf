@@ -22,6 +22,10 @@ resource "azurerm_storage_account" "mssql_security_storage" {
       days = 7
     }
   }
+
+  sas_policy {
+    expiration_period = local.storage_account_sas_expiration_period
+  }
 }
 
 resource "azurerm_storage_account_network_rules" "mssql_security_storage" {

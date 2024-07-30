@@ -291,6 +291,7 @@ locals {
   ] : []
   container_app_blob_storage_public_access_enabled       = local.enable_container_app_blob_storage == false ? false : var.container_app_blob_storage_public_access_enabled
   container_app_storage_cross_tenant_replication_enabled = var.container_app_storage_cross_tenant_replication_enabled
+  storage_account_sas_expiration_period                  = var.storage_account_sas_expiration_period
   # Storage Account / File Share
   enable_container_app_file_share           = var.enable_container_app_file_share
   container_app_file_share_mount_path       = var.container_app_file_share_mount_path

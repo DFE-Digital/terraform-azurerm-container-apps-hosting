@@ -39,6 +39,10 @@ resource "azurerm_storage_account" "container_app" {
     }
   }
 
+  sas_policy {
+    expiration_period = local.storage_account_sas_expiration_period
+  }
+
   tags = local.tags
 }
 

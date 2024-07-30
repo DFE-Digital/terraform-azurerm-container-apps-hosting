@@ -110,6 +110,8 @@ module "azure_container_apps_hosting" {
   # container_app_blob_storage_ipv4_allow_list       = [ "8.8.8.8", "1.1.1.1" ]
   ## This will remove the automatically generated 'ConnectionStrings__BlobStorage' environment var from the Container App
   create_container_app_blob_storage_sas = false
+  ## Change the expiration date for SAS tokens. Format 'DD.HH:MM:SS'
+  # storage_account_sas_expiration_period = "00.01:00:00"
   ## Deploy a File Share
   # enable_container_app_file_share = true
   ## If you need maximum SMB compatibility for your File Share
@@ -856,6 +858,7 @@ module "azure_container_apps_hosting" {
 | <a name="input_storage_account_file_share_quota_gb"></a> [storage\_account\_file\_share\_quota\_gb](#input\_storage\_account\_file\_share\_quota\_gb) | The maximum size of the share, in gigabytes. | `number` | `2` | no |
 | <a name="input_storage_account_ipv4_allow_list"></a> [storage\_account\_ipv4\_allow\_list](#input\_storage\_account\_ipv4\_allow\_list) | A list of public IPv4 address to grant access to the Storage Account | `list(string)` | `[]` | no |
 | <a name="input_storage_account_public_access_enabled"></a> [storage\_account\_public\_access\_enabled](#input\_storage\_account\_public\_access\_enabled) | Should the Azure Storage Account have Public visibility? | `bool` | `false` | no |
+| <a name="input_storage_account_sas_expiration_period"></a> [storage\_account\_sas\_expiration\_period](#input\_storage\_account\_sas\_expiration\_period) | The SAS expiration period in format of DD.HH:MM:SS | `string` | `"02.00:00:00"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to be applied to all resources | `map(string)` | `{}` | no |
 | <a name="input_virtual_network_address_space"></a> [virtual\_network\_address\_space](#input\_virtual\_network\_address\_space) | Virtual Network address space CIDR | `string` | `"172.16.0.0/12"` | no |
 | <a name="input_worker_container_command"></a> [worker\_container\_command](#input\_worker\_container\_command) | Container command for the Worker container. `enable_worker_container` must be set to true for this to have any effect. | `list(string)` | `[]` | no |
