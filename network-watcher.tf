@@ -32,6 +32,10 @@ resource "azurerm_storage_account" "default_network_watcher_nsg_flow_logs" {
     }
   }
 
+  sas_policy {
+    expiration_period = local.storage_account_sas_expiration_period
+  }
+
   tags = local.tags
 }
 

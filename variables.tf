@@ -1018,6 +1018,12 @@ variable "storage_account_public_access_enabled" {
   default     = false
 }
 
+variable "storage_account_sas_expiration_period" {
+  description = "The SAS expiration period in format of DD.HH:MM:SS"
+  type        = string
+  default     = "02.00:00:00"
+}
+
 variable "container_app_storage_account_shared_access_key_enabled" {
   description = "Should the storage account for the container app permit requests to be authorized with the account access key via Shared Key?"
   type        = bool
