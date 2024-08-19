@@ -887,7 +887,7 @@ variable "monitor_email_receivers" {
 }
 
 variable "existing_logic_app_workflow" {
-  description = "Name, Resource Group and HTTP Trigger URL of an existing Logic App Workflow. Leave empty to create a new Resource"
+  description = "Name, Resource Group and HTTP Trigger URL of an existing Logic App Workflow to route Alerts to"
   type = object({
     name : string
     resource_group_name : string
@@ -896,24 +896,6 @@ variable "existing_logic_app_workflow" {
     name                = ""
     resource_group_name = ""
   }
-}
-
-variable "monitor_enable_slack_webhook" {
-  description = "Enable slack webhooks to send monitoring notifications to a channel. Has no effect if you have defined `existing_logic_app_workflow`"
-  type        = bool
-  default     = false
-}
-
-variable "monitor_slack_webhook_receiver" {
-  description = "A Slack App webhook URL. Has no effect if you have defined `existing_logic_app_workflow`"
-  type        = string
-  default     = ""
-}
-
-variable "monitor_slack_channel" {
-  description = "Slack channel name/id to send messages to. Has no effect if you have defined `existing_logic_app_workflow`"
-  type        = string
-  default     = ""
 }
 
 variable "monitor_endpoint_healthcheck" {

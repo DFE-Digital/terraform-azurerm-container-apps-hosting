@@ -26,7 +26,7 @@ data "azurerm_logic_app_workflow" "existing_logic_app_workflow" {
 data "azapi_resource_action" "existing_logic_app_workflow_callback_url" {
   count = local.existing_logic_app_workflow.name == "" ? 0 : 1
 
-  resource_id = "${data.azurerm_logic_app_workflow.existing_logic_app_workflow[0].id}/triggers/${data.azurerm_logic_app_workflow.existing_logic_app_workflow[0].name}-trigger"
+  resource_id = "${data.azurerm_logic_app_workflow.existing_logic_app_workflow[0].id}/triggers/http-request-trigger"
   action      = "listCallbackUrl"
   type        = "Microsoft.Logic/workflows/triggers@2019-05-01"
 
