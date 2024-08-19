@@ -916,6 +916,12 @@ variable "monitor_slack_channel" {
   default     = ""
 }
 
+variable "monitor_slack_channel_critical" {
+  description = "Slack channel name/id to send Critical messages to. Has no effect if you have defined `existing_logic_app_workflow`"
+  type        = string
+  default     = ""
+}
+
 variable "monitor_endpoint_healthcheck" {
   description = "Specify a route that should be monitored for a 200 OK status"
   type        = string

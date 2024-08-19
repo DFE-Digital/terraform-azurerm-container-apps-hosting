@@ -391,6 +391,7 @@ locals {
   monitor_enable_slack_webhook   = var.monitor_enable_slack_webhook
   monitor_slack_webhook_receiver = var.monitor_slack_webhook_receiver
   monitor_slack_channel          = var.monitor_slack_channel
+  monitor_slack_channel_critical = var.monitor_slack_channel_critical != "" ? var.monitor_slack_channel_critical : var.monitor_slack_channel
   monitor_logic_app_receiver = {
     name         = local.logic_app_workflow_name
     resource_id  = local.logic_app_workflow_id

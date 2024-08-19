@@ -89,6 +89,30 @@ resource "azurerm_logic_app_action_http" "slack" {
   )
 }
 
+resource "azurerm_logic_app_action_http" "slack_critical" {
+  count = local.enable_monitoring && local.existing_logic_app_workflow.name == "" && local.monitor_enable_slack_webhook && local.monitor_slack_channel_critical != local.monitor_slack_channel ? 1 : 0
+
+  name         = "${local.resource_prefix}-action-critical"
+  logic_app_id = azurerm_logic_app_workflow.webhook[0].id
+  method       = "POST"
+  uri          = local.monitor_slack_webhook_receiver
+  headers = {
+    "Content-Type" : "application/json"
+  }
+
+  run_after {
+    action_name   = azurerm_logic_app_action_custom.var_alarm_context[0].name
+    action_result = "Succeeded"
+  }
+
+  body = templatefile(
+    "${path.module}/webhook/slack.json",
+    {
+      channel = local.monitor_slack_channel
+    }
+  )
+}
+
 resource "azurerm_monitor_diagnostic_setting" "webhook" {
   count = local.enable_monitoring && local.existing_logic_app_workflow.name == "" ? 1 : 0
 
