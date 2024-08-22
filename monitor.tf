@@ -29,7 +29,7 @@ resource "azurerm_monitor_action_group" "main" {
   }
 
   dynamic "logic_app_receiver" {
-    for_each = local.enable_monitoring || local.existing_logic_app_workflow.name != "" ? [0] : []
+    for_each = local.existing_logic_app_workflow.name != "" ? [0] : []
 
     content {
       name                    = local.monitor_logic_app_receiver.name
