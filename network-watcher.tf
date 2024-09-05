@@ -18,7 +18,7 @@ resource "azurerm_storage_account" "default_network_watcher_nsg_flow_logs" {
   account_kind                     = "StorageV2"
   account_replication_type         = "LRS"
   min_tls_version                  = "TLS1_2"
-  enable_https_traffic_only        = true
+  https_traffic_only_enabled        = true
   public_network_access_enabled    = true
   allow_nested_items_to_be_public  = false
   cross_tenant_replication_enabled = false

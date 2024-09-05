@@ -7,7 +7,7 @@ resource "azurerm_storage_account" "container_app" {
   account_tier                     = "Standard"
   account_replication_type         = "LRS"
   min_tls_version                  = "TLS1_2"
-  enable_https_traffic_only        = true
+  https_traffic_only_enabled        = true
   public_network_access_enabled    = local.storage_account_public_access_enabled
   shared_access_key_enabled        = local.container_app_storage_account_shared_access_key_enabled
   allow_nested_items_to_be_public  = local.container_app_blob_storage_public_access_enabled
