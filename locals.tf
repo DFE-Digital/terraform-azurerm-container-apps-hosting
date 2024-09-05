@@ -33,6 +33,7 @@ locals {
   redis_cache_subnet_cidr                                  = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 4)
   postgresql_subnet_cidr                                   = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 5)
   storage_subnet_cidr                                      = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 6)
+  app_configuration_subnet_cidr                            = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 7)
   container_app_environment_internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
   container_apps_infra_subnet_service_endpoints = distinct(concat(
     local.launch_in_vnet && local.enable_storage_account ? ["Microsoft.Storage"] : [],
@@ -96,6 +97,14 @@ locals {
       subresource_names : ["file"],
     }
   } : {}
+  enable_private_endpoint_app_configuration = local.enable_app_configuration ? true : false
+  private_endpoint_app_configuration = local.enable_private_endpoint_app_configuration ? {
+    "appconfig" : {
+      resource_group : local.resource_group,
+      subnet_id : azurerm_subnet.app_configuration_private_endpoint_subnet[0].id,
+      resource_id : azurerm_app_configuration.default[0].id,
+    }
+  } : {}
   private_endpoints = merge(
     local.private_endpoint_redis,
     local.private_endpoint_mssql,
@@ -103,6 +112,7 @@ locals {
     local.private_endpoint_registry,
     local.private_endpoint_storage_blob,
     local.private_endpoint_storage_file,
+    local.private_endpoint_app_configuration,
   )
 
   # Azure Container Registry

@@ -418,3 +418,53 @@ resource "azurerm_private_dns_a_record" "storage_private_link_file" {
   records             = [azurerm_private_endpoint.default["file"].private_service_connection[0].private_ip_address]
   tags                = local.tags
 }
+
+# App Configuration Networking
+
+resource "azurerm_subnet" "app_configuration_private_endpoint_subnet" {
+  count = local.enable_private_endpoint_app_configuration ? 1 : 0
+
+  name                              = "${local.resource_prefix}appconfigprivateendpoint"
+  virtual_network_name              = local.virtual_network.name
+  resource_group_name               = local.resource_group.name
+  address_prefixes                  = [local.app_configuration_subnet_cidr]
+  private_endpoint_network_policies = "Enabled"
+}
+
+resource "azurerm_subnet_route_table_association" "app_configuration_private_endpoint_subnet" {
+  count = local.enable_private_endpoint_app_configuration ? 1 : 0
+
+  subnet_id      = azurerm_subnet.app_configuration_private_endpoint_subnet[0].id
+  route_table_id = azurerm_route_table.default[0].id
+}
+
+# App Configuration Networking / Private Endpoint
+
+resource "azurerm_private_dns_zone" "app_configuration_private_link" {
+  count = local.enable_private_endpoint_app_configuration ? 1 : 0
+
+  name                = "${azurerm_app_configuration.default[0].name}.privatelink.azconfig.io"
+  resource_group_name = local.resource_group.name
+  tags                = local.tags
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "app_configuration_private_link" {
+  count = local.enable_private_endpoint_app_configuration ? 1 : 0
+
+  name                  = "${local.resource_prefix}appconfigprivatelink"
+  resource_group_name   = local.resource_group.name
+  private_dns_zone_name = azurerm_private_dns_zone.app_configuration_private_link[0].name
+  virtual_network_id    = local.virtual_network.id
+  tags                  = local.tags
+}
+
+resource "azurerm_private_dns_a_record" "app_configuration_private_link" {
+  count = local.enable_private_endpoint_app_configuration ? 1 : 0
+
+  name                = "@"
+  zone_name           = azurerm_private_dns_zone.app_configuration_private_link[0].name
+  resource_group_name = local.resource_group.name
+  ttl                 = 300
+  records             = [azurerm_private_endpoint.default["appconfig"].private_service_connection[0].private_ip_address]
+  tags                = local.tags
+}
