@@ -159,6 +159,12 @@ resource "azurerm_container_app" "container_apps" {
               "secretRef" : "connectionstrings--redis"
             }
           ] : [],
+          local.enable_app_configuration ? [
+            {
+              "name"      = "ConnectionStrings__AppConfig",
+              "secretRef" = "connectionstrings--appconfig"
+            }
+          ] : [],
           [
             for env_name, env_value in local.container_environment_variables : {
               name  = env_name

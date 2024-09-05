@@ -211,6 +211,12 @@ locals {
         value = azurerm_redis_cache.default[0].primary_connection_string
       }
     ] : [],
+    local.enable_app_configuration ? [
+      {
+        name  = "connectionstrings--appconfig",
+        value = azurerm_app_configuration.default[0].endpoint
+      }
+    ] : [],
     local.container_app_blob_storage_sas_secret,
     [for env_name, env_value in nonsensitive(local.container_secret_environment_variables) : {
       name  = lower(replace(env_name, "_", "-"))
