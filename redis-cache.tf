@@ -1,15 +1,15 @@
 resource "azurerm_redis_cache" "default" {
   count = local.enable_redis_cache ? 1 : 0
 
-  name                = "${local.resource_prefix}default"
-  location            = local.resource_group.location
-  resource_group_name = local.resource_group.name
-  capacity            = local.redis_cache_capacity
-  family              = local.redis_cache_family
-  sku_name            = local.redis_cache_sku
-  redis_version       = local.redis_cache_version
-  enable_non_ssl_port = false
-  minimum_tls_version = "1.2"
+  name                 = "${local.resource_prefix}default"
+  location             = local.resource_group.location
+  resource_group_name  = local.resource_group.name
+  capacity             = local.redis_cache_capacity
+  family               = local.redis_cache_family
+  sku_name             = local.redis_cache_sku
+  redis_version        = local.redis_cache_version
+  non_ssl_port_enabled = false
+  minimum_tls_version  = "1.2"
   public_network_access_enabled = local.launch_in_vnet ? (
     local.redis_cache_sku == "Premium" ? false : true
   ) : true
