@@ -33,6 +33,7 @@ locals {
   redis_cache_subnet_cidr                                  = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 4)
   postgresql_subnet_cidr                                   = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 5)
   storage_subnet_cidr                                      = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 6)
+  app_configuration_subnet_cidr                            = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 7)
   container_app_environment_internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
   container_apps_infra_subnet_service_endpoints = distinct(concat(
     local.launch_in_vnet && local.enable_storage_account ? ["Microsoft.Storage"] : [],
@@ -80,7 +81,7 @@ locals {
     }
   } : {}
   enable_private_endpoint_storage = local.enable_storage_account ? true : false
-  private_endpoint_storage_blob = local.enable_private_endpoint_storage ? {
+  private_endpoint_storage_blob = local.enable_container_app_blob_storage ? {
     "blob" : {
       resource_group : local.resource_group,
       subnet_id : azurerm_subnet.storage_private_endpoint_subnet[0].id,
@@ -96,6 +97,14 @@ locals {
       subresource_names : ["file"],
     }
   } : {}
+  enable_private_endpoint_app_configuration = local.enable_app_configuration && local.app_configuration_sku != "free" ? true : false
+  private_endpoint_app_configuration = local.enable_private_endpoint_app_configuration ? {
+    "appconfig" : {
+      resource_group : local.resource_group,
+      subnet_id : azurerm_subnet.app_configuration_private_endpoint_subnet[0].id,
+      resource_id : azurerm_app_configuration.default[0].id,
+    }
+  } : {}
   private_endpoints = merge(
     local.private_endpoint_redis,
     local.private_endpoint_mssql,
@@ -103,6 +112,7 @@ locals {
     local.private_endpoint_registry,
     local.private_endpoint_storage_blob,
     local.private_endpoint_storage_file,
+    local.private_endpoint_app_configuration,
   )
 
   # Azure Container Registry
@@ -209,6 +219,12 @@ locals {
       {
         name  = "connectionstrings--redis",
         value = azurerm_redis_cache.default[0].primary_connection_string
+      }
+    ] : [],
+    local.enable_app_configuration ? [
+      {
+        name  = "connectionstrings--appconfig",
+        value = azurerm_app_configuration.default[0].endpoint
       }
     ] : [],
     local.container_app_blob_storage_sas_secret,
@@ -415,4 +431,9 @@ locals {
     local.network_security_group_container_apps_infra_id,
   )
   network_watcher_nsg_storage_access_key_rotation_reminder_days = var.network_watcher_nsg_storage_access_key_rotation_reminder_days != 0 ? var.network_watcher_nsg_storage_access_key_rotation_reminder_days : local.storage_account_access_key_rotation_reminder_days
+
+  # App Configuration
+  enable_app_configuration      = var.enable_app_configuration
+  app_configuration_sku         = var.app_configuration_sku
+  app_configuration_assign_role = var.app_configuration_assign_role
 }

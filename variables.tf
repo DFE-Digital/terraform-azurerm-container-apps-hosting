@@ -1188,3 +1188,21 @@ variable "container_app_file_share_security_profile" {
     error_message = "Valid values for container_app_file_share_security_profile are 'security' or 'compatibility'."
   }
 }
+
+variable "enable_app_configuration" {
+  description = "Deploy an Azure App Configuration resource"
+  type        = bool
+  default     = false
+}
+
+variable "app_configuration_sku" {
+  description = "The SKU name of the App Configuration. Possible values are free and standard. Defaults to free."
+  type        = string
+  default     = "free"
+}
+
+variable "app_configuration_assign_role" {
+  description = "Assign the 'App Configuration Data Reader' Role to the Container App User-Assigned Managed Identity. Note: If you do not have 'Microsoft.Authorization/roleAssignments/write' permission, you will need to manually assign the 'App Configuration Data Reader' Role to the identity"
+  type        = bool
+  default     = false
+}

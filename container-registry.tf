@@ -8,27 +8,14 @@ resource "azurerm_container_registry" "acr" {
   admin_enabled                 = local.registry_admin_enabled
   public_network_access_enabled = local.registry_public_access_enabled
   tags                          = local.tags
-
-  dynamic "retention_policy" {
-    for_each = local.registry_sku == "Premium" ? [1] : []
-
-    content {
-      days    = local.registry_retention_days
-      enabled = local.enable_registry_retention_policy
-    }
-  }
+  retention_policy_in_days      = local.registry_sku == "Premium" && local.enable_registry_retention_policy ? local.registry_retention_days : null
+  network_rule_bypass_option    = "None"
 
   dynamic "network_rule_set" {
     for_each = local.registry_sku == "Premium" && length(local.registry_ipv4_allow_list) > 0 ? { ip_rules : local.registry_ipv4_allow_list } : {}
 
     content {
       default_action = "Deny"
-
-      # Allow the Container App subnet to access the Container Registry
-      virtual_network {
-        action    = "Allow"
-        subnet_id = azurerm_subnet.container_apps_infra_subnet[0].id
-      }
 
       dynamic "ip_rule" {
         for_each = network_rule_set.value
