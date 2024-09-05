@@ -40,16 +40,17 @@ resource "azurerm_subnet_route_table_association" "container_apps_infra_subnet" 
   route_table_id = azurerm_route_table.default[0].id
 }
 
+// TODO: Container Instances/Groups aren't in use, I wonder if we can remove this?
 resource "azurerm_subnet" "container_instances_subnet" {
   count = local.enable_mssql_database ? (
     local.launch_in_vnet ? 1 : 0
   ) : 0
 
-  name                                      = "${local.resource_prefix}containerinstances"
-  virtual_network_name                      = local.virtual_network.name
-  resource_group_name                       = local.resource_group.name
-  address_prefixes                          = [local.container_instances_subnet_cidr]
-  private_endpoint_network_policies_enabled = true
+  name                              = "${local.resource_prefix}containerinstances"
+  virtual_network_name              = local.virtual_network.name
+  resource_group_name               = local.resource_group.name
+  address_prefixes                  = [local.container_instances_subnet_cidr]
+  private_endpoint_network_policies = "Enabled"
 
   delegation {
     name = "ACIDelegationService"
@@ -131,11 +132,11 @@ resource "azurerm_subnet" "mssql_private_endpoint_subnet" {
     local.launch_in_vnet ? 1 : 0
   ) : 0
 
-  name                                      = "${local.resource_prefix}mssqlprivateendpoint"
-  virtual_network_name                      = local.virtual_network.name
-  resource_group_name                       = local.resource_group.name
-  address_prefixes                          = [local.mssql_private_endpoint_subnet_cidr]
-  private_endpoint_network_policies_enabled = true
+  name                              = "${local.resource_prefix}mssqlprivateendpoint"
+  virtual_network_name              = local.virtual_network.name
+  resource_group_name               = local.resource_group.name
+  address_prefixes                  = [local.mssql_private_endpoint_subnet_cidr]
+  private_endpoint_network_policies = "Enabled"
 }
 
 resource "azurerm_subnet_route_table_association" "mssql_private_endpoint_subnet" {
@@ -181,11 +182,11 @@ resource "azurerm_private_dns_a_record" "mssql_private_endpoint" {
 resource "azurerm_subnet" "redis_cache_subnet" {
   count = local.enable_private_endpoint_redis ? 1 : 0
 
-  name                                      = "${local.resource_prefix}rediscache"
-  virtual_network_name                      = local.virtual_network.name
-  resource_group_name                       = local.resource_group.name
-  address_prefixes                          = [local.redis_cache_subnet_cidr]
-  private_endpoint_network_policies_enabled = true
+  name                              = "${local.resource_prefix}rediscache"
+  virtual_network_name              = local.virtual_network.name
+  resource_group_name               = local.resource_group.name
+  address_prefixes                  = [local.redis_cache_subnet_cidr]
+  private_endpoint_network_policies = "Enabled"
 }
 
 resource "azurerm_subnet_route_table_association" "redis_cache_subnet" {
@@ -231,12 +232,13 @@ resource "azurerm_private_dns_a_record" "redis_cache_private_endpoint" {
 resource "azurerm_subnet" "postgresql_subnet" {
   count = local.enable_private_endpoint_postgres ? 1 : 0
 
-  name                                      = "${local.resource_prefix}postgresql"
-  virtual_network_name                      = local.virtual_network.name
-  resource_group_name                       = local.resource_group.name
-  address_prefixes                          = [local.postgresql_subnet_cidr]
-  private_endpoint_network_policies_enabled = true
-  service_endpoints                         = ["Microsoft.Sql"]
+  name                              = "${local.resource_prefix}postgresql"
+  virtual_network_name              = local.virtual_network.name
+  resource_group_name               = local.resource_group.name
+  address_prefixes                  = [local.postgresql_subnet_cidr]
+  private_endpoint_network_policies = "Enabled"
+  service_endpoints                 = ["Microsoft.Sql"]
+
   delegation {
     name = "fs"
     service_delegation {
@@ -291,11 +293,11 @@ resource "azurerm_private_dns_a_record" "postgresql_private_link" {
 resource "azurerm_subnet" "registry_private_endpoint_subnet" {
   count = local.enable_private_endpoint_registry ? 1 : 0
 
-  name                                      = "${local.resource_prefix}registryprivateendpoint"
-  virtual_network_name                      = local.virtual_network.name
-  resource_group_name                       = local.resource_group.name
-  address_prefixes                          = [local.registry_subnet_cidr]
-  private_endpoint_network_policies_enabled = true
+  name                              = "${local.resource_prefix}registryprivateendpoint"
+  virtual_network_name              = local.virtual_network.name
+  resource_group_name               = local.resource_group.name
+  address_prefixes                  = [local.registry_subnet_cidr]
+  private_endpoint_network_policies = "Enabled"
 }
 
 resource "azurerm_subnet_route_table_association" "registry_private_endpoint_subnet" {
@@ -341,11 +343,11 @@ resource "azurerm_private_dns_a_record" "registry_private_link" {
 resource "azurerm_subnet" "storage_private_endpoint_subnet" {
   count = local.enable_private_endpoint_storage ? 1 : 0
 
-  name                                      = "${local.resource_prefix}storageprivateendpoint"
-  virtual_network_name                      = local.virtual_network.name
-  resource_group_name                       = local.resource_group.name
-  address_prefixes                          = [local.storage_subnet_cidr]
-  private_endpoint_network_policies_enabled = true
+  name                              = "${local.resource_prefix}storageprivateendpoint"
+  virtual_network_name              = local.virtual_network.name
+  resource_group_name               = local.resource_group.name
+  address_prefixes                  = [local.storage_subnet_cidr]
+  private_endpoint_network_policies = "Enabled"
 }
 
 resource "azurerm_subnet_route_table_association" "storage_private_endpoint_subnet" {
