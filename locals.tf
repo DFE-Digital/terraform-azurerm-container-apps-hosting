@@ -80,7 +80,7 @@ locals {
     }
   } : {}
   enable_private_endpoint_storage = local.enable_storage_account ? true : false
-  private_endpoint_storage_blob = local.enable_private_endpoint_storage ? {
+  private_endpoint_storage_blob = local.enable_container_app_blob_storage ? {
     "blob" : {
       resource_group : local.resource_group,
       subnet_id : azurerm_subnet.storage_private_endpoint_subnet[0].id,
