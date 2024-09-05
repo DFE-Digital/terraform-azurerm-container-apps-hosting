@@ -6,7 +6,7 @@ resource "azurerm_app_configuration" "default" {
   location              = local.resource_group.location
   sku                   = local.app_configuration_sku
   local_auth_enabled    = true
-  public_network_access = "Disabled"
+  public_network_access = local.app_configuration_sku == "free" ? "Enabled" : "Disabled"
 
   tags = local.tags
 }
