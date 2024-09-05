@@ -1200,3 +1200,9 @@ variable "app_configuration_sku" {
   type        = string
   default     = "free"
 }
+
+variable "app_configuration_assign_role" {
+  description = "Assign the 'App Configuration Data Reader' Role to the Container App User-Assigned Managed Identity. Note: If you do not have 'Microsoft.Authorization/roleAssignments/write' permission, you will need to manually assign the 'App Configuration Data Reader' Role to the identity"
+  type        = bool
+  default     = false
+}

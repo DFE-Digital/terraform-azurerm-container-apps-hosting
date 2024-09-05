@@ -423,6 +423,7 @@ locals {
   network_watcher_nsg_storage_access_key_rotation_reminder_days = var.network_watcher_nsg_storage_access_key_rotation_reminder_days != 0 ? var.network_watcher_nsg_storage_access_key_rotation_reminder_days : local.storage_account_access_key_rotation_reminder_days
 
   # App Configuration
-  enable_app_configuration = var.enable_app_configuration
-  app_configuration_sku    = var.app_configuration_sku
+  enable_app_configuration      = var.enable_app_configuration
+  app_configuration_sku         = var.app_configuration_sku
+  app_configuration_assign_role = var.app_configuration_assign_role
 }
