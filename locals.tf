@@ -237,6 +237,53 @@ locals {
     key_vault_secret_id = azurerm_key_vault_secret.secret_app_setting[name].versionless_id
     name                = secret["name"]
   } } : {}
+  container_app_env_vars = { for i, v in concat(
+    local.enable_app_insights_integration ? [
+      {
+        "name" : "ApplicationInsights__ConnectionString",
+        "secretRef" : "applicationinsights--connectionstring"
+      },
+      {
+        "name" : "ApplicationInsights__InstrumentationKey",
+        "secretRef" : "applicationinsights--instrumentationkey"
+      }
+    ] : [],
+    (length(local.container_app_blob_storage_sas_secret) > 0) ?
+    [
+      {
+        "name" : "ConnectionStrings__BlobStorage",
+        "secretRef" : "connectionstrings--blobstorage"
+      }
+    ] : [],
+    local.enable_redis_cache ?
+    [
+      {
+        "name" : "ConnectionStrings__Redis",
+        "secretRef" : "connectionstrings--redis"
+      }
+    ] : [],
+    local.enable_app_configuration ? [
+      {
+        "name" : "ConnectionStrings__AppConfig",
+        "secretRef" : "connectionstrings--appconfig"
+      }
+    ] : [],
+    [
+      for env_name, env_value in local.container_environment_variables : {
+        name  = env_name
+        value = env_value
+      }
+    ],
+    [
+      for env_name, env_value in nonsensitive(local.container_secret_environment_variables) : {
+        name      = env_name
+        secretRef = lower(replace(env_name, "_", "-"))
+      }
+  ]) : v.name => v }
+  # Container App / Init Containers
+  enable_init_container  = var.enable_init_container
+  init_container_image   = var.init_container_image
+  init_container_command = var.init_container_command
 
   # Container App / Identity
   enable_container_app_uami = anytrue([
