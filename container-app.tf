@@ -81,16 +81,7 @@ resource "azurerm_container_app" "container_apps" {
   }
 
   dynamic "identity" {
-    for_each = local.registry_use_managed_identity ? [1] : []
-
-    content {
-      type         = "UserAssigned"
-      identity_ids = [azurerm_user_assigned_identity.containerapp[0].id]
-    }
-  }
-
-  dynamic "identity" {
-    for_each = local.container_app_identities != null ? [1] : []
+    for_each = local.container_app_identities
 
     content {
       type         = local.container_app_identities.type

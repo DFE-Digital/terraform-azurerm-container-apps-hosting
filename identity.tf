@@ -1,5 +1,5 @@
 resource "azurerm_user_assigned_identity" "containerapp" {
-  count = local.registry_use_managed_identity ? 1 : 0
+  count = local.enable_container_app_uami ? 1 : 0
 
   location            = local.resource_group.location
   name                = "${local.resource_prefix}-uami-containerapp"
