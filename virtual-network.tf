@@ -16,7 +16,7 @@ resource "azurerm_route_table" "default" {
   name                          = "${local.resource_prefix}default"
   location                      = local.resource_group.location
   resource_group_name           = local.resource_group.name
-  disable_bgp_route_propagation = false
+  bgp_route_propagation_enabled = true
   tags                          = local.tags
 }
 
