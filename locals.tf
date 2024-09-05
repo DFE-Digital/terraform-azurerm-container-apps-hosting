@@ -97,7 +97,7 @@ locals {
       subresource_names : ["file"],
     }
   } : {}
-  enable_private_endpoint_app_configuration = local.enable_app_configuration ? true : false
+  enable_private_endpoint_app_configuration = local.enable_app_configuration && local.app_configuration_sku != "free" ? true : false
   private_endpoint_app_configuration = local.enable_private_endpoint_app_configuration ? {
     "appconfig" : {
       resource_group : local.resource_group,
