@@ -195,7 +195,6 @@ locals {
   container_environment_variables        = var.container_environment_variables
   container_secret_environment_variables = var.container_secret_environment_variables
   container_fqdn                         = azurerm_container_app.container_apps["main"].ingress[0].fqdn
-  container_app_identities               = var.container_app_identities
   container_app_name_override            = var.container_app_name_override
   container_app_name                     = local.container_app_name_override == "" ? "${local.resource_prefix}-${local.image_name}" : local.container_app_name_override
   container_app_secrets = { for i, v in concat(
@@ -238,6 +237,22 @@ locals {
     key_vault_secret_id = azurerm_key_vault_secret.secret_app_setting[name].versionless_id
     name                = secret["name"]
   } } : {}
+
+  # Container App / Identity
+  enable_container_app_uami = anytrue([
+    local.registry_use_managed_identity,
+    local.enable_app_configuration,
+    local.key_vault != null,
+    local.enable_storage_account,
+  ])
+  container_app_identities = merge(
+    local.enable_container_app_uami ? {
+      type         = "UserAssigned"
+      identity_ids = [azurerm_user_assigned_identity.containerapp[0].id]
+    } : null,
+    var.container_app_identities,
+  )
+
   # Container App / Container image
   image_name = var.image_name
   image_tag  = var.image_tag
