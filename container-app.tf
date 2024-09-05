@@ -97,6 +97,28 @@ resource "azurerm_container_app" "container_apps" {
   }
 
   template {
+    dynamic "init_container" {
+      for_each = each.value == "main" && local.enable_init_container ? [1] : []
+
+      content {
+        name    = "${each.value}-init"
+        image   = local.init_container_image != "" ? local.init_container_image : "${local.registry_server}/${local.image_name}:${local.image_tag}"
+        cpu     = local.container_cpu
+        memory  = "${local.container_memory}Gi"
+        command = local.init_container_command
+
+        dynamic "env" {
+          for_each = local.container_app_env_vars
+
+          content {
+            name        = env.value["name"]
+            secret_name = lookup(env.value, "secretRef", null)
+            value       = lookup(env.value, "value", null)
+          }
+        }
+      }
+    }
+
     container {
       name    = each.value
       image   = "${local.registry_server}/${local.image_name}:${local.image_tag}"
@@ -125,49 +147,7 @@ resource "azurerm_container_app" "container_apps" {
       }
 
       dynamic "env" {
-        for_each = { for i, v in concat(
-          local.enable_app_insights_integration ? [
-            {
-              "name" : "ApplicationInsights__ConnectionString",
-              "secretRef" : "applicationinsights--connectionstring"
-            },
-            {
-              "name" : "ApplicationInsights__InstrumentationKey",
-              "secretRef" : "applicationinsights--instrumentationkey"
-            }
-          ] : [],
-          (length(local.container_app_blob_storage_sas_secret) > 0) ?
-          [
-            {
-              "name" : "ConnectionStrings__BlobStorage",
-              "secretRef" : "connectionstrings--blobstorage"
-            }
-          ] : [],
-          local.enable_redis_cache ?
-          [
-            {
-              "name" : "ConnectionStrings__Redis",
-              "secretRef" : "connectionstrings--redis"
-            }
-          ] : [],
-          local.enable_app_configuration ? [
-            {
-              "name"      = "ConnectionStrings__AppConfig",
-              "secretRef" = "connectionstrings--appconfig"
-            }
-          ] : [],
-          [
-            for env_name, env_value in local.container_environment_variables : {
-              name  = env_name
-              value = env_value
-            }
-          ],
-          [
-            for env_name, env_value in nonsensitive(local.container_secret_environment_variables) : {
-              name      = env_name
-              secretRef = lower(replace(env_name, "_", "-"))
-            }
-        ]) : v.name => v }
+        for_each = local.container_app_env_vars
 
         content {
           name        = env.value["name"]
