@@ -8,7 +8,7 @@ resource "azurerm_storage_account" "mssql_security_storage" {
   account_replication_type         = "LRS"
   min_tls_version                  = "TLS1_2"
   tags                             = local.tags
-  https_traffic_only_enabled        = true
+  https_traffic_only_enabled       = true
   public_network_access_enabled    = local.enable_mssql_vulnerability_assessment ? true : false
   shared_access_key_enabled        = local.mssql_security_storage_shared_access_key_enabled
   allow_nested_items_to_be_public  = false
