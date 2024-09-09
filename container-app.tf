@@ -81,11 +81,11 @@ resource "azurerm_container_app" "container_apps" {
   }
 
   dynamic "identity" {
-    for_each = toset(local.container_app_identity_ids)
+    for_each = length(local.container_app_identity_ids) > 0 ? [1] : []
 
     content {
       type         = "UserAssigned"
-      identity_ids = identity.value
+      identity_ids = local.container_app_identity_ids
     }
   }
 
