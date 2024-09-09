@@ -268,6 +268,12 @@ locals {
         "secretRef" : "connectionstrings--appconfig"
       }
     ] : [],
+    local.enable_container_app_uami ? [
+      {
+        "name" : "AZURE_CLIENT_ID"
+        "value" : azurerm_user_assigned_identity.containerapp[0].client_id
+      }
+    ] : [],
     [
       for env_name, env_value in local.container_environment_variables : {
         name  = env_name
