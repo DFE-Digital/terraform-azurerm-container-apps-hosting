@@ -41,15 +41,15 @@ resource "azurerm_monitor_action_group" "main" {
 }
 
 resource "azurerm_monitor_metric_alert" "cpu" {
-  for_each = local.enable_monitoring ? local.monitor_container_ids : {}
+  for_each = local.enable_monitoring ? local.monitor_containers : {}
 
-  name                = "${element(split("/", each.value), length(split("/", each.value)) - 1)}-cpu"
+  name                = "${each.value.name}-containerapps-cpu"
   resource_group_name = local.resource_group.name
-  scopes              = [each.value]
-  description         = "Action will be triggered when CPU usage is higher than a defined threshold for longer than 5 minutes"
+  scopes              = [each.value.id]
+  description         = "Container App ${each.value.name} is consuming more than ${local.alarm_cpu_threshold_percentage}% of CPU"
   window_size         = "PT5M"
   frequency           = "PT5M"
-  severity            = 2
+  severity            = 2 # Warning
 
   criteria {
     metric_namespace = "microsoft.app/containerapps"
@@ -57,7 +57,7 @@ resource "azurerm_monitor_metric_alert" "cpu" {
     aggregation      = "Average"
     operator         = "GreaterThan"
     # CPU usage in nanocores (1,000,000,000 nanocores = 1 core)
-    threshold = ((local.container_cpu * 10000000) * local.alarm_cpu_threshold_percentage)
+    threshold = ((each.value.template[0].container[0].cpu * 10000000) * local.alarm_cpu_threshold_percentage)
   }
 
   action {
@@ -68,15 +68,15 @@ resource "azurerm_monitor_metric_alert" "cpu" {
 }
 
 resource "azurerm_monitor_metric_alert" "memory" {
-  for_each = local.enable_monitoring ? local.monitor_container_ids : {}
+  for_each = local.enable_monitoring ? local.monitor_containers : {}
 
-  name                = "${element(split("/", each.value), length(split("/", each.value)) - 1)}-memory"
+  name                = "${each.value.name}-containerapps-memory"
   resource_group_name = local.resource_group.name
-  scopes              = [each.value]
-  description         = "Action will be triggered when memory usage is higher than a defined threshold for longer than 5 minutes"
+  scopes              = [each.value.id]
+  description         = "Container App ${each.value.name} is consuming more than ${local.alarm_memory_threshold_percentage}% of Memory"
   window_size         = "PT5M"
   frequency           = "PT5M"
-  severity            = 2
+  severity            = 2 # Warning
 
   criteria {
     metric_namespace = "microsoft.app/containerapps"
@@ -84,7 +84,7 @@ resource "azurerm_monitor_metric_alert" "memory" {
     aggregation      = "Average"
     operator         = "GreaterThan"
     # Memory usage in bytes (1,000,000,000 bytes = 1 GB)
-    threshold = ((local.container_memory * 10000000) * local.alarm_memory_threshold_percentage)
+    threshold = ((replace(each.value.template[0].container[0].memory, "Gi", "") * 10000000) * local.alarm_memory_threshold_percentage)
   }
 
   action {
@@ -103,7 +103,7 @@ resource "azurerm_monitor_metric_alert" "sql_cpu" {
   description         = "Action will be triggered when SQL CPU usage is higher than a defined threshold for longer than 5 minutes"
   window_size         = "PT5M"
   frequency           = "PT5M"
-  severity            = 2
+  severity            = 2 # Warning
 
   criteria {
     metric_namespace = "Microsoft.Sql/servers/databases"
@@ -129,7 +129,7 @@ resource "azurerm_monitor_metric_alert" "sql_dtu" {
   description         = "Action will be triggered when SQL DTU usage is higher than a defined threshold for longer than 5 minutes"
   window_size         = "PT5M"
   frequency           = "PT5M"
-  severity            = 2
+  severity            = 2 # Warning
 
   criteria {
     metric_namespace = "Microsoft.Sql/servers/databases"
@@ -155,7 +155,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "exceptions" {
   evaluation_frequency = "PT5M"
   window_duration      = "PT5M"
   scopes               = [azurerm_application_insights.main[0].id]
-  severity             = 2
+  severity             = 2 # Warning
   description          = "Action will be triggered when an Exception is raised in App Insights"
 
   criteria {
@@ -233,7 +233,7 @@ resource "azurerm_monitor_metric_alert" "http" {
   # https://github.com/hashicorp/terraform-provider-azurerm/issues/8551
   scopes      = [azurerm_application_insights_standard_web_test.main[0].id, azurerm_application_insights.main[0].id]
   description = "Action will be triggered when regional availability becomes impacted."
-  severity    = 2
+  severity    = 0 # Critical
 
   application_insights_web_test_location_availability_criteria {
     web_test_id           = azurerm_application_insights_standard_web_test.main[0].id
@@ -273,22 +273,22 @@ resource "azurerm_monitor_metric_alert" "tls" {
 }
 
 resource "azurerm_monitor_metric_alert" "count" {
-  for_each = local.enable_monitoring ? local.monitor_container_ids : {}
+  for_each = local.enable_monitoring ? local.monitor_containers : {}
 
-  name                = "${element(split("/", each.value), length(split("/", each.value)) - 1)}-replicas"
+  name                = "${each.value.name}-containerapps-replicas"
   resource_group_name = local.resource_group.name
-  scopes              = [each.value]
-  description         = "Action will be triggered when container count is zero"
+  scopes              = [each.value.id]
+  description         = "Container App ${each.value.name} has less than ${each.value.template[0].min_replicas} replicas"
   window_size         = "PT5M"
   frequency           = "PT1M"
-  severity            = 1
+  severity            = 1 # Error
 
   criteria {
     metric_namespace = "microsoft.app/containerapps"
     metric_name      = "Replicas"
     aggregation      = "Average"
     operator         = "LessThan"
-    threshold        = each.key == "worker_id" ? local.worker_container_min_replicas : local.container_min_replicas
+    threshold        = each.value.template[0].min_replicas
   }
 
   action {
@@ -307,7 +307,7 @@ resource "azurerm_monitor_metric_alert" "redis" {
   description         = "Action will be triggered when Redis Server Load is higher than 80%"
   window_size         = "PT5M"
   frequency           = "PT1M"
-  severity            = 2
+  severity            = 2 # Warning
 
   criteria {
     metric_namespace = "Microsoft.Cache/Redis"
@@ -334,7 +334,7 @@ resource "azurerm_monitor_metric_alert" "latency" {
   description         = "Action will be triggered when Origin latency is higher than ${local.alarm_latency_threshold_ms}ms"
   window_size         = "PT5M"
   frequency           = "PT5M"
-  severity            = 2
+  severity            = 2 # Warning
 
   criteria {
     metric_namespace = "Microsoft.Cdn/profiles"
@@ -369,7 +369,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "log-analytics-ingesti
 
   evaluation_frequency = "P1D"
   scopes               = [azurerm_log_analytics_workspace.container_app.id]
-  severity             = 2
+  severity             = 2 # Warning
   window_duration      = "P1D"
 
   action {
