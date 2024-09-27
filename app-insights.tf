@@ -40,7 +40,8 @@ resource "azurerm_application_insights_standard_web_test" "main" {
   ]
 
   request {
-    url = local.monitor_http_availability_url
+    url       = local.monitor_http_availability_url
+    http_verb = "HEAD"
 
     header {
       name  = "X-AppInsights-HttpTest"
