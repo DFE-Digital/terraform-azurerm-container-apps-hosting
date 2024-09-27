@@ -31,6 +31,7 @@ resource "azurerm_application_insights_standard_web_test" "main" {
   timeout                 = 10
   description             = "Regional HTTP availability check"
   enabled                 = true
+  retry_enabled           = true
 
   geo_locations = [
     "emea-nl-ams-azr",  # West Europe
@@ -39,12 +40,17 @@ resource "azurerm_application_insights_standard_web_test" "main" {
   ]
 
   request {
-    url = local.monitor_http_availability_url
+    url       = local.monitor_http_availability_url
+    http_verb = "HEAD"
 
     header {
       name  = "X-AppInsights-HttpTest"
       value = azurerm_application_insights.main[0].name
     }
+  }
+
+  validation_rules {
+    expected_status_code = 0 # 0 = response code < 400
   }
 
   tags = merge(
