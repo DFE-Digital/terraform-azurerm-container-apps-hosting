@@ -464,11 +464,14 @@ locals {
     length(local.cdn_frontdoor_custom_domains) >= 1 ? local.cdn_frontdoor_custom_domains[0] : azurerm_cdn_frontdoor_endpoint.endpoint[0].host_name
   ) : local.container_fqdn
   monitor_http_availability_url = "https://${local.monitor_http_availability_fqdn}${local.monitor_endpoint_healthcheck}"
-  monitor_default_container_id  = { "default_id" = azurerm_container_app.container_apps["main"].id }
-  monitor_worker_container_id   = local.enable_worker_container ? { "worker_id" = azurerm_container_app.container_apps["worker"].id } : {}
-  monitor_container_ids = merge(
-    local.monitor_default_container_id,
-    local.monitor_worker_container_id,
+  monitor_default_container     = { "default" = azurerm_container_app.container_apps["main"] }
+  monitor_worker_container      = local.enable_worker_container ? { "worker" = azurerm_container_app.container_apps["worker"] } : {}
+  monitor_containers = merge(
+    local.monitor_default_container,
+    local.monitor_worker_container,
+    {
+      for name, container in local.custom_container_apps : name => azurerm_container_app.custom_container_apps[name]
+    }
   )
   monitor_logic_app_receiver = {
     name         = local.logic_app_workflow_name
