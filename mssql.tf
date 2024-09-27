@@ -86,7 +86,12 @@ resource "azurerm_monitor_diagnostic_setting" "mssql_security_storage" {
 
   # The below metrics are kept in to avoid a diff in the Terraform Plan output
   metric {
-    category = "AllMetrics"
+    category = "Capacity"
+    enabled  = false
+  }
+
+  metric {
+    category = "Transaction"
     enabled  = false
   }
 }

@@ -125,6 +125,7 @@ resource "azurerm_monitor_diagnostic_setting" "nsg_flow_logs" {
     category = "Capacity"
     enabled  = false
   }
+
   metric {
     category = "Transaction"
     enabled  = false

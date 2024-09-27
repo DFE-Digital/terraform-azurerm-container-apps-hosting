@@ -106,6 +106,7 @@ resource "azurerm_monitor_diagnostic_setting" "blobs" {
     category = "Capacity"
     enabled  = false
   }
+
   metric {
     category = "Transaction"
     enabled  = false
@@ -129,6 +130,7 @@ resource "azurerm_monitor_diagnostic_setting" "files" {
     category = "Capacity"
     enabled  = false
   }
+
   metric {
     category = "Transaction"
     enabled  = false
