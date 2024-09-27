@@ -874,6 +874,12 @@ variable "app_insights_retention_days" {
   default     = 730
 }
 
+variable "app_insights_smart_detection_enabled" {
+  description = "Enable or Disable Smart Detection with App Insights"
+  type        = bool
+  default     = true
+}
+
 variable "enable_monitoring" {
   description = "Create an App Insights instance and notification group for the Container App"
   type        = bool

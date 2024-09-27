@@ -448,8 +448,9 @@ locals {
   eventhub_export_log_analytics_table_names = var.eventhub_export_log_analytics_table_names
 
   # Application Insights
-  enable_app_insights_integration = var.enable_app_insights_integration
-  app_insights_retention_days     = var.app_insights_retention_days
+  enable_app_insights_integration      = var.enable_app_insights_integration
+  app_insights_retention_days          = var.app_insights_retention_days
+  app_insights_smart_detection_enabled = var.app_insights_smart_detection_enabled
 
   # Azure Monitor
   enable_monitoring = var.enable_monitoring
