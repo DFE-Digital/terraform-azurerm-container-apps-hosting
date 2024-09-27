@@ -31,6 +31,7 @@ resource "azurerm_application_insights_standard_web_test" "main" {
   timeout                 = 10
   description             = "Regional HTTP availability check"
   enabled                 = true
+  retry_enabled           = true
 
   geo_locations = [
     "emea-nl-ams-azr",  # West Europe
