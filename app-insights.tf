@@ -49,6 +49,10 @@ resource "azurerm_application_insights_standard_web_test" "main" {
     }
   }
 
+  validation_rules {
+    expected_status_code = 0 # 0 = response code < 400
+  }
+
   tags = merge(
     local.tags,
     { "hidden-link:${azurerm_application_insights.main[0].id}" = "Resource" },
