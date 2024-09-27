@@ -146,6 +146,46 @@ resource "azurerm_monitor_metric_alert" "sql_dtu" {
   tags = local.tags
 }
 
+resource "azurerm_application_insights_smart_detection_rule" "ai_response_time" {
+  count = local.enable_monitoring && local.enable_app_insights_integration ? 1 : 0
+
+  name                               = "Degradation in server response time"
+  application_insights_id            = azurerm_application_insights.main[0].id
+  additional_email_recipients        = local.monitor_email_receivers
+  send_emails_to_subscription_owners = false
+  enabled                            = true
+}
+
+resource "azurerm_application_insights_smart_detection_rule" "ai_exception_volume" {
+  count = local.enable_monitoring && local.enable_app_insights_integration ? 1 : 0
+
+  name                               = "Abnormal rise in exception volume"
+  application_insights_id            = azurerm_application_insights.main[0].id
+  additional_email_recipients        = local.monitor_email_receivers
+  send_emails_to_subscription_owners = false
+  enabled                            = true
+}
+
+resource "azurerm_application_insights_smart_detection_rule" "ai_dependency_duration" {
+  count = local.enable_monitoring && local.enable_app_insights_integration ? 1 : 0
+
+  name                               = "Degradation in dependency duration"
+  application_insights_id            = azurerm_application_insights.main[0].id
+  additional_email_recipients        = local.monitor_email_receivers
+  send_emails_to_subscription_owners = false
+  enabled                            = true
+}
+
+resource "azurerm_application_insights_smart_detection_rule" "ai_data_volume" {
+  count = local.enable_monitoring && local.enable_app_insights_integration ? 1 : 0
+
+  name                               = "Abnormal rise in daily data volume"
+  application_insights_id            = azurerm_application_insights.main[0].id
+  additional_email_recipients        = local.monitor_email_receivers
+  send_emails_to_subscription_owners = false
+  enabled                            = true
+}
+
 resource "azurerm_monitor_scheduled_query_rules_alert_v2" "exceptions" {
   count = local.enable_monitoring && local.enable_app_insights_integration ? 1 : 0
 
