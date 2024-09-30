@@ -532,9 +532,14 @@ module "azure_container_apps_hosting" {
 | [azurerm_application_insights_smart_detection_rule.ai_data_volume](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_smart_detection_rule) | resource |
 | [azurerm_application_insights_smart_detection_rule.ai_dependency_duration](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_smart_detection_rule) | resource |
 | [azurerm_application_insights_smart_detection_rule.ai_exception_volume](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_smart_detection_rule) | resource |
+| [azurerm_application_insights_smart_detection_rule.ai_long_dependency_duration](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_smart_detection_rule) | resource |
+| [azurerm_application_insights_smart_detection_rule.ai_memory](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_smart_detection_rule) | resource |
 | [azurerm_application_insights_smart_detection_rule.ai_response_time](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_smart_detection_rule) | resource |
+| [azurerm_application_insights_smart_detection_rule.ai_security](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_smart_detection_rule) | resource |
+| [azurerm_application_insights_smart_detection_rule.ai_slow_page](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_smart_detection_rule) | resource |
+| [azurerm_application_insights_smart_detection_rule.ai_slow_server](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_smart_detection_rule) | resource |
+| [azurerm_application_insights_smart_detection_rule.ai_trace](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_smart_detection_rule) | resource |
 | [azurerm_application_insights_standard_web_test.main](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_standard_web_test) | resource |
-| [azurerm_application_insights_standard_web_test.tls](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights_standard_web_test) | resource |
 | [azurerm_cdn_frontdoor_custom_domain.custom_container_apps](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_custom_domain) | resource |
 | [azurerm_cdn_frontdoor_custom_domain.custom_domain](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_custom_domain) | resource |
 | [azurerm_cdn_frontdoor_custom_domain_association.custom_domain_association](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_custom_domain_association) | resource |
@@ -604,9 +609,14 @@ module "azure_container_apps_hosting" {
 | [azurerm_monitor_metric_alert.redis](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_monitor_metric_alert.sql_cpu](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_monitor_metric_alert.sql_dtu](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
-| [azurerm_monitor_metric_alert.tls](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert) | resource |
 | [azurerm_monitor_scheduled_query_rules_alert_v2.exceptions](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_scheduled_query_rules_alert_v2) | resource |
 | [azurerm_monitor_scheduled_query_rules_alert_v2.log-analytics-ingestion](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_scheduled_query_rules_alert_v2) | resource |
+| [azurerm_monitor_smart_detector_alert_rule.ai_smart_dependency_degradation](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_smart_detector_alert_rule) | resource |
+| [azurerm_monitor_smart_detector_alert_rule.ai_smart_exception_volume](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_smart_detector_alert_rule) | resource |
+| [azurerm_monitor_smart_detector_alert_rule.ai_smart_failures](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_smart_detector_alert_rule) | resource |
+| [azurerm_monitor_smart_detector_alert_rule.ai_smart_memory_leak](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_smart_detector_alert_rule) | resource |
+| [azurerm_monitor_smart_detector_alert_rule.ai_smart_performance_degradation](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_smart_detector_alert_rule) | resource |
+| [azurerm_monitor_smart_detector_alert_rule.ai_smart_trace_severity](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_smart_detector_alert_rule) | resource |
 | [azurerm_mssql_database.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database) | resource |
 | [azurerm_mssql_database_extended_auditing_policy.default](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database_extended_auditing_policy) | resource |
 | [azurerm_mssql_firewall_rule.default_mssql](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_firewall_rule) | resource |
@@ -698,10 +708,10 @@ module "azure_container_apps_hosting" {
 | <a name="input_alarm_latency_threshold_ms"></a> [alarm\_latency\_threshold\_ms](#input\_alarm\_latency\_threshold\_ms) | Specify a number in milliseconds which should be set as a threshold for a request latency monitoring alarm | `number` | `1000` | no |
 | <a name="input_alarm_log_ingestion_gb_per_day"></a> [alarm\_log\_ingestion\_gb\_per\_day](#input\_alarm\_log\_ingestion\_gb\_per\_day) | Define an alarm threshold for Log Analytics ingestion rate in GB (per day) (Defaults to no limit) | `number` | `0` | no |
 | <a name="input_alarm_memory_threshold_percentage"></a> [alarm\_memory\_threshold\_percentage](#input\_alarm\_memory\_threshold\_percentage) | Specify a number (%) which should be set as a threshold for a memory usage monitoring alarm | `number` | `80` | no |
-| <a name="input_alarm_tls_expiry_days_remaining"></a> [alarm\_tls\_expiry\_days\_remaining](#input\_alarm\_tls\_expiry\_days\_remaining) | Number of days remaining of TLS validity before an alarm should be raised | `number` | `30` | no |
 | <a name="input_app_configuration_assign_role"></a> [app\_configuration\_assign\_role](#input\_app\_configuration\_assign\_role) | Assign the 'App Configuration Data Reader' Role to the Container App User-Assigned Managed Identity. Note: If you do not have 'Microsoft.Authorization/roleAssignments/write' permission, you will need to manually assign the 'App Configuration Data Reader' Role to the identity | `bool` | `false` | no |
 | <a name="input_app_configuration_sku"></a> [app\_configuration\_sku](#input\_app\_configuration\_sku) | The SKU name of the App Configuration. Possible values are free and standard. Defaults to free. | `string` | `"free"` | no |
 | <a name="input_app_insights_retention_days"></a> [app\_insights\_retention\_days](#input\_app\_insights\_retention\_days) | Number of days to retain App Insights data for (Default: 2 years) | `number` | `730` | no |
+| <a name="input_app_insights_smart_detection_enabled"></a> [app\_insights\_smart\_detection\_enabled](#input\_app\_insights\_smart\_detection\_enabled) | Enable or Disable Smart Detection with App Insights | `bool` | `true` | no |
 | <a name="input_azure_location"></a> [azure\_location](#input\_azure\_location) | Azure location in which to launch resources. | `string` | n/a | yes |
 | <a name="input_cdn_frontdoor_custom_domains"></a> [cdn\_frontdoor\_custom\_domains](#input\_cdn\_frontdoor\_custom\_domains) | Azure CDN Front Door custom domains | `list(string)` | `[]` | no |
 | <a name="input_cdn_frontdoor_custom_domains_create_dns_records"></a> [cdn\_frontdoor\_custom\_domains\_create\_dns\_records](#input\_cdn\_frontdoor\_custom\_domains\_create\_dns\_records) | Should the TXT records and ALIAS/CNAME records be automatically created if the custom domains exist within the DNS Zone? | `bool` | `true` | no |
@@ -809,7 +819,6 @@ module "azure_container_apps_hosting" {
 | <a name="input_launch_in_vnet"></a> [launch\_in\_vnet](#input\_launch\_in\_vnet) | Conditionally launch into a VNet | `bool` | `true` | no |
 | <a name="input_monitor_email_receivers"></a> [monitor\_email\_receivers](#input\_monitor\_email\_receivers) | A list of email addresses that should be notified by monitoring alerts | `list(string)` | `[]` | no |
 | <a name="input_monitor_endpoint_healthcheck"></a> [monitor\_endpoint\_healthcheck](#input\_monitor\_endpoint\_healthcheck) | Specify a route that should be monitored for a 200 OK status | `string` | `"/"` | no |
-| <a name="input_monitor_tls_expiry"></a> [monitor\_tls\_expiry](#input\_monitor\_tls\_expiry) | Enable or disable daily TLS expiry check | `bool` | `false` | no |
 | <a name="input_mssql_azuread_admin_object_id"></a> [mssql\_azuread\_admin\_object\_id](#input\_mssql\_azuread\_admin\_object\_id) | Object ID of a User within Azure AD that you want to assign as the SQL Server Administrator | `string` | `""` | no |
 | <a name="input_mssql_azuread_admin_username"></a> [mssql\_azuread\_admin\_username](#input\_mssql\_azuread\_admin\_username) | Username of a User within Azure AD that you want to assign as the SQL Server Administrator | `string` | `""` | no |
 | <a name="input_mssql_azuread_auth_only"></a> [mssql\_azuread\_auth\_only](#input\_mssql\_azuread\_auth\_only) | Set to true to only permit SQL logins from Azure AD users | `bool` | `false` | no |

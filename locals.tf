@@ -448,8 +448,9 @@ locals {
   eventhub_export_log_analytics_table_names = var.eventhub_export_log_analytics_table_names
 
   # Application Insights
-  enable_app_insights_integration = var.enable_app_insights_integration
-  app_insights_retention_days     = var.app_insights_retention_days
+  enable_app_insights_integration      = var.enable_app_insights_integration
+  app_insights_retention_days          = var.app_insights_retention_days
+  app_insights_smart_detection_enabled = var.app_insights_smart_detection_enabled
 
   # Azure Monitor
   enable_monitoring = var.enable_monitoring
@@ -478,12 +479,10 @@ locals {
     resource_id  = local.logic_app_workflow_id
     callback_url = local.logic_app_workflow_callback_url
   }
-  monitor_tls_expiry = var.monitor_tls_expiry
   # Azure Monitor / Alarm thresholds
   alarm_cpu_threshold_percentage    = var.alarm_cpu_threshold_percentage
   alarm_memory_threshold_percentage = var.alarm_memory_threshold_percentage
   alarm_latency_threshold_ms        = var.alarm_latency_threshold_ms
-  alarm_tls_expiry_days_remaining   = var.alarm_tls_expiry_days_remaining
   alarm_log_ingestion_gb_per_day    = var.alarm_log_ingestion_gb_per_day
 
   # Network Watcher

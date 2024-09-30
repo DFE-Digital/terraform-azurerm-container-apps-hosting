@@ -874,6 +874,12 @@ variable "app_insights_retention_days" {
   default     = 730
 }
 
+variable "app_insights_smart_detection_enabled" {
+  description = "Enable or Disable Smart Detection with App Insights"
+  type        = bool
+  default     = true
+}
+
 variable "enable_monitoring" {
   description = "Create an App Insights instance and notification group for the Container App"
   type        = bool
@@ -902,18 +908,6 @@ variable "monitor_endpoint_healthcheck" {
   description = "Specify a route that should be monitored for a 200 OK status"
   type        = string
   default     = "/"
-}
-
-variable "monitor_tls_expiry" {
-  description = "Enable or disable daily TLS expiry check"
-  type        = bool
-  default     = false
-}
-
-variable "alarm_tls_expiry_days_remaining" {
-  description = "Number of days remaining of TLS validity before an alarm should be raised"
-  type        = number
-  default     = 30
 }
 
 variable "alarm_log_ingestion_gb_per_day" {

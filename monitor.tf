@@ -43,7 +43,7 @@ resource "azurerm_monitor_action_group" "main" {
 resource "azurerm_monitor_metric_alert" "cpu" {
   for_each = local.enable_monitoring ? local.monitor_containers : {}
 
-  name                = "${each.value.name}-containerapps-cpu"
+  name                = "Container App CPU - ${each.value.name}"
   resource_group_name = local.resource_group.name
   scopes              = [each.value.id]
   description         = "Container App ${each.value.name} is consuming more than ${local.alarm_cpu_threshold_percentage}% of CPU"
@@ -70,7 +70,7 @@ resource "azurerm_monitor_metric_alert" "cpu" {
 resource "azurerm_monitor_metric_alert" "memory" {
   for_each = local.enable_monitoring ? local.monitor_containers : {}
 
-  name                = "${each.value.name}-containerapps-memory"
+  name                = "Container App Memory - ${each.value.name}"
   resource_group_name = local.resource_group.name
   scopes              = [each.value.id]
   description         = "Container App ${each.value.name} is consuming more than ${local.alarm_memory_threshold_percentage}% of Memory"
@@ -94,13 +94,39 @@ resource "azurerm_monitor_metric_alert" "memory" {
   tags = local.tags
 }
 
+resource "azurerm_monitor_metric_alert" "count" {
+  for_each = local.enable_monitoring ? local.monitor_containers : {}
+
+  name                = "Container App Replica Count - ${each.value.name}"
+  resource_group_name = local.resource_group.name
+  scopes              = [each.value.id]
+  description         = "Container App ${each.value.name} has less than ${each.value.template[0].min_replicas} replicas"
+  window_size         = "PT5M"
+  frequency           = "PT1M"
+  severity            = 1 # Error
+
+  criteria {
+    metric_namespace = "microsoft.app/containerapps"
+    metric_name      = "Replicas"
+    aggregation      = "Average"
+    operator         = "LessThan"
+    threshold        = each.value.template[0].min_replicas
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.main[0].id
+  }
+
+  tags = local.tags
+}
+
 resource "azurerm_monitor_metric_alert" "sql_cpu" {
   count = local.enable_monitoring && local.enable_mssql_database ? 1 : 0
 
-  name                = "${local.resource_prefix}-sql-cpu"
+  name                = "SQL CPU Usage - ${azurerm_mssql_database.default[0].name}"
   resource_group_name = local.resource_group.name
   scopes              = [azurerm_mssql_database.default[0].id]
-  description         = "Action will be triggered when SQL CPU usage is higher than a defined threshold for longer than 5 minutes"
+  description         = "Azure SQL Server ${azurerm_mssql_database.default[0].name} is consuming more than 80% of CPU"
   window_size         = "PT5M"
   frequency           = "PT5M"
   severity            = 2 # Warning
@@ -123,10 +149,10 @@ resource "azurerm_monitor_metric_alert" "sql_cpu" {
 resource "azurerm_monitor_metric_alert" "sql_dtu" {
   count = local.enable_monitoring && local.enable_mssql_database ? 1 : 0
 
-  name                = "${local.resource_prefix}-sql-dtu"
+  name                = "SQL DTU Usage - ${azurerm_mssql_database.default[0].name}"
   resource_group_name = local.resource_group.name
   scopes              = [azurerm_mssql_database.default[0].id]
-  description         = "Action will be triggered when SQL DTU usage is higher than a defined threshold for longer than 5 minutes"
+  description         = "Azure SQL Server ${azurerm_mssql_database.default[0].name} is consuming more than 80% of available DTUs"
   window_size         = "PT5M"
   frequency           = "PT5M"
   severity            = 2 # Warning
@@ -146,50 +172,218 @@ resource "azurerm_monitor_metric_alert" "sql_dtu" {
   tags = local.tags
 }
 
+resource "azurerm_monitor_smart_detector_alert_rule" "ai_smart_failures" {
+  count = local.enable_monitoring && local.enable_app_insights_integration && local.app_insights_smart_detection_enabled ? 1 : 0
+
+  name                = "Failure Anomalies - ${azurerm_application_insights.main[0].name}"
+  description         = "Failure Anomalies notifies you of an unusual rise in the rate of failed HTTP requests or dependency calls."
+  resource_group_name = local.resource_group.name
+  severity            = "Sev2" # Warning
+  scope_resource_ids  = [azurerm_application_insights.main[0].id]
+  frequency           = "PT1M"
+  detector_type       = "FailureAnomaliesDetector"
+
+  action_group {
+    ids = [azurerm_monitor_action_group.main[0].id]
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_monitor_smart_detector_alert_rule" "ai_smart_performance_degradation" {
+  count = local.enable_monitoring && local.enable_app_insights_integration && local.app_insights_smart_detection_enabled ? 1 : 0
+
+  name                = "Request Performance Degradation - ${azurerm_application_insights.main[0].name}"
+  description         = "Request Performance Degradation notifies you when your app has started responding to requests more slowly than it used to."
+  resource_group_name = local.resource_group.name
+  severity            = "Sev2" # Warning
+  scope_resource_ids  = [azurerm_application_insights.main[0].id]
+  frequency           = "P1D"
+  detector_type       = "RequestPerformanceDegradationDetector"
+
+  action_group {
+    ids = [azurerm_monitor_action_group.main[0].id]
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_monitor_smart_detector_alert_rule" "ai_smart_dependency_degradation" {
+  count = local.enable_monitoring && local.enable_app_insights_integration && local.app_insights_smart_detection_enabled ? 1 : 0
+
+  name                = "Dependency Performance Degradation - ${azurerm_application_insights.main[0].name}"
+  description         = "Dependency Performance Degradation notifies you when your app makes calls to a REST API, database, or other dependency. The dependency is responding more slowly than it used to."
+  resource_group_name = local.resource_group.name
+  severity            = "Sev2" # Warning
+  scope_resource_ids  = [azurerm_application_insights.main[0].id]
+  frequency           = "P1D"
+  detector_type       = "DependencyPerformanceDegradationDetector"
+
+  action_group {
+    ids = [azurerm_monitor_action_group.main[0].id]
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_monitor_smart_detector_alert_rule" "ai_smart_exception_volume" {
+  count = local.enable_monitoring && local.enable_app_insights_integration && local.app_insights_smart_detection_enabled ? 1 : 0
+
+  name                = "Exception Volume Changed - ${azurerm_application_insights.main[0].name}"
+  description         = "Exception Volume Changed notifies you when your app is showing an abnormal rise in the number of exceptions of a specific type, during a day."
+  resource_group_name = local.resource_group.name
+  severity            = "Sev2" # Warning
+  scope_resource_ids  = [azurerm_application_insights.main[0].id]
+  frequency           = "P1D"
+  detector_type       = "ExceptionVolumeChangedDetector"
+
+  action_group {
+    ids = [azurerm_monitor_action_group.main[0].id]
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_monitor_smart_detector_alert_rule" "ai_smart_trace_severity" {
+  count = local.enable_monitoring && local.enable_app_insights_integration && local.app_insights_smart_detection_enabled ? 1 : 0
+
+  name                = "Trace Severity - ${azurerm_application_insights.main[0].name}"
+  description         = "Trace Severity notifies you if the ratio between “good” traces (traces logged with a level of Info or Verbose) and “bad” traces (traces logged with a level of Warning, Error, or Fatal) is degrading in a specific day."
+  resource_group_name = local.resource_group.name
+  severity            = "Sev2" # Warning
+  scope_resource_ids  = [azurerm_application_insights.main[0].id]
+  frequency           = "P1D"
+  detector_type       = "TraceSeverityDetector"
+
+  action_group {
+    ids = [azurerm_monitor_action_group.main[0].id]
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_monitor_smart_detector_alert_rule" "ai_smart_memory_leak" {
+  count = local.enable_monitoring && local.enable_app_insights_integration && local.app_insights_smart_detection_enabled ? 1 : 0
+
+  name                = "Memory Leak - ${azurerm_application_insights.main[0].name}"
+  description         = "Memory Leak analyzes the memory consumption of each process in your application. It can warn you about potential memory leaks or increased memory consumption."
+  resource_group_name = local.resource_group.name
+  severity            = "Sev2" # Warning
+  scope_resource_ids  = [azurerm_application_insights.main[0].id]
+  frequency           = "P1D"
+  detector_type       = "MemoryLeakDetector"
+
+  action_group {
+    ids = [azurerm_monitor_action_group.main[0].id]
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_application_insights_smart_detection_rule" "ai_slow_page" {
+  count = local.enable_app_insights_integration ? 1 : 0
+
+  name                               = "Slow page load time"
+  application_insights_id            = azurerm_application_insights.main[0].id
+  additional_email_recipients        = local.monitor_email_receivers
+  send_emails_to_subscription_owners = false
+  enabled                            = local.app_insights_smart_detection_enabled
+}
+
+resource "azurerm_application_insights_smart_detection_rule" "ai_slow_server" {
+  count = local.enable_app_insights_integration ? 1 : 0
+
+  name                               = "Slow server response time"
+  application_insights_id            = azurerm_application_insights.main[0].id
+  additional_email_recipients        = local.monitor_email_receivers
+  send_emails_to_subscription_owners = false
+  enabled                            = local.app_insights_smart_detection_enabled
+}
+
+resource "azurerm_application_insights_smart_detection_rule" "ai_memory" {
+  count = local.enable_app_insights_integration ? 1 : 0
+
+  name                               = "Potential memory leak detected"
+  application_insights_id            = azurerm_application_insights.main[0].id
+  additional_email_recipients        = local.monitor_email_receivers
+  send_emails_to_subscription_owners = false
+  enabled                            = local.app_insights_smart_detection_enabled
+}
+
+resource "azurerm_application_insights_smart_detection_rule" "ai_security" {
+  count = local.enable_app_insights_integration ? 1 : 0
+
+  name                               = "Potential security issue detected"
+  application_insights_id            = azurerm_application_insights.main[0].id
+  additional_email_recipients        = local.monitor_email_receivers
+  send_emails_to_subscription_owners = false
+  enabled                            = local.app_insights_smart_detection_enabled
+}
+
+resource "azurerm_application_insights_smart_detection_rule" "ai_trace" {
+  count = local.enable_app_insights_integration ? 1 : 0
+
+  name                               = "Degradation in trace severity ratio"
+  application_insights_id            = azurerm_application_insights.main[0].id
+  additional_email_recipients        = local.monitor_email_receivers
+  send_emails_to_subscription_owners = false
+  enabled                            = local.app_insights_smart_detection_enabled
+}
+
+resource "azurerm_application_insights_smart_detection_rule" "ai_long_dependency_duration" {
+  count = local.enable_app_insights_integration ? 1 : 0
+
+  name                               = "Long dependency duration"
+  application_insights_id            = azurerm_application_insights.main[0].id
+  additional_email_recipients        = local.monitor_email_receivers
+  send_emails_to_subscription_owners = false
+  enabled                            = local.app_insights_smart_detection_enabled
+}
+
 resource "azurerm_application_insights_smart_detection_rule" "ai_response_time" {
-  count = local.enable_monitoring && local.enable_app_insights_integration ? 1 : 0
+  count = local.enable_app_insights_integration ? 1 : 0
 
   name                               = "Degradation in server response time"
   application_insights_id            = azurerm_application_insights.main[0].id
   additional_email_recipients        = local.monitor_email_receivers
   send_emails_to_subscription_owners = false
-  enabled                            = true
+  enabled                            = local.app_insights_smart_detection_enabled
 }
 
 resource "azurerm_application_insights_smart_detection_rule" "ai_exception_volume" {
-  count = local.enable_monitoring && local.enable_app_insights_integration ? 1 : 0
+  count = local.enable_app_insights_integration ? 1 : 0
 
   name                               = "Abnormal rise in exception volume"
   application_insights_id            = azurerm_application_insights.main[0].id
   additional_email_recipients        = local.monitor_email_receivers
   send_emails_to_subscription_owners = false
-  enabled                            = true
+  enabled                            = local.app_insights_smart_detection_enabled
 }
 
 resource "azurerm_application_insights_smart_detection_rule" "ai_dependency_duration" {
-  count = local.enable_monitoring && local.enable_app_insights_integration ? 1 : 0
+  count = local.enable_app_insights_integration ? 1 : 0
 
   name                               = "Degradation in dependency duration"
   application_insights_id            = azurerm_application_insights.main[0].id
   additional_email_recipients        = local.monitor_email_receivers
   send_emails_to_subscription_owners = false
-  enabled                            = true
+  enabled                            = local.app_insights_smart_detection_enabled
 }
 
 resource "azurerm_application_insights_smart_detection_rule" "ai_data_volume" {
-  count = local.enable_monitoring && local.enable_app_insights_integration ? 1 : 0
+  count = local.enable_app_insights_integration ? 1 : 0
 
   name                               = "Abnormal rise in daily data volume"
   application_insights_id            = azurerm_application_insights.main[0].id
   additional_email_recipients        = local.monitor_email_receivers
   send_emails_to_subscription_owners = false
-  enabled                            = true
+  enabled                            = local.app_insights_smart_detection_enabled
 }
 
 resource "azurerm_monitor_scheduled_query_rules_alert_v2" "exceptions" {
   count = local.enable_monitoring && local.enable_app_insights_integration ? 1 : 0
 
-  name                 = "${azurerm_application_insights.main[0].name}-exceptions"
+  name                 = "Exceptions Count - ${azurerm_application_insights.main[0].name}"
   resource_group_name  = local.resource_group.name
   location             = local.resource_group.location
   evaluation_frequency = "PT5M"
@@ -267,12 +461,12 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "exceptions" {
 resource "azurerm_monitor_metric_alert" "http" {
   count = local.enable_monitoring && local.enable_app_insights_integration ? 1 : 0
 
-  name                = "${local.resource_prefix}-http"
+  name                = "HTTP Availability Test - ${azurerm_application_insights.main[0].name}"
   resource_group_name = local.resource_group.name
   # Scope requires web test to come first
   # https://github.com/hashicorp/terraform-provider-azurerm/issues/8551
   scopes      = [azurerm_application_insights_standard_web_test.main[0].id, azurerm_application_insights.main[0].id]
-  description = "Action will be triggered when regional availability becomes impacted."
+  description = "HTTP URL ${local.monitor_http_availability_url} could not be reached by 2 out of 3 locations"
   severity    = 0 # Critical
 
   application_insights_web_test_location_availability_criteria {
@@ -288,63 +482,13 @@ resource "azurerm_monitor_metric_alert" "http" {
   tags = local.tags
 }
 
-resource "azurerm_monitor_metric_alert" "tls" {
-  count = local.enable_monitoring && local.monitor_tls_expiry && local.enable_app_insights_integration ? 1 : 0
-
-  name                = "${local.resource_prefix}-tls"
-  resource_group_name = local.resource_group.name
-  # Scope requires web test to come first
-  # https://github.com/hashicorp/terraform-provider-azurerm/issues/8551
-  scopes      = [azurerm_application_insights_standard_web_test.tls[0].id, azurerm_application_insights.main[0].id]
-  description = "Action will be triggered when the TLS certificate expires in ${local.alarm_tls_expiry_days_remaining} days or less"
-  severity    = 2
-
-  application_insights_web_test_location_availability_criteria {
-    web_test_id           = azurerm_application_insights_standard_web_test.tls[0].id
-    component_id          = azurerm_application_insights.main[0].id
-    failed_location_count = 1
-  }
-
-  action {
-    action_group_id = azurerm_monitor_action_group.main[0].id
-  }
-
-  tags = local.tags
-}
-
-resource "azurerm_monitor_metric_alert" "count" {
-  for_each = local.enable_monitoring ? local.monitor_containers : {}
-
-  name                = "${each.value.name}-containerapps-replicas"
-  resource_group_name = local.resource_group.name
-  scopes              = [each.value.id]
-  description         = "Container App ${each.value.name} has less than ${each.value.template[0].min_replicas} replicas"
-  window_size         = "PT5M"
-  frequency           = "PT1M"
-  severity            = 1 # Error
-
-  criteria {
-    metric_namespace = "microsoft.app/containerapps"
-    metric_name      = "Replicas"
-    aggregation      = "Average"
-    operator         = "LessThan"
-    threshold        = each.value.template[0].min_replicas
-  }
-
-  action {
-    action_group_id = azurerm_monitor_action_group.main[0].id
-  }
-
-  tags = local.tags
-}
-
 resource "azurerm_monitor_metric_alert" "redis" {
   count = local.enable_monitoring && local.enable_redis_cache ? 1 : 0
 
-  name                = "${azurerm_redis_cache.default[0].name}-cpu"
+  name                = "Azure Cache for Redis CPU - ${azurerm_redis_cache.default[0].name}"
   resource_group_name = local.resource_group.name
   scopes              = [azurerm_redis_cache.default[0].id]
-  description         = "Action will be triggered when Redis Server Load is higher than 80%"
+  description         = "Azure Cache for Redis ${azurerm_redis_cache.default[0].name} is consuming more than 80% of CPU"
   window_size         = "PT5M"
   frequency           = "PT1M"
   severity            = 2 # Warning
@@ -368,10 +512,10 @@ resource "azurerm_monitor_metric_alert" "redis" {
 resource "azurerm_monitor_metric_alert" "latency" {
   count = local.enable_monitoring && local.enable_cdn_frontdoor ? 1 : 0
 
-  name                = "${azurerm_cdn_frontdoor_profile.cdn[0].name}-latency"
+  name                = "Azure Front Door Total Latency - ${azurerm_cdn_frontdoor_profile.cdn[0].name}"
   resource_group_name = local.resource_group.name
   scopes              = [azurerm_cdn_frontdoor_profile.cdn[0].id]
-  description         = "Action will be triggered when Origin latency is higher than ${local.alarm_latency_threshold_ms}ms"
+  description         = "Azure Front Door ${azurerm_cdn_frontdoor_profile.cdn[0].name} total latency is greater than ${local.alarm_latency_threshold_ms / 1000}s"
   window_size         = "PT5M"
   frequency           = "PT5M"
   severity            = 2 # Warning
@@ -395,7 +539,8 @@ resource "azurerm_monitor_metric_alert" "latency" {
 resource "azurerm_monitor_scheduled_query_rules_alert_v2" "log-analytics-ingestion" {
   count = local.enable_monitoring && local.alarm_log_ingestion_gb_per_day != 0 ? 1 : 0
 
-  name                = "${azurerm_log_analytics_workspace.container_app.name}-log-ingestion"
+  name                = "Log Ingestion Rate - ${azurerm_log_analytics_workspace.container_app.name}"
+  description         = "${azurerm_log_analytics_workspace.container_app.name} log ingestion reaches more than ${local.alarm_log_ingestion_gb_per_day}GB/day"
   resource_group_name = local.resource_group.name
   location            = local.resource_group.location
 
@@ -416,6 +561,5 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "log-analytics-ingesti
     action_groups = [azurerm_monitor_action_group.main[0].id]
   }
 
-  description = "Action will be triggered when log ingestion reaches more than ${local.alarm_log_ingestion_gb_per_day}GB/day"
-  tags        = local.tags
+  tags = local.tags
 }
