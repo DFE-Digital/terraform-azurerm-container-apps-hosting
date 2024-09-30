@@ -146,6 +146,114 @@ resource "azurerm_monitor_metric_alert" "sql_dtu" {
   tags = local.tags
 }
 
+resource "azurerm_monitor_smart_detector_alert_rule" "ai_smart_failures" {
+  count = local.enable_monitoring && local.enable_app_insights_integration && local.app_insights_smart_detection_enabled ? 1 : 0
+
+  name                = "Failure Anomalies - ${azurerm_application_insights.main[0].name}"
+  description         = "Failure Anomalies notifies you of an unusual rise in the rate of failed HTTP requests or dependency calls."
+  resource_group_name = local.resource_group.name
+  severity            = "Sev2" # Warning
+  scope_resource_ids  = [azurerm_application_insights.main[0].id]
+  frequency           = "PT1M"
+  detector_type       = "FailureAnomaliesDetector"
+
+  action_group {
+    ids = [azurerm_monitor_action_group.main[0].id]
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_monitor_smart_detector_alert_rule" "ai_smart_performance_degradation" {
+  count = local.enable_monitoring && local.enable_app_insights_integration && local.app_insights_smart_detection_enabled ? 1 : 0
+
+  name                = "Request Performance Degradation - ${azurerm_application_insights.main[0].name}"
+  description         = "Request Performance Degradation notifies you when your app has started responding to requests more slowly than it used to."
+  resource_group_name = local.resource_group.name
+  severity            = "Sev2" # Warning
+  scope_resource_ids  = [azurerm_application_insights.main[0].id]
+  frequency           = "P1D"
+  detector_type       = "RequestPerformanceDegradationDetector"
+
+  action_group {
+    ids = [azurerm_monitor_action_group.main[0].id]
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_monitor_smart_detector_alert_rule" "ai_smart_dependency_degradation" {
+  count = local.enable_monitoring && local.enable_app_insights_integration && local.app_insights_smart_detection_enabled ? 1 : 0
+
+  name                = "Dependency Performance Degradation - ${azurerm_application_insights.main[0].name}"
+  description         = "Dependency Performance Degradation notifies you when your app makes calls to a REST API, database, or other dependency. The dependency is responding more slowly than it used to."
+  resource_group_name = local.resource_group.name
+  severity            = "Sev2" # Warning
+  scope_resource_ids  = [azurerm_application_insights.main[0].id]
+  frequency           = "P1D"
+  detector_type       = "DependencyPerformanceDegradationDetector"
+
+  action_group {
+    ids = [azurerm_monitor_action_group.main[0].id]
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_monitor_smart_detector_alert_rule" "ai_smart_exception_volume" {
+  count = local.enable_monitoring && local.enable_app_insights_integration && local.app_insights_smart_detection_enabled ? 1 : 0
+
+  name                = "Exception Volume Changed - ${azurerm_application_insights.main[0].name}"
+  description         = "Exception Volume Changed notifies you when your app is showing an abnormal rise in the number of exceptions of a specific type, during a day."
+  resource_group_name = local.resource_group.name
+  severity            = "Sev2" # Warning
+  scope_resource_ids  = [azurerm_application_insights.main[0].id]
+  frequency           = "P1D"
+  detector_type       = "ExceptionVolumeChangedDetector"
+
+  action_group {
+    ids = [azurerm_monitor_action_group.main[0].id]
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_monitor_smart_detector_alert_rule" "ai_smart_trace_severity" {
+  count = local.enable_monitoring && local.enable_app_insights_integration && local.app_insights_smart_detection_enabled ? 1 : 0
+
+  name                = "Trace Severity - ${azurerm_application_insights.main[0].name}"
+  description         = "Trace Severity notifies you if the ratio between “good” traces (traces logged with a level of Info or Verbose) and “bad” traces (traces logged with a level of Warning, Error, or Fatal) is degrading in a specific day."
+  resource_group_name = local.resource_group.name
+  severity            = "Sev2" # Warning
+  scope_resource_ids  = [azurerm_application_insights.main[0].id]
+  frequency           = "P1D"
+  detector_type       = "TraceSeverityDetector"
+
+  action_group {
+    ids = [azurerm_monitor_action_group.main[0].id]
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_monitor_smart_detector_alert_rule" "ai_smart_memory_leak" {
+  count = local.enable_monitoring && local.enable_app_insights_integration && local.app_insights_smart_detection_enabled ? 1 : 0
+
+  name                = "Memory Leak - ${azurerm_application_insights.main[0].name}"
+  description         = "Memory Leak analyzes the memory consumption of each process in your application. It can warn you about potential memory leaks or increased memory consumption."
+  resource_group_name = local.resource_group.name
+  severity            = "Sev2" # Warning
+  scope_resource_ids  = [azurerm_application_insights.main[0].id]
+  frequency           = "P1D"
+  detector_type       = "MemoryLeakDetector"
+
+  action_group {
+    ids = [azurerm_monitor_action_group.main[0].id]
+  }
+
+  tags = local.tags
+}
+
 resource "azurerm_application_insights_smart_detection_rule" "ai_slow_page" {
   count = local.enable_app_insights_integration ? 1 : 0
 
