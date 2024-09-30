@@ -123,7 +123,7 @@ resource "azurerm_monitor_metric_alert" "count" {
 resource "azurerm_monitor_metric_alert" "sql_cpu" {
   count = local.enable_monitoring && local.enable_mssql_database ? 1 : 0
 
-  name                = "SQL Database CPU - ${azurerm_mssql_server.default[0].name}/${azurerm_mssql_database.default[0].name}"
+  name                = "SQL Database CPU - ${azurerm_mssql_database.default[0].name}"
   resource_group_name = local.resource_group.name
   scopes              = [azurerm_mssql_database.default[0].id]
   description         = "SQL Database ${azurerm_mssql_server.default[0].name}/${azurerm_mssql_database.default[0].name} is consuming more than 80% of CPU"
@@ -149,7 +149,7 @@ resource "azurerm_monitor_metric_alert" "sql_cpu" {
 resource "azurerm_monitor_metric_alert" "sql_dtu" {
   count = local.enable_monitoring && local.enable_mssql_database ? 1 : 0
 
-  name                = "SQL Database DTU - ${azurerm_mssql_server.default[0].name}/${azurerm_mssql_database.default[0].name}"
+  name                = "SQL Database DTU - ${azurerm_mssql_database.default[0].name}"
   resource_group_name = local.resource_group.name
   scopes              = [azurerm_mssql_database.default[0].id]
   description         = "SQL Database ${azurerm_mssql_server.default[0].name}/${azurerm_mssql_database.default[0].name} is consuming more than 80% of available DTUs"
