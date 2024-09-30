@@ -910,18 +910,6 @@ variable "monitor_endpoint_healthcheck" {
   default     = "/"
 }
 
-variable "monitor_tls_expiry" {
-  description = "Enable or disable daily TLS expiry check"
-  type        = bool
-  default     = false
-}
-
-variable "alarm_tls_expiry_days_remaining" {
-  description = "Number of days remaining of TLS validity before an alarm should be raised"
-  type        = number
-  default     = 30
-}
-
 variable "alarm_log_ingestion_gb_per_day" {
   description = "Define an alarm threshold for Log Analytics ingestion rate in GB (per day) (Defaults to no limit)"
   type        = number

@@ -482,30 +482,6 @@ resource "azurerm_monitor_metric_alert" "http" {
   tags = local.tags
 }
 
-resource "azurerm_monitor_metric_alert" "tls" {
-  count = local.enable_monitoring && local.monitor_tls_expiry && local.enable_app_insights_integration ? 1 : 0
-
-  name                = "${local.resource_prefix}-tls"
-  resource_group_name = local.resource_group.name
-  # Scope requires web test to come first
-  # https://github.com/hashicorp/terraform-provider-azurerm/issues/8551
-  scopes      = [azurerm_application_insights_standard_web_test.tls[0].id, azurerm_application_insights.main[0].id]
-  description = "Action will be triggered when the TLS certificate expires in ${local.alarm_tls_expiry_days_remaining} days or less"
-  severity    = 2
-
-  application_insights_web_test_location_availability_criteria {
-    web_test_id           = azurerm_application_insights_standard_web_test.tls[0].id
-    component_id          = azurerm_application_insights.main[0].id
-    failed_location_count = 1
-  }
-
-  action {
-    action_group_id = azurerm_monitor_action_group.main[0].id
-  }
-
-  tags = local.tags
-}
-
 resource "azurerm_monitor_metric_alert" "redis" {
   count = local.enable_monitoring && local.enable_redis_cache ? 1 : 0
 
