@@ -43,7 +43,7 @@ resource "azurerm_monitor_action_group" "main" {
 resource "azurerm_monitor_metric_alert" "cpu" {
   for_each = local.enable_monitoring ? local.monitor_containers : {}
 
-  name                = "${each.value.name}-containerapps-cpu"
+  name                = "Container App CPU - ${each.value.name}"
   resource_group_name = local.resource_group.name
   scopes              = [each.value.id]
   description         = "Container App ${each.value.name} is consuming more than ${local.alarm_cpu_threshold_percentage}% of CPU"
@@ -70,7 +70,7 @@ resource "azurerm_monitor_metric_alert" "cpu" {
 resource "azurerm_monitor_metric_alert" "memory" {
   for_each = local.enable_monitoring ? local.monitor_containers : {}
 
-  name                = "${each.value.name}-containerapps-memory"
+  name                = "Container App Memory - ${each.value.name}"
   resource_group_name = local.resource_group.name
   scopes              = [each.value.id]
   description         = "Container App ${each.value.name} is consuming more than ${local.alarm_memory_threshold_percentage}% of Memory"
@@ -94,13 +94,39 @@ resource "azurerm_monitor_metric_alert" "memory" {
   tags = local.tags
 }
 
+resource "azurerm_monitor_metric_alert" "count" {
+  for_each = local.enable_monitoring ? local.monitor_containers : {}
+
+  name                = "Container App Replica Count - ${each.value.name}"
+  resource_group_name = local.resource_group.name
+  scopes              = [each.value.id]
+  description         = "Container App ${each.value.name} has less than ${each.value.template[0].min_replicas} replicas"
+  window_size         = "PT5M"
+  frequency           = "PT1M"
+  severity            = 1 # Error
+
+  criteria {
+    metric_namespace = "microsoft.app/containerapps"
+    metric_name      = "Replicas"
+    aggregation      = "Average"
+    operator         = "LessThan"
+    threshold        = each.value.template[0].min_replicas
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.main[0].id
+  }
+
+  tags = local.tags
+}
+
 resource "azurerm_monitor_metric_alert" "sql_cpu" {
   count = local.enable_monitoring && local.enable_mssql_database ? 1 : 0
 
-  name                = "${local.resource_prefix}-sql-cpu"
+  name                = "SQL CPU Usage - ${azurerm_mssql_database.default[0].name}"
   resource_group_name = local.resource_group.name
   scopes              = [azurerm_mssql_database.default[0].id]
-  description         = "Action will be triggered when SQL CPU usage is higher than a defined threshold for longer than 5 minutes"
+  description         = "Azure SQL Server ${azurerm_mssql_database.default[0].name} is consuming more than 80% of CPU"
   window_size         = "PT5M"
   frequency           = "PT5M"
   severity            = 2 # Warning
@@ -123,10 +149,10 @@ resource "azurerm_monitor_metric_alert" "sql_cpu" {
 resource "azurerm_monitor_metric_alert" "sql_dtu" {
   count = local.enable_monitoring && local.enable_mssql_database ? 1 : 0
 
-  name                = "${local.resource_prefix}-sql-dtu"
+  name                = "SQL DTU Usage - ${azurerm_mssql_database.default[0].name}"
   resource_group_name = local.resource_group.name
   scopes              = [azurerm_mssql_database.default[0].id]
-  description         = "Action will be triggered when SQL DTU usage is higher than a defined threshold for longer than 5 minutes"
+  description         = "Azure SQL Server ${azurerm_mssql_database.default[0].name} is consuming more than 80% of available DTUs"
   window_size         = "PT5M"
   frequency           = "PT5M"
   severity            = 2 # Warning
@@ -357,7 +383,7 @@ resource "azurerm_application_insights_smart_detection_rule" "ai_data_volume" {
 resource "azurerm_monitor_scheduled_query_rules_alert_v2" "exceptions" {
   count = local.enable_monitoring && local.enable_app_insights_integration ? 1 : 0
 
-  name                 = "${azurerm_application_insights.main[0].name}-exceptions"
+  name                 = "Exceptions Count - ${azurerm_application_insights.main[0].name}"
   resource_group_name  = local.resource_group.name
   location             = local.resource_group.location
   evaluation_frequency = "PT5M"
@@ -435,12 +461,12 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "exceptions" {
 resource "azurerm_monitor_metric_alert" "http" {
   count = local.enable_monitoring && local.enable_app_insights_integration ? 1 : 0
 
-  name                = "${local.resource_prefix}-http"
+  name                = "HTTP Availability Test - ${azurerm_application_insights.main[0].name}"
   resource_group_name = local.resource_group.name
   # Scope requires web test to come first
   # https://github.com/hashicorp/terraform-provider-azurerm/issues/8551
   scopes      = [azurerm_application_insights_standard_web_test.main[0].id, azurerm_application_insights.main[0].id]
-  description = "Action will be triggered when regional availability becomes impacted."
+  description = "HTTP URL ${local.monitor_http_availability_url} could not be reached by 2 out of 3 locations"
   severity    = 0 # Critical
 
   application_insights_web_test_location_availability_criteria {
@@ -480,39 +506,13 @@ resource "azurerm_monitor_metric_alert" "tls" {
   tags = local.tags
 }
 
-resource "azurerm_monitor_metric_alert" "count" {
-  for_each = local.enable_monitoring ? local.monitor_containers : {}
-
-  name                = "${each.value.name}-containerapps-replicas"
-  resource_group_name = local.resource_group.name
-  scopes              = [each.value.id]
-  description         = "Container App ${each.value.name} has less than ${each.value.template[0].min_replicas} replicas"
-  window_size         = "PT5M"
-  frequency           = "PT1M"
-  severity            = 1 # Error
-
-  criteria {
-    metric_namespace = "microsoft.app/containerapps"
-    metric_name      = "Replicas"
-    aggregation      = "Average"
-    operator         = "LessThan"
-    threshold        = each.value.template[0].min_replicas
-  }
-
-  action {
-    action_group_id = azurerm_monitor_action_group.main[0].id
-  }
-
-  tags = local.tags
-}
-
 resource "azurerm_monitor_metric_alert" "redis" {
   count = local.enable_monitoring && local.enable_redis_cache ? 1 : 0
 
-  name                = "${azurerm_redis_cache.default[0].name}-cpu"
+  name                = "Azure Cache for Redis CPU - ${azurerm_redis_cache.default[0].name}"
   resource_group_name = local.resource_group.name
   scopes              = [azurerm_redis_cache.default[0].id]
-  description         = "Action will be triggered when Redis Server Load is higher than 80%"
+  description         = "Azure Cache for Redis ${azurerm_redis_cache.default[0].name} is consuming more than 80% of CPU"
   window_size         = "PT5M"
   frequency           = "PT1M"
   severity            = 2 # Warning
@@ -536,10 +536,10 @@ resource "azurerm_monitor_metric_alert" "redis" {
 resource "azurerm_monitor_metric_alert" "latency" {
   count = local.enable_monitoring && local.enable_cdn_frontdoor ? 1 : 0
 
-  name                = "${azurerm_cdn_frontdoor_profile.cdn[0].name}-latency"
+  name                = "Azure Front Door Total Latency - ${azurerm_cdn_frontdoor_profile.cdn[0].name}"
   resource_group_name = local.resource_group.name
   scopes              = [azurerm_cdn_frontdoor_profile.cdn[0].id]
-  description         = "Action will be triggered when Origin latency is higher than ${local.alarm_latency_threshold_ms}ms"
+  description         = "Azure Front Door ${azurerm_cdn_frontdoor_profile.cdn[0].name} total latency is greater than ${local.alarm_latency_threshold_ms / 1000}s"
   window_size         = "PT5M"
   frequency           = "PT5M"
   severity            = 2 # Warning
@@ -563,7 +563,8 @@ resource "azurerm_monitor_metric_alert" "latency" {
 resource "azurerm_monitor_scheduled_query_rules_alert_v2" "log-analytics-ingestion" {
   count = local.enable_monitoring && local.alarm_log_ingestion_gb_per_day != 0 ? 1 : 0
 
-  name                = "${azurerm_log_analytics_workspace.container_app.name}-log-ingestion"
+  name                = "Log Ingestion Rate - ${azurerm_log_analytics_workspace.container_app.name}"
+  description         = "${azurerm_log_analytics_workspace.container_app.name} log ingestion reaches more than ${local.alarm_log_ingestion_gb_per_day}GB/day"
   resource_group_name = local.resource_group.name
   location            = local.resource_group.location
 
@@ -584,6 +585,5 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "log-analytics-ingesti
     action_groups = [azurerm_monitor_action_group.main[0].id]
   }
 
-  description = "Action will be triggered when log ingestion reaches more than ${local.alarm_log_ingestion_gb_per_day}GB/day"
-  tags        = local.tags
+  tags = local.tags
 }
