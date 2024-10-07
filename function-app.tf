@@ -95,7 +95,7 @@ resource "azurerm_linux_function_app" "function_apps" {
   ftp_publish_basic_authentication_enabled       = each.value.ftp_publish_basic_authentication_enabled
   webdeploy_publish_basic_authentication_enabled = each.value.webdeploy_publish_basic_authentication_enabled
   https_only                                     = true
-  zip_deploy_file                                = data.archive_file.azure_function[each.key].output_path
+  zip_deploy_file                                = each.value.zip_deploy_file
   key_vault_reference_identity_id                = azurerm_user_assigned_identity.function_apps[each.key].id
   virtual_network_subnet_id                      = azurerm_subnet.function_apps_infra_subnet[0].id
 
