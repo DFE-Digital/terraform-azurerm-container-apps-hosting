@@ -45,11 +45,9 @@ data "azurerm_key_vault" "existing_key_vault" {
 }
 
 data "archive_file" "azure_function" {
-  for_each = {
-    1 : "health-api"
-  }
+  for_each = local.linux_function_health_insights_api
 
   type        = "zip"
-  output_path = "${path.module}/functions/dist/${each.value}.zip"
-  source_dir  = "${path.module}/functions/src/${each.value}/"
+  output_path = "${path.module}/functions/dist/${each.key}.zip"
+  source_dir  = "${path.module}/functions/src/${each.key}/"
 }
