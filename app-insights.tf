@@ -11,7 +11,7 @@ resource "azurerm_application_insights" "main" {
 }
 
 resource "azurerm_log_analytics_workspace" "app_insights" {
-  count = local.enable_app_insights_integration || local.enable_linux_function_apps ? 1 : 0
+  count = local.enable_app_insights_integration ? 1 : 0
 
   name                = "${local.resource_prefix}-insights"
   location            = local.resource_group.location
@@ -60,7 +60,7 @@ resource "azurerm_application_insights_standard_web_test" "main" {
 }
 
 resource "azurerm_application_insights" "function_apps" {
-  for_each = local.linux_function_apps
+  for_each = local.enable_app_insights_integration ? merge(local.linux_function_apps, local.linux_function_health_insights_api) : {}
 
   name                = "${local.resource_prefix}-${each.key}-insights"
   location            = local.resource_group.location
