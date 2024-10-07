@@ -34,6 +34,7 @@ locals {
   postgresql_subnet_cidr                                   = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 5)
   storage_subnet_cidr                                      = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 6)
   app_configuration_subnet_cidr                            = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 7)
+  function_apps_subnet_cidr                                = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 8)
   container_app_environment_internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
   container_apps_infra_subnet_service_endpoints = distinct(concat(
     local.launch_in_vnet && local.enable_storage_account ? ["Microsoft.Storage"] : [],
@@ -382,6 +383,13 @@ locals {
   mssql_security_storage_shared_access_key_enabled         = var.mssql_storage_account_shared_access_key_enabled
   mssql_security_storage_access_key_rotation_reminder_days = var.mssql_security_storage_access_key_rotation_reminder_days != 0 ? var.mssql_security_storage_access_key_rotation_reminder_days : local.storage_account_access_key_rotation_reminder_days
   mssql_security_storage_cross_tenant_replication_enabled  = var.mssql_security_storage_cross_tenant_replication_enabled
+
+  # Azure Functions
+  linux_function_apps = merge(
+    {},
+    var.linux_function_apps
+  )
+  enable_linux_function_apps = length(local.linux_function_apps) > 0 ? true : false
 
   # Azure DNS Zone
   enable_dns_zone      = var.enable_dns_zone
