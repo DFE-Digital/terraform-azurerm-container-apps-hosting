@@ -7,6 +7,16 @@ resource "azurerm_log_analytics_workspace" "container_app" {
   tags                = local.tags
 }
 
+resource "azurerm_log_analytics_workspace" "function_app" {
+  count               = local.enable_linux_function_apps ? 1 : 0
+  name                = "${local.resource_prefix}functionapp"
+  resource_group_name = local.resource_group.name
+  location            = local.resource_group.location
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+  tags                = local.tags
+}
+
 resource "azurerm_log_analytics_data_export_rule" "container_app" {
   count                   = local.enable_event_hub ? 1 : 0
   name                    = "${local.resource_prefix}containerapp"

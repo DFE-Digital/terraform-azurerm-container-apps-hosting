@@ -468,3 +468,33 @@ resource "azurerm_private_dns_a_record" "app_configuration_private_link" {
   records             = [azurerm_private_endpoint.default["appconfig"].private_service_connection[0].private_ip_address]
   tags                = local.tags
 }
+
+# Function App Networking
+
+resource "azurerm_subnet" "function_apps_infra_subnet" {
+  count = local.enable_linux_function_apps ? 1 : 0
+
+  name                 = "${local.resource_prefix}functionapps"
+  virtual_network_name = local.virtual_network.name
+  resource_group_name  = local.resource_group.name
+  address_prefixes     = [local.function_apps_subnet_cidr]
+
+  delegation {
+    name = "Microsoft.Web.serverFarms"
+    service_delegation {
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/action",
+      ]
+      name = "Microsoft.Web/serverFarms"
+    }
+  }
+
+  service_endpoints = ["Microsoft.Web", "Microsoft.Storage"]
+}
+
+resource "azurerm_subnet_route_table_association" "function_apps_infra" {
+  count = local.enable_linux_function_apps ? 1 : 0
+
+  subnet_id      = azurerm_subnet.function_apps_infra_subnet[0].id
+  route_table_id = azurerm_route_table.default[0].id
+}

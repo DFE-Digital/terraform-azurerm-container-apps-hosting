@@ -155,3 +155,53 @@ data "azurerm_storage_account_blob_container_sas" "container_app" {
     list   = true
   }
 }
+
+resource "azurerm_storage_account" "function_app_backing" {
+  count = local.enable_linux_function_apps ? 1 : 0
+
+  name                            = replace(local.resource_prefix, "-", "")
+  resource_group_name             = local.resource_group.name
+  location                        = local.resource_group.location
+  account_tier                    = "Standard"
+  account_replication_type        = "LRS"
+  min_tls_version                 = "TLS1_2"
+  https_traffic_only_enabled      = true
+  allow_nested_items_to_be_public = false
+
+  blob_properties {
+    delete_retention_policy {
+      days = 7
+    }
+    container_delete_retention_policy {
+      days = 7
+    }
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_storage_account_network_rules" "function_app_backing" {
+  count = local.enable_linux_function_apps ? 1 : 0
+
+  storage_account_id = azurerm_storage_account.function_app_backing[0].id
+  default_action     = "Allow"
+  bypass             = ["AzureServices"]
+}
+
+resource "azapi_update_resource" "function_app_storage_key_rotation_reminder" {
+  count = local.enable_linux_function_apps ? 1 : 0
+
+  type        = "Microsoft.Storage/storageAccounts@2023-01-01"
+  resource_id = azurerm_storage_account.function_app_backing[0].id
+  body = jsonencode({
+    properties = {
+      keyPolicy : {
+        keyExpirationPeriodInDays : local.storage_account_access_key_rotation_reminder_days
+      }
+    }
+  })
+
+  depends_on = [
+    azurerm_storage_account.function_app_backing[0]
+  ]
+}
