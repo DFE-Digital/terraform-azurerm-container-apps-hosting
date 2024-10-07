@@ -43,3 +43,13 @@ data "azurerm_key_vault" "existing_key_vault" {
   name                = local.existing_key_vault
   resource_group_name = local.existing_resource_group
 }
+
+data "archive_file" "azure_function" {
+  for_each = {
+    1 : "health-api"
+  }
+
+  type        = "zip"
+  output_path = "${path.module}/functions/dist/${each.value}.zip"
+  source_dir  = "${path.module}/functions/src/${each.value}/"
+}
