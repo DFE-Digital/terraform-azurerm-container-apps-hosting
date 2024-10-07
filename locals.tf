@@ -385,21 +385,21 @@ locals {
   mssql_security_storage_cross_tenant_replication_enabled  = var.mssql_security_storage_cross_tenant_replication_enabled
 
   # Azure Functions
-  linux_function_apps = merge(
-    local.enable_app_insights_integration && local.enable_monitoring && var.enable_health_insights_api ? {
-      "health-api" : {
-        runtime                                        = "python"
-        runtime_version                                = "3.11"
-        app_settings                                   = {}
-        allowed_origins                                = ["*"]
-        ftp_publish_basic_authentication_enabled       = false
-        webdeploy_publish_basic_authentication_enabled = false
-        ipv4_access                                    = []
+  linux_function_apps = var.linux_function_apps
+  linux_function_health_insights_api = local.enable_app_insights_integration && local.enable_monitoring && var.enable_health_insights_api ? {
+    "health-api" = {
+      runtime         = "python"
+      runtime_version = "3.11"
+      app_settings = {
+        "TARGET_LOG_ANALYTICS_RESOURCE_ID" = azurerm_application_insights.main[0].id
       }
-    } : {},
-    var.linux_function_apps
-  )
-  enable_linux_function_apps = length(local.linux_function_apps) > 0 ? true : false
+      allowed_origins                                = ["*"]
+      ftp_publish_basic_authentication_enabled       = false
+      webdeploy_publish_basic_authentication_enabled = false
+      ipv4_access                                    = []
+    }
+  } : {}
+  enable_linux_function_apps = (length(local.linux_function_apps) > 0 || local.linux_function_health_insights_api != {}) ? true : false
 
   # Azure DNS Zone
   enable_dns_zone      = var.enable_dns_zone
