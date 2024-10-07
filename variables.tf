@@ -1211,3 +1211,23 @@ variable "init_container_command" {
   type        = list(any)
   default     = []
 }
+
+variable "linux_function_apps" {
+  description = "A list of Linux Function Apps with their corresponding app settings"
+  type = map(object({
+    runtime                                        = string
+    runtime_version                                = string
+    app_settings                                   = optional(map(string), {})
+    allowed_origins                                = optional(list(string), ["*"])
+    ftp_publish_basic_authentication_enabled       = optional(bool, false)
+    webdeploy_publish_basic_authentication_enabled = optional(bool, false)
+    ipv4_access                                    = optional(list(string), [])
+  }))
+  default = {}
+}
+
+variable "enable_health_insights_api" {
+  description = "Deploys a Function App that exposes the last 3 HTTP Web Tests via an API endpoint. 'enable_app_insights_integration' and 'enable_monitoring' must be set to 'true'."
+  type        = bool
+  default     = false
+}
