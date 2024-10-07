@@ -386,7 +386,17 @@ locals {
 
   # Azure Functions
   linux_function_apps = merge(
-    {},
+    local.enable_app_insights_integration && local.enable_monitoring && var.enable_health_insights_api ? {
+      "health-api" : {
+        runtime                                        = "python"
+        runtime_version                                = "3.11"
+        app_settings                                   = {}
+        allowed_origins                                = ["*"]
+        ftp_publish_basic_authentication_enabled       = false
+        webdeploy_publish_basic_authentication_enabled = false
+        ipv4_access                                    = []
+      }
+    } : {},
     var.linux_function_apps
   )
   enable_linux_function_apps = length(local.linux_function_apps) > 0 ? true : false
