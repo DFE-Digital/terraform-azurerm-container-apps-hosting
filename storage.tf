@@ -159,14 +159,20 @@ data "azurerm_storage_account_blob_container_sas" "container_app" {
 resource "azurerm_storage_account" "function_app_backing" {
   count = local.enable_linux_function_apps ? 1 : 0
 
-  name                            = "${replace(local.resource_prefix, "-", "")}functionapps"
-  resource_group_name             = local.resource_group.name
-  location                        = local.resource_group.location
-  account_tier                    = "Standard"
-  account_replication_type        = "LRS"
-  min_tls_version                 = "TLS1_2"
-  https_traffic_only_enabled      = true
-  allow_nested_items_to_be_public = false
+  name                             = "s${local.resource_prefix_sha_short}functions"
+  resource_group_name              = local.resource_group.name
+  location                         = local.resource_group.location
+  account_tier                     = "Standard"
+  account_replication_type         = "LRS"
+  min_tls_version                  = "TLS1_2"
+  https_traffic_only_enabled       = true
+  allow_nested_items_to_be_public  = false
+  public_network_access_enabled    = false
+  cross_tenant_replication_enabled = false
+
+  sas_policy {
+    expiration_period = local.storage_account_sas_expiration_period
+  }
 
   blob_properties {
     delete_retention_policy {
