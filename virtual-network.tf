@@ -499,6 +499,23 @@ resource "azurerm_subnet_route_table_association" "function_apps_infra" {
   route_table_id = azurerm_route_table.default[0].id
 }
 
+resource "azurerm_subnet" "function_apps_private_endpoint_subnet" {
+  count = local.enable_linux_function_apps ? 1 : 0
+
+  name                              = "${local.resource_prefix}functionappsprivateendpoint"
+  virtual_network_name              = local.virtual_network.name
+  resource_group_name               = local.resource_group.name
+  address_prefixes                  = [local.function_apps_private_endpoint_subnet_cidr]
+  private_endpoint_network_policies = "Enabled"
+}
+
+resource "azurerm_subnet_route_table_association" "function_apps_private_endpoint" {
+  count = local.enable_linux_function_apps ? 1 : 0
+
+  subnet_id      = azurerm_subnet.function_apps_private_endpoint_subnet[0].id
+  route_table_id = azurerm_route_table.default[0].id
+}
+
 # Function App Networking / Storage Account / Private Endpoint / Blob
 
 resource "azurerm_private_dns_zone" "function_apps_storage_private_link_blob" {

@@ -35,6 +35,7 @@ locals {
   storage_subnet_cidr                                      = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 6)
   app_configuration_subnet_cidr                            = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 7)
   function_apps_subnet_cidr                                = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 8)
+  function_apps_private_endpoint_subnet_cidr               = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 9)
   container_app_environment_internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
   container_apps_infra_subnet_service_endpoints = distinct(concat(
     local.launch_in_vnet && local.enable_storage_account ? ["Microsoft.Storage"] : [],
@@ -110,7 +111,7 @@ locals {
   private_endpoint_function_apps_storage_blob = local.enable_private_endpoint_function_apps_storage ? {
     "fn-blob" : {
       resource_group : local.resource_group,
-      subnet_id : azurerm_subnet.function_apps_infra_subnet[0].id,
+      subnet_id : azurerm_subnet.function_apps_private_endpoint_subnet[0].id,
       resource_id : azurerm_storage_account.function_app_backing[0].id,
       subresource_names : ["blob"]
     }
