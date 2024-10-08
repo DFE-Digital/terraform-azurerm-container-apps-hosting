@@ -13,7 +13,7 @@ resource "azurerm_service_plan" "function_apps" {
 resource "azurerm_linux_function_app" "health_api" {
   for_each = local.linux_function_health_insights_api
 
-  name                                           = "${local.environment}${each.key}"
+  name                                           = "${local.resource_prefix}-${each.key}"
   resource_group_name                            = local.resource_group.name
   location                                       = local.resource_group.location
   storage_account_name                           = azurerm_storage_account.function_app_backing[0].name
