@@ -106,6 +106,15 @@ locals {
       resource_id : azurerm_app_configuration.default[0].id,
     }
   } : {}
+  enable_private_endpoint_function_apps_storage = local.enable_linux_function_apps ? true : false
+  private_endpoint_function_apps = local.enable_private_endpoint_function_apps_storage ? {
+    "fn-blob" : {
+      resource_group : local.resource_group,
+      subnet_id : azurerm_subnet.function_apps_infra_subnet[0].id,
+      resource_id : azurerm_storage_account.function_app_backing[0].id,
+      subresource_names : ["blob"]
+    }
+  } : {}
   private_endpoints = merge(
     local.private_endpoint_redis,
     local.private_endpoint_mssql,
@@ -114,6 +123,7 @@ locals {
     local.private_endpoint_storage_blob,
     local.private_endpoint_storage_file,
     local.private_endpoint_app_configuration,
+    local.private_endpoint_function_apps,
   )
 
   # Azure Container Registry

@@ -498,3 +498,34 @@ resource "azurerm_subnet_route_table_association" "function_apps_infra" {
   subnet_id      = azurerm_subnet.function_apps_infra_subnet[0].id
   route_table_id = azurerm_route_table.default[0].id
 }
+
+# Function App Networking / Storage Account / Private Endpoint / Blob
+
+resource "azurerm_private_dns_zone" "function_apps_storage_private_link_blob" {
+  count = local.enable_linux_function_apps ? 1 : 0
+
+  name                = "${azurerm_storage_account.function_app_backing[0].name}.blob.core.windows.net"
+  resource_group_name = local.resource_group.name
+  tags                = local.tags
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "function_apps_storage_private_link_blob" {
+  count = local.enable_linux_function_apps ? 1 : 0
+
+  name                  = "${azurerm_storage_account.function_app_backing[0].name}privatelinkblob"
+  resource_group_name   = local.resource_group.name
+  private_dns_zone_name = azurerm_private_dns_zone.function_apps_storage_private_link_blob[0].name
+  virtual_network_id    = local.virtual_network.id
+  tags                  = local.tags
+}
+
+resource "azurerm_private_dns_a_record" "function_apps_storage_private_link_blob" {
+  count = local.enable_linux_function_apps ? 1 : 0
+
+  name                = "@"
+  zone_name           = azurerm_private_dns_zone.function_apps_storage_private_link_blob[0].name
+  resource_group_name = local.resource_group.name
+  ttl                 = 300
+  records             = [azurerm_private_endpoint.default["fn-blob"].private_service_connection[0].private_ip_address]
+  tags                = local.tags
+}
