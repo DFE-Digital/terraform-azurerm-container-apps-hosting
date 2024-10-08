@@ -384,6 +384,22 @@ locals {
   mssql_security_storage_access_key_rotation_reminder_days = var.mssql_security_storage_access_key_rotation_reminder_days != 0 ? var.mssql_security_storage_access_key_rotation_reminder_days : local.storage_account_access_key_rotation_reminder_days
   mssql_security_storage_cross_tenant_replication_enabled  = var.mssql_security_storage_cross_tenant_replication_enabled
 
+  # Azure Functions
+  linux_function_health_insights_api = (local.enable_app_insights_integration && local.enable_monitoring && var.enable_health_insights_api) ? {
+    "health-api" = {
+      runtime         = "python"
+      runtime_version = "3.11"
+      app_settings = {
+        "TARGET_LOG_ANALYTICS_RESOURCE_ID" = azurerm_application_insights.main[0].id
+      }
+      allowed_origins                                = var.health_insights_api_cors_origins
+      ftp_publish_basic_authentication_enabled       = false
+      webdeploy_publish_basic_authentication_enabled = true
+      ipv4_access                                    = var.health_insights_api_ipv4_allow_list
+    }
+  } : {}
+  enable_linux_function_apps = length(keys(local.linux_function_health_insights_api)) > 0 ? true : false
+
   # Azure DNS Zone
   enable_dns_zone      = var.enable_dns_zone
   dns_zone_domain_name = var.dns_zone_domain_name
