@@ -104,6 +104,22 @@ module "azure_container_apps_hosting" {
   # redis_cache_patch_schedule_hour      = 23
   # redis_cache_firewall_ipv4_allow_list = [ "8.8.8.8", "1.1.1.1" ]
 
+  ## Deploy a Health insights Azure function
+  # enable_health_insights_api = true
+
+  ## Deploy custom Azure Functions
+  ## Note: Terraform will not deploy the app source itself, you will need to do that
+  # linux_function_apps = {
+  #   "my-function" = {
+  #     runtime         = "python"
+  #     runtime_version = "3.11"
+  #     app_settings = {
+  #       "MY_APP_SETTING" = "foo"
+  #     }
+  #     allowed_origins                                = ["*"]
+  #   }
+  # }
+
   ## Deploy an Azure Storage Account and connect it to the Container App
   # enable_container_app_blob_storage                = false
   # container_app_blob_storage_public_access_enabled = false
