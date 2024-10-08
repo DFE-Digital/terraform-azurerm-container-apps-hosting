@@ -212,3 +212,26 @@ resource "azapi_update_resource" "function_app_storage_key_rotation_reminder" {
     azurerm_storage_account.function_app_backing[0]
   ]
 }
+
+resource "azurerm_monitor_diagnostic_setting" "function_app_storage" {
+  count = local.enable_linux_function_apps ? 1 : 0
+
+  name                       = "${azurerm_storage_account.function_app_backing[0].name}-storage-blobs-diag"
+  target_resource_id         = "${azurerm_storage_account.function_app_backing[0].id}/blobServices/default"
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.function_app[0].id
+
+  enabled_log {
+    category_group = "Audit"
+  }
+
+  # The below metrics are kept in to avoid a diff in the Terraform Plan output
+  metric {
+    category = "Capacity"
+    enabled  = false
+  }
+
+  metric {
+    category = "Transaction"
+    enabled  = false
+  }
+}
