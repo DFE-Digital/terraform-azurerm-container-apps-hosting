@@ -25,9 +25,11 @@ resource "azurerm_linux_function_app" "health_api" {
   zip_deploy_file                                = data.archive_file.azure_function[each.key].output_path
   key_vault_reference_identity_id                = azurerm_user_assigned_identity.function_apps[each.key].id
   virtual_network_subnet_id                      = azurerm_subnet.function_apps_infra_subnet[0].id
+  content_share_force_disabled                   = true
 
   app_settings = merge(each.value.app_settings, {
     "WEBSITE_RUN_FROM_PACKAGE" = 1,
+    "WEBSITE_CONTENTOVERVNET"  = 1,
     "AZURE_CLIENT_ID"          = azurerm_user_assigned_identity.function_apps[each.key].client_id
     "WEBSITE_DNS_SERVER"       = "168.63.129.16" // Azure Private DNS Resolver
   })
@@ -39,6 +41,10 @@ resource "azurerm_linux_function_app" "health_api" {
     app_scale_limit                        = 1
     http2_enabled                          = true
     vnet_route_all_enabled                 = true
+    ftps_state                             = each.value.ftp_publish_basic_authentication_enabled ? "FtpsOnly" : "Disabled"
+    ip_restriction_default_action          = length(each.value.ipv4_access) > 0 ? "Deny" : "Allow"
+    scm_ip_restriction_default_action      = length(each.value.ipv4_access) > 0 ? "Deny" : "Allow"
+    scm_use_main_ip_restriction            = true
 
     cors {
       allowed_origins     = each.value.allowed_origins
@@ -112,6 +118,10 @@ resource "azurerm_linux_function_app" "function_apps" {
     app_scale_limit                        = 1
     http2_enabled                          = true
     vnet_route_all_enabled                 = true
+    ftps_state                             = each.value.ftp_publish_basic_authentication_enabled ? "FtpsOnly" : "Disabled"
+    ip_restriction_default_action          = length(each.value.ipv4_access) > 0 ? "Deny" : "Allow"
+    scm_ip_restriction_default_action      = length(each.value.ipv4_access) > 0 ? "Deny" : "Allow"
+    scm_use_main_ip_restriction            = true
 
     cors {
       allowed_origins     = each.value.allowed_origins
