@@ -405,7 +405,7 @@ locals {
       }
       allowed_origins                                = ["*"]
       ftp_publish_basic_authentication_enabled       = true
-      webdeploy_publish_basic_authentication_enabled = false
+      webdeploy_publish_basic_authentication_enabled = true
       ipv4_access                                    = []
     }
   } : {}
