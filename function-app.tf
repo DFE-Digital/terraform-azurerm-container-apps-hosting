@@ -28,7 +28,8 @@ resource "azurerm_linux_function_app" "health_api" {
   content_share_force_disabled                   = true
 
   app_settings = merge(each.value.app_settings, {
-    "WEBSITE_RUN_FROM_PACKAGE" = 1,
+    # https://www.maxivanov.io/deploy-azure-functions-with-terraform/#5.9.-create-function-app
+    "WEBSITE_RUN_FROM_PACKAGE" = "",
     "WEBSITE_CONTENTOVERVNET"  = 1,
     "AZURE_CLIENT_ID"          = azurerm_user_assigned_identity.function_apps[each.key].client_id
     "WEBSITE_DNS_SERVER"       = "168.63.129.16" // Azure Private DNS Resolver
@@ -87,6 +88,12 @@ resource "azurerm_linux_function_app" "health_api" {
     "hidden-link: /app-insights-instrumentation-key" : azurerm_application_insights.function_apps[each.key].instrumentation_key,
     "hidden-link: /app-insights-resource-id" : azurerm_application_insights.function_apps[each.key].id,
   })
+
+  lifecycle {
+    ignore_changes = [
+      app_settings["WEBSITE_RUN_FROM_PACKAGE"],
+    ]
+  }
 }
 
 resource "azurerm_linux_function_app" "function_apps" {
@@ -101,14 +108,12 @@ resource "azurerm_linux_function_app" "function_apps" {
   ftp_publish_basic_authentication_enabled       = each.value.ftp_publish_basic_authentication_enabled
   webdeploy_publish_basic_authentication_enabled = each.value.webdeploy_publish_basic_authentication_enabled
   https_only                                     = true
-  zip_deploy_file                                = each.value.zip_deploy_file
   key_vault_reference_identity_id                = azurerm_user_assigned_identity.function_apps[each.key].id
   virtual_network_subnet_id                      = azurerm_subnet.function_apps_infra_subnet[0].id
 
   app_settings = merge(each.value.app_settings, {
-    "WEBSITE_RUN_FROM_PACKAGE" = 1,
-    "AZURE_CLIENT_ID"          = azurerm_user_assigned_identity.function_apps[each.key].client_id
-    "WEBSITE_DNS_SERVER"       = "168.63.129.16" // Azure Private DNS Resolver
+    "AZURE_CLIENT_ID"    = azurerm_user_assigned_identity.function_apps[each.key].client_id
+    "WEBSITE_DNS_SERVER" = "168.63.129.16" // Azure Private DNS Resolver
   })
 
   site_config {

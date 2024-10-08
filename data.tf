@@ -50,4 +50,21 @@ data "archive_file" "azure_function" {
   type        = "zip"
   output_path = "${path.module}/functions/dist/${each.key}.zip"
   source_dir  = "${path.module}/functions/src/${each.key}/"
+
+  depends_on = [
+    null_resource.health_api_package_deps
+  ]
+}
+
+resource "null_resource" "health_api_package_deps" {
+  for_each = local.linux_function_health_insights_api
+
+  triggers = {
+    requirements_md5 = "${filemd5("${path.module}/functions/src/${each.key}/requirements.txt")}"
+  }
+
+  provisioner "local-exec" {
+    command     = "pip3 install --target='.python_packages/lib/site-packages' -r requirements.txt"
+    working_dir = "${path.module}/functions/src/${each.key}"
+  }
 }

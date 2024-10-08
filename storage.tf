@@ -167,7 +167,7 @@ resource "azurerm_storage_account" "function_app_backing" {
   min_tls_version                  = "TLS1_2"
   https_traffic_only_enabled       = true
   allow_nested_items_to_be_public  = false
-  public_network_access_enabled    = false
+  public_network_access_enabled    = true
   cross_tenant_replication_enabled = false
 
   sas_policy {
@@ -193,6 +193,7 @@ resource "azurerm_storage_account_network_rules" "function_app_backing" {
   default_action             = "Deny"
   bypass                     = ["AzureServices"]
   virtual_network_subnet_ids = [azurerm_subnet.function_apps_infra_subnet[0].id]
+  ip_rules                   = local.storage_account_ipv4_allow_list
 }
 
 resource "azapi_update_resource" "function_app_storage_key_rotation_reminder" {
@@ -234,4 +235,24 @@ resource "azurerm_monitor_diagnostic_setting" "function_app_storage" {
     category = "Transaction"
     enabled  = false
   }
+}
+
+resource "azurerm_storage_container" "health_api_package" {
+  for_each = local.linux_function_health_insights_api
+
+  name                 = "${local.environment}healthapipackages"
+  storage_account_name = azurerm_storage_account.function_app_backing[0].name
+}
+
+resource "azurerm_storage_blob" "health_api_package" {
+  for_each = local.linux_function_health_insights_api
+
+  name                   = "${each.key}.zip"
+  storage_account_name   = azurerm_storage_account.function_app_backing[0].name
+  storage_container_name = azurerm_storage_container.health_api_package[each.key].name
+  type                   = "Block"
+  source                 = data.archive_file.azure_function[each.key].output_path
+  content_md5            = data.archive_file.azure_function[each.key].output_md5
+  content_type           = "application/zip"
+  access_tier            = "Cool"
 }

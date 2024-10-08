@@ -405,7 +405,7 @@ locals {
         "TARGET_LOG_ANALYTICS_RESOURCE_ID" = azurerm_application_insights.main[0].id
       }
       allowed_origins                                = ["*"]
-      ftp_publish_basic_authentication_enabled       = true
+      ftp_publish_basic_authentication_enabled       = false
       webdeploy_publish_basic_authentication_enabled = true
       ipv4_access                                    = []
     }
