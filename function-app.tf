@@ -159,8 +159,8 @@ resource "azurerm_linux_function_app" "function_apps" {
 resource "azurerm_monitor_diagnostic_setting" "function_apps" {
   for_each = merge(local.linux_function_apps, local.linux_function_health_insights_api)
 
-  name                       = "${azurerm_linux_function_app.function_apps[each.key].name}-diagnostics"
-  target_resource_id         = azurerm_linux_function_app.function_apps[each.key].id
+  name                       = "${(each.key == "health-api" ? azurerm_linux_function_app.health_api[each.key].name : azurerm_linux_function_app.function_apps[each.key].name)}-diagnostics"
+  target_resource_id         = each.key == "health-api" ? azurerm_linux_function_app.health_api[each.key].id : azurerm_linux_function_app.function_apps[each.key].id
   log_analytics_workspace_id = azurerm_log_analytics_workspace.function_app[0].id
 
   enabled_log {
