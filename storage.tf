@@ -159,7 +159,7 @@ data "azurerm_storage_account_blob_container_sas" "container_app" {
 resource "azurerm_storage_account" "function_app_backing" {
   count = local.enable_linux_function_apps ? 1 : 0
 
-  name                            = replace(local.resource_prefix, "-", "")
+  name                            = "${replace(local.resource_prefix, "-", "")}functionapps"
   resource_group_name             = local.resource_group.name
   location                        = local.resource_group.location
   account_tier                    = "Standard"
