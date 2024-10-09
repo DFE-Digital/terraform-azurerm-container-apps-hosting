@@ -236,23 +236,3 @@ resource "azurerm_monitor_diagnostic_setting" "function_app_storage" {
     enabled  = false
   }
 }
-
-resource "azurerm_storage_container" "health_api_package" {
-  for_each = local.linux_function_health_insights_api
-
-  name                 = "${local.environment}healthapipackages"
-  storage_account_name = azurerm_storage_account.function_app_backing[0].name
-}
-
-resource "azurerm_storage_blob" "health_api_package" {
-  for_each = local.linux_function_health_insights_api
-
-  name                   = "${each.key}.zip"
-  storage_account_name   = azurerm_storage_account.function_app_backing[0].name
-  storage_container_name = azurerm_storage_container.health_api_package[each.key].name
-  type                   = "Block"
-  source                 = data.archive_file.azure_function[each.key].output_path
-  content_md5            = data.archive_file.azure_function[each.key].output_md5
-  content_type           = "application/zip"
-  access_tier            = "Cool"
-}
