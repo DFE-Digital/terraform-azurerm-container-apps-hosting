@@ -34,8 +34,6 @@ locals {
   postgresql_subnet_cidr                                   = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 5)
   storage_subnet_cidr                                      = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 6)
   app_configuration_subnet_cidr                            = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 7)
-  function_apps_subnet_cidr                                = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 8)
-  function_apps_private_endpoint_subnet_cidr               = cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 9)
   container_app_environment_internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
   container_apps_infra_subnet_service_endpoints = distinct(concat(
     local.launch_in_vnet && local.enable_storage_account ? ["Microsoft.Storage"] : [],
@@ -107,15 +105,6 @@ locals {
       resource_id : azurerm_app_configuration.default[0].id,
     }
   } : {}
-  enable_private_endpoint_function_apps_storage = local.enable_linux_function_apps ? true : false
-  private_endpoint_function_apps_storage_blob = local.enable_private_endpoint_function_apps_storage ? {
-    "fn-blob" : {
-      resource_group : local.resource_group,
-      subnet_id : azurerm_subnet.function_apps_private_endpoint_subnet[0].id,
-      resource_id : azurerm_storage_account.function_app_backing[0].id,
-      subresource_names : ["blob"]
-    }
-  } : {}
   private_endpoints = merge(
     local.private_endpoint_redis,
     local.private_endpoint_mssql,
@@ -124,7 +113,6 @@ locals {
     local.private_endpoint_storage_blob,
     local.private_endpoint_storage_file,
     local.private_endpoint_app_configuration,
-    local.private_endpoint_function_apps_storage_blob,
   )
 
   # Azure Container Registry
@@ -397,7 +385,7 @@ locals {
 
   # Azure Functions
   linux_function_apps = var.linux_function_apps
-  linux_function_health_insights_api = local.enable_app_insights_integration && local.enable_monitoring && var.enable_health_insights_api ? {
+  linux_function_health_insights_api = (local.enable_app_insights_integration && local.enable_monitoring && var.enable_health_insights_api) ? {
     "health-api" = {
       runtime         = "python"
       runtime_version = "3.11"
@@ -410,7 +398,7 @@ locals {
       ipv4_access                                    = []
     }
   } : {}
-  enable_linux_function_apps = (length(local.linux_function_apps) > 0 || local.linux_function_health_insights_api != {}) ? true : false
+  enable_linux_function_apps = (length(local.linux_function_apps) > 0 || length(keys(local.linux_function_health_insights_api)) > 0) ? true : false
 
   # Azure DNS Zone
   enable_dns_zone      = var.enable_dns_zone

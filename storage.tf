@@ -189,11 +189,10 @@ resource "azurerm_storage_account" "function_app_backing" {
 resource "azurerm_storage_account_network_rules" "function_app_backing" {
   count = local.enable_linux_function_apps ? 1 : 0
 
-  storage_account_id         = azurerm_storage_account.function_app_backing[0].id
-  default_action             = "Deny"
-  bypass                     = ["AzureServices"]
-  virtual_network_subnet_ids = [azurerm_subnet.function_apps_infra_subnet[0].id]
-  ip_rules                   = local.storage_account_ipv4_allow_list
+  storage_account_id = azurerm_storage_account.function_app_backing[0].id
+  default_action     = "Allow"
+  bypass             = ["AzureServices"]
+  ip_rules           = local.storage_account_ipv4_allow_list
 }
 
 resource "azapi_update_resource" "function_app_storage_key_rotation_reminder" {

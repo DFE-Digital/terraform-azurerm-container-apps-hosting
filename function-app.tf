@@ -5,7 +5,7 @@ resource "azurerm_service_plan" "function_apps" {
   resource_group_name = local.resource_group.name
   location            = local.resource_group.location
   os_type             = "Linux"
-  sku_name            = "B1"
+  sku_name            = "Y1" // PAYG/Consumption plan
 
   tags = local.tags
 }
@@ -23,26 +23,18 @@ resource "azurerm_linux_function_app" "health_api" {
   webdeploy_publish_basic_authentication_enabled = each.value.webdeploy_publish_basic_authentication_enabled
   https_only                                     = true
   key_vault_reference_identity_id                = azurerm_user_assigned_identity.function_apps[each.key].id
-  virtual_network_subnet_id                      = azurerm_subnet.function_apps_infra_subnet[0].id
-  content_share_force_disabled                   = true
   zip_deploy_file                                = data.archive_file.azure_function[each.key].output_path
 
   app_settings = merge(each.value.app_settings, {
-    "SCM_DO_BUILD_DURING_DEPLOYMENT" = false
-    "ENABLE_ORYX_BUILD"              = false
-    "WEBSITE_CONTENTOVERVNET"        = 1
-    "WEBSITE_VNET_ROUTE_ALL"         = 1
-    "WEBSITE_DNS_SERVER"             = "168.63.129.16" // Azure Private DNS Resolver
-    "AZURE_CLIENT_ID"                = azurerm_user_assigned_identity.function_apps[each.key].client_id
+    "AZURE_CLIENT_ID" = azurerm_user_assigned_identity.function_apps[each.key].client_id
   })
 
   site_config {
-    always_on                              = true
+    always_on                              = false
     application_insights_connection_string = azurerm_application_insights.function_apps[each.key].connection_string
     application_insights_key               = azurerm_application_insights.function_apps[each.key].instrumentation_key
     app_scale_limit                        = 1
     http2_enabled                          = true
-    vnet_route_all_enabled                 = true
     ftps_state                             = each.value.ftp_publish_basic_authentication_enabled ? "FtpsOnly" : "Disabled"
     ip_restriction_default_action          = length(each.value.ipv4_access) > 0 ? "Deny" : "Allow"
     scm_ip_restriction_default_action      = length(each.value.ipv4_access) > 0 ? "Deny" : "Allow"
@@ -51,12 +43,6 @@ resource "azurerm_linux_function_app" "health_api" {
     cors {
       allowed_origins     = each.value.allowed_origins
       support_credentials = contains(each.value.allowed_origins, "*") ? false : true
-    }
-
-    ip_restriction {
-      action                    = "Allow"
-      name                      = "AllowSubnetInbound"
-      virtual_network_subnet_id = azurerm_subnet.function_apps_infra_subnet[0].id
     }
 
     dynamic "ip_restriction" {
@@ -108,22 +94,17 @@ resource "azurerm_linux_function_app" "function_apps" {
   webdeploy_publish_basic_authentication_enabled = each.value.webdeploy_publish_basic_authentication_enabled
   https_only                                     = true
   key_vault_reference_identity_id                = azurerm_user_assigned_identity.function_apps[each.key].id
-  virtual_network_subnet_id                      = azurerm_subnet.function_apps_infra_subnet[0].id
 
   app_settings = merge(each.value.app_settings, {
-    "AZURE_CLIENT_ID"         = azurerm_user_assigned_identity.function_apps[each.key].client_id
-    "WEBSITE_DNS_SERVER"      = "168.63.129.16" // Azure Private DNS Resolver
-    "WEBSITE_CONTENTOVERVNET" = 1
-    "WEBSITE_VNET_ROUTE_ALL"  = 1
+    "AZURE_CLIENT_ID" = azurerm_user_assigned_identity.function_apps[each.key].client_id
   })
 
   site_config {
-    always_on                              = true
+    always_on                              = false
     application_insights_connection_string = local.enable_app_insights_integration ? azurerm_application_insights.function_apps[each.key].connection_string : null
     application_insights_key               = local.enable_app_insights_integration ? azurerm_application_insights.function_apps[each.key].instrumentation_key : null
     app_scale_limit                        = 1
     http2_enabled                          = true
-    vnet_route_all_enabled                 = true
     ftps_state                             = each.value.ftp_publish_basic_authentication_enabled ? "FtpsOnly" : "Disabled"
     ip_restriction_default_action          = length(each.value.ipv4_access) > 0 ? "Deny" : "Allow"
     scm_ip_restriction_default_action      = length(each.value.ipv4_access) > 0 ? "Deny" : "Allow"
@@ -132,12 +113,6 @@ resource "azurerm_linux_function_app" "function_apps" {
     cors {
       allowed_origins     = each.value.allowed_origins
       support_credentials = contains(each.value.allowed_origins, "*") ? false : true
-    }
-
-    ip_restriction {
-      action                    = "Allow"
-      name                      = "AllowSubnetInbound"
-      virtual_network_subnet_id = azurerm_subnet.function_apps_infra_subnet[0].id
     }
 
     dynamic "ip_restriction" {
