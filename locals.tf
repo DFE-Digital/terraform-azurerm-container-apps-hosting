@@ -301,7 +301,7 @@ locals {
   ])
   container_app_uami = local.enable_container_app_uami ? azurerm_user_assigned_identity.containerapp[0].id : null
   container_app_identity_ids = concat(
-    var.container_app_identities, [local.container_app_uami]
+    var.container_app_identities, local.container_app_uami != null ? [local.container_app_uami] : []
   )
 
   # Container App / Container image
