@@ -485,12 +485,11 @@ module "azure_container_apps_hosting" {
   # enable_network_watcher_traffic_analytics   = true
   # network_watcher_traffic_analytics_interval = 60
 
-  ## Use a user assigned or system assigned identity on the Container App
-  #   container_app_identities = {
-  #   type         = "UserAssigned", # Accepted values: "UserAssigned", "SystemAssigned", "SystemAssigned, UserAssigned"
-  #   identity_ids = [azurerm_user_assigned_identity.user_assigned_identity.id]
-  # }
+  ## Use a user assigned identity on the Container App.
+  # container_app_identities = [azurerm_user_assigned_identity.user_assigned_identity.id]
 
+  # A user assigned managed identity is created for the container app by default, but can be disabled.
+  # container_app_use_managed_identity = false
 
   # Tags are applied to every resource deployed by this module
   # Include them as Key:Value pairs
