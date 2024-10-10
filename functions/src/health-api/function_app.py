@@ -11,7 +11,7 @@ credential = DefaultAzureCredential()
 client = LogsQueryClient(credential)
 
 response_headers = { "Content-Type": "application/json" }
-query = """availabilityResults | take 3 | project location, success"""
+query = """ availabilityResults | project location, success, timestamp | order by timestamp desc | take 3"""
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 
