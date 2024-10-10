@@ -392,10 +392,10 @@ locals {
       app_settings = {
         "TARGET_LOG_ANALYTICS_RESOURCE_ID" = azurerm_application_insights.main[0].id
       }
-      allowed_origins                                = ["*"]
+      allowed_origins                                = var.health_insights_api_cors_origins
       ftp_publish_basic_authentication_enabled       = false
       webdeploy_publish_basic_authentication_enabled = true
-      ipv4_access                                    = []
+      ipv4_access                                    = var.health_insights_api_ipv4_allow_list
     }
   } : {}
   enable_linux_function_apps = (length(local.linux_function_apps) > 0 || length(keys(local.linux_function_health_insights_api)) > 0) ? true : false
