@@ -155,3 +155,83 @@ data "azurerm_storage_account_blob_container_sas" "container_app" {
     list   = true
   }
 }
+
+resource "azurerm_storage_account" "function_app_backing" {
+  count = local.enable_linux_function_apps ? 1 : 0
+
+  name                             = "s${local.resource_prefix_sha_short}functions"
+  resource_group_name              = local.resource_group.name
+  location                         = local.resource_group.location
+  account_tier                     = "Standard"
+  account_replication_type         = "LRS"
+  min_tls_version                  = "TLS1_2"
+  https_traffic_only_enabled       = true
+  allow_nested_items_to_be_public  = false
+  public_network_access_enabled    = true
+  cross_tenant_replication_enabled = false
+
+  sas_policy {
+    expiration_period = local.storage_account_sas_expiration_period
+  }
+
+  blob_properties {
+    delete_retention_policy {
+      days = 7
+    }
+    container_delete_retention_policy {
+      days = 7
+    }
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_storage_account_network_rules" "function_app_backing" {
+  count = local.enable_linux_function_apps ? 1 : 0
+
+  storage_account_id = azurerm_storage_account.function_app_backing[0].id
+  default_action     = "Allow"
+  bypass             = ["AzureServices"]
+  ip_rules           = local.storage_account_ipv4_allow_list
+}
+
+resource "azapi_update_resource" "function_app_storage_key_rotation_reminder" {
+  count = local.enable_linux_function_apps ? 1 : 0
+
+  type        = "Microsoft.Storage/storageAccounts@2023-01-01"
+  resource_id = azurerm_storage_account.function_app_backing[0].id
+  body = jsonencode({
+    properties = {
+      keyPolicy : {
+        keyExpirationPeriodInDays : local.storage_account_access_key_rotation_reminder_days
+      }
+    }
+  })
+
+  depends_on = [
+    azurerm_storage_account.function_app_backing[0]
+  ]
+}
+
+resource "azurerm_monitor_diagnostic_setting" "function_app_storage" {
+  count = local.enable_linux_function_apps ? 1 : 0
+
+  name                       = "${azurerm_storage_account.function_app_backing[0].name}-storage-blobs-diag"
+  target_resource_id         = "${azurerm_storage_account.function_app_backing[0].id}/blobServices/default"
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.function_app[0].id
+
+  enabled_log {
+    category_group = "Audit"
+  }
+
+  # The below metrics are kept in to avoid a diff in the Terraform Plan output
+  metric {
+    category = "Capacity"
+    enabled  = false
+  }
+
+  metric {
+    category = "Transaction"
+    enabled  = false
+  }
+}

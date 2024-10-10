@@ -43,3 +43,17 @@ data "azurerm_key_vault" "existing_key_vault" {
   name                = local.existing_key_vault
   resource_group_name = local.existing_resource_group
 }
+
+data "archive_file" "azure_function" {
+  for_each = local.linux_function_health_insights_api
+
+  type        = "zip"
+  output_path = "${path.module}/functions/dist/${each.key}.zip"
+  source_dir  = "${path.module}/functions/src/${each.key}/"
+}
+
+resource "terraform_data" "function_app_package_sha" {
+  for_each = local.linux_function_health_insights_api
+
+  input = filesha256(data.archive_file.azure_function[each.key].output_path)
+}
