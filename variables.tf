@@ -1211,3 +1211,21 @@ variable "init_container_command" {
   type        = list(any)
   default     = []
 }
+
+variable "enable_health_insights_api" {
+  description = "Deploys a Function App that exposes the last 3 HTTP Web Tests via an API endpoint. 'enable_app_insights_integration' and 'enable_monitoring' must be set to 'true'."
+  type        = bool
+  default     = false
+}
+
+variable "health_insights_api_cors_origins" {
+  description = "List of hostnames that are permitted to contact the Health insights API"
+  type        = list(string)
+  default     = ["*"]
+}
+
+variable "health_insights_api_ipv4_allow_list" {
+  description = "List of IPv4 addresses that are permitted to contact the Health insights API"
+  type        = list(string)
+  default     = []
+}

@@ -33,3 +33,12 @@ resource "azurerm_role_assignment" "mssql_storageblobdatacontributor" {
   principal_id         = azurerm_user_assigned_identity.mssql[0].id
   description          = "Allow SQL Auditing to write reports and findings into the MSSQL Security Storage Account"
 }
+
+resource "azurerm_user_assigned_identity" "function_apps" {
+  for_each = local.enable_linux_function_apps ? local.linux_function_health_insights_api : {}
+
+  location            = local.resource_group.location
+  name                = "${local.resource_prefix}-${each.key}-uami-function"
+  resource_group_name = local.resource_group.name
+  tags                = local.tags
+}
