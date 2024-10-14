@@ -1229,3 +1229,17 @@ variable "health_insights_api_ipv4_allow_list" {
   type        = list(string)
   default     = []
 }
+
+variable "linux_function_apps" {
+  description = "A list of Linux Function Apps with their corresponding app settings"
+  type = map(object({
+    runtime                                        = string
+    runtime_version                                = string
+    app_settings                                   = optional(map(string), {})
+    allowed_origins                                = optional(list(string), ["*"])
+    ftp_publish_basic_authentication_enabled       = optional(bool, false)
+    webdeploy_publish_basic_authentication_enabled = optional(bool, false)
+    ipv4_access                                    = optional(list(string), [])
+  }))
+  default = {}
+}
