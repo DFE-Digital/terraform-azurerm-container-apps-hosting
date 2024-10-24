@@ -223,7 +223,7 @@ resource "azurerm_cdn_frontdoor_rule" "vdp_security_txt" {
   count = local.enable_cdn_frontdoor && local.enable_cdn_frontdoor_vdp_redirects ? 1 : 0
 
   depends_on                = [azurerm_cdn_frontdoor_origin_group.group, azurerm_cdn_frontdoor_origin.origin]
-  name                      = "security_txt_redirect"
+  name                      = "securitytxtredirect"
   cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.vdp[0].id
   order                     = 1
   behavior_on_match         = "Continue"
@@ -250,7 +250,7 @@ resource "azurerm_cdn_frontdoor_rule" "vdp_thanks_txt" {
   count = local.enable_cdn_frontdoor && local.enable_cdn_frontdoor_vdp_redirects ? 1 : 0
 
   depends_on                = [azurerm_cdn_frontdoor_origin_group.group, azurerm_cdn_frontdoor_origin.origin]
-  name                      = "thanks_txt_redirect"
+  name                      = "thankstxtredirect"
   cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.vdp[0].id
   order                     = 1
   behavior_on_match         = "Continue"
