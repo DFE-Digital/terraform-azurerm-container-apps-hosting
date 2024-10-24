@@ -1229,3 +1229,15 @@ variable "health_insights_api_ipv4_allow_list" {
   type        = list(string)
   default     = []
 }
+
+variable "enable_cdn_frontdoor_vdp_redirects" {
+  description = "Deploy redirects for security.txt and thanks.txt to an external Vulnerability Disclosure Program service"
+  type        = bool
+  default     = false
+}
+
+variable "cdn_frontdoor_vdp_destination_hostname" {
+  description = "Requires 'enable_cdn_frontdoor_vdp_redirects' to be set to 'true'. Hostname to redirect security.txt and thanks.txt to"
+  type        = string
+  default     = ""
+}
