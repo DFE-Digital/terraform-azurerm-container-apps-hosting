@@ -459,6 +459,8 @@ locals {
   cdn_frontdoor_waf_custom_rules                  = var.cdn_frontdoor_waf_custom_rules
   cdn_frontdoor_waf_managed_rulesets              = var.cdn_frontdoor_waf_managed_rulesets
   cdn_frontdoor_rate_limiting_bypass_ip_list      = var.cdn_frontdoor_rate_limiting_bypass_ip_list
+  enable_cdn_frontdoor_vdp_redirects              = var.enable_cdn_frontdoor_vdp_redirects
+  cdn_frontdoor_vdp_destination_hostname          = var.cdn_frontdoor_vdp_destination_hostname
 
   # Event Hub
   enable_event_hub                          = var.enable_event_hub
