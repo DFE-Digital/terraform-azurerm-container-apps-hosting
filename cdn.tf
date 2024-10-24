@@ -252,7 +252,7 @@ resource "azurerm_cdn_frontdoor_rule" "vdp_thanks_txt" {
   depends_on                = [azurerm_cdn_frontdoor_origin_group.group, azurerm_cdn_frontdoor_origin.origin]
   name                      = "thankstxtredirect"
   cdn_frontdoor_rule_set_id = azurerm_cdn_frontdoor_rule_set.vdp[0].id
-  order                     = 1
+  order                     = 2
   behavior_on_match         = "Continue"
 
   actions {
