@@ -446,10 +446,12 @@ locals {
   ruleset_redirects_id                            = length(local.cdn_frontdoor_host_redirects) > 0 ? [azurerm_cdn_frontdoor_rule_set.redirects[0].id] : []
   ruleset_add_response_headers_id                 = length(local.cdn_frontdoor_host_add_response_headers) > 0 ? [azurerm_cdn_frontdoor_rule_set.add_response_headers[0].id] : []
   ruleset_remove_response_headers_id              = length(local.cdn_frontdoor_remove_response_headers) > 0 ? [azurerm_cdn_frontdoor_rule_set.remove_response_headers[0].id] : []
+  ruleset_vdp_id                                  = local.enable_cdn_frontdoor_vdp_redirects ? [azurerm_cdn_frontdoor_rule_set.vdp[0].id] : []
   ruleset_ids = concat(
     local.ruleset_redirects_id,
     local.ruleset_add_response_headers_id,
     local.ruleset_remove_response_headers_id,
+    local.ruleset_vdp_id
   )
   cdn_frontdoor_enable_rate_limiting              = var.cdn_frontdoor_enable_rate_limiting
   cdn_frontdoor_rate_limiting_duration_in_minutes = var.cdn_frontdoor_rate_limiting_duration_in_minutes
