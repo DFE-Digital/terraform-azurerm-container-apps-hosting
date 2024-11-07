@@ -237,7 +237,7 @@ locals {
     key_vault_secret_id = azurerm_key_vault_secret.secret_app_setting[name].versionless_id
     name                = secret["name"]
   } } : {}
-  container_app_client_id_value = local.enable_container_app_uami ? azurerm_user_assigned_identity.containerapp[0].client_id : length(var.container_app_identities) == 1 ? var.container_app_identities[0] : null
+
   container_app_env_vars = { for i, v in concat(
     local.enable_app_insights_integration ? [
       {
@@ -269,10 +269,10 @@ locals {
         "secretRef" : "connectionstrings--appconfig"
       }
     ] : [],
-    local.container_app_client_id_value != null ? [
+    local.enable_container_app_uami ? [
       {
         "name" : "AZURE_CLIENT_ID"
-        "value" : local.container_app_client_id_value
+        "value" : local.container_app_uami
       }
     ] : [],
     [
