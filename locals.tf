@@ -506,6 +506,7 @@ locals {
   alarm_memory_threshold_percentage = var.alarm_memory_threshold_percentage
   alarm_latency_threshold_ms        = var.alarm_latency_threshold_ms
   alarm_log_ingestion_gb_per_day    = var.alarm_log_ingestion_gb_per_day
+  alarm_for_delete_events           = var.alarm_for_delete_events
 
   # Network Watcher
   enable_network_watcher                         = var.enable_network_watcher

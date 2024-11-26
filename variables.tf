@@ -910,6 +910,12 @@ variable "monitor_endpoint_healthcheck" {
   default     = "/"
 }
 
+variable "alarm_for_delete_events" {
+  description = "Should Alert Rules be created for Administrative 'Delete' actions?"
+  type        = bool
+  default     = true
+}
+
 variable "alarm_log_ingestion_gb_per_day" {
   description = "Define an alarm threshold for Log Analytics ingestion rate in GB (per day) (Defaults to no limit)"
   type        = number
