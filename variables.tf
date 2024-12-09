@@ -1258,6 +1258,7 @@ variable "linux_function_apps" {
     ftp_publish_basic_authentication_enabled       = optional(bool, false)
     webdeploy_publish_basic_authentication_enabled = optional(bool, false)
     ipv4_access                                    = optional(list(string), [])
+    minimum_tls_version                            = optional(string, "1.3")
   }))
   default = {}
 }
