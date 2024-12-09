@@ -39,6 +39,7 @@ resource "azurerm_linux_function_app" "health_api" {
     ip_restriction_default_action          = length(each.value.ipv4_access) > 0 ? "Deny" : "Allow"
     scm_ip_restriction_default_action      = length(each.value.ipv4_access) > 0 ? "Deny" : "Allow"
     scm_use_main_ip_restriction            = true
+    minimum_tls_version                    = "1.3"
 
     cors {
       allowed_origins     = each.value.allowed_origins
@@ -109,6 +110,7 @@ resource "azurerm_linux_function_app" "function_apps" {
     ip_restriction_default_action          = length(each.value.ipv4_access) > 0 ? "Deny" : "Allow"
     scm_ip_restriction_default_action      = length(each.value.ipv4_access) > 0 ? "Deny" : "Allow"
     scm_use_main_ip_restriction            = true
+    minimum_tls_version                    = each.value.minimum_tls_version
 
     cors {
       allowed_origins     = each.value.allowed_origins
