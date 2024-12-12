@@ -565,7 +565,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "log-analytics-ingesti
 }
 
 resource "azurerm_monitor_activity_log_alert" "delete_container_app" {
-  for_each = local.alarm_for_delete_events ? merge(azurerm_container_app.container_apps, azurerm_container_app.custom_container_apps) : {}
+  for_each = local.enable_monitoring && local.alarm_for_delete_events ? merge(azurerm_container_app.container_apps, azurerm_container_app.custom_container_apps) : {}
 
   name                = "Resource Deletion - Container App - ${each.value.name}"
   resource_group_name = local.resource_group.name
@@ -588,7 +588,7 @@ resource "azurerm_monitor_activity_log_alert" "delete_container_app" {
 }
 
 resource "azurerm_monitor_activity_log_alert" "delete_sql_database" {
-  count = local.alarm_for_delete_events && local.enable_mssql_database ? 1 : 0
+  count = local.enable_monitoring && local.alarm_for_delete_events && local.enable_mssql_database ? 1 : 0
 
   name                = "Resource Deletion - SQL Database - ${azurerm_mssql_database.default[0].name}"
   resource_group_name = local.resource_group.name
@@ -611,7 +611,7 @@ resource "azurerm_monitor_activity_log_alert" "delete_sql_database" {
 }
 
 resource "azurerm_monitor_activity_log_alert" "delete_dns_zone" {
-  count = local.alarm_for_delete_events && local.enable_dns_zone ? 1 : 0
+  count = local.enable_monitoring && local.alarm_for_delete_events && local.enable_dns_zone ? 1 : 0
 
   name                = "Resource Deletion - DNS Zone - ${azurerm_dns_zone.default[0].name}"
   resource_group_name = local.resource_group.name
@@ -634,7 +634,7 @@ resource "azurerm_monitor_activity_log_alert" "delete_dns_zone" {
 }
 
 resource "azurerm_monitor_activity_log_alert" "delete_redis_cache" {
-  count = local.alarm_for_delete_events && local.enable_redis_cache ? 1 : 0
+  count = local.enable_monitoring && local.alarm_for_delete_events && local.enable_redis_cache ? 1 : 0
 
   name                = "Resource Deletion - Redis Cache - ${azurerm_redis_cache.default[0].name}"
   resource_group_name = local.resource_group.name
@@ -657,7 +657,7 @@ resource "azurerm_monitor_activity_log_alert" "delete_redis_cache" {
 }
 
 resource "azurerm_monitor_activity_log_alert" "delete_postgresql_database" {
-  count = local.alarm_for_delete_events && local.enable_postgresql_database ? 1 : 0
+  count = local.enable_monitoring && local.alarm_for_delete_events && local.enable_postgresql_database ? 1 : 0
 
   name                = "Resource Deletion - PostgreSQL Database - ${azurerm_postgresql_flexible_server_database.default[0].name}"
   resource_group_name = local.resource_group.name
@@ -680,7 +680,7 @@ resource "azurerm_monitor_activity_log_alert" "delete_postgresql_database" {
 }
 
 resource "azurerm_monitor_activity_log_alert" "delete_frontdoor_cdn" {
-  count = local.alarm_for_delete_events && local.enable_cdn_frontdoor ? 1 : 0
+  count = local.enable_monitoring && local.alarm_for_delete_events && local.enable_cdn_frontdoor ? 1 : 0
 
   name                = "Resource Deletion - Front Door - ${azurerm_cdn_frontdoor_profile.cdn[0].name}"
   resource_group_name = local.resource_group.name
@@ -703,7 +703,7 @@ resource "azurerm_monitor_activity_log_alert" "delete_frontdoor_cdn" {
 }
 
 resource "azurerm_monitor_activity_log_alert" "delete_vnet" {
-  count = local.alarm_for_delete_events && local.launch_in_vnet ? 1 : 0
+  count = local.enable_monitoring && local.alarm_for_delete_events && local.launch_in_vnet ? 1 : 0
 
   name                = "Resource Deletion - Virtual Network - ${local.virtual_network.name}"
   resource_group_name = local.resource_group.name
