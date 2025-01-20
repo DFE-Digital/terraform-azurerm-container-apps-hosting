@@ -12,6 +12,8 @@ resource "azurerm_container_app_environment" "container_app_env" {
 }
 
 resource "azurerm_monitor_diagnostic_setting" "container_app_env" {
+  count = local.existing_container_app_environment.name == "" ? 1 : 0
+
   name                       = "${local.resource_prefix}-containerapp-diag"
   target_resource_id         = local.container_app_environment.id
   log_analytics_workspace_id = azurerm_log_analytics_workspace.container_app.id
