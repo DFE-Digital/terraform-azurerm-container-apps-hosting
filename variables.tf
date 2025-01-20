@@ -37,6 +37,18 @@ variable "existing_resource_group" {
   default     = ""
 }
 
+variable "existing_container_app_environment" {
+  description = "Conditionally launch resources into an existing Container App environment. Specifying this will NOT create an environment."
+  type = object({
+    name           = string
+    resource_group = string
+  })
+  default = {
+    name           = ""
+    resource_group = ""
+  }
+}
+
 variable "enable_resource_group_lock" {
   description = "Enabling this will add a Resource Lock to the Resource Group preventing any resources from being deleted."
   type        = bool

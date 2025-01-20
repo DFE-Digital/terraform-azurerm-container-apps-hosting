@@ -2,7 +2,7 @@ resource "azurerm_container_app" "custom_container_apps" {
   for_each = local.custom_container_apps
 
   name                         = each.key
-  container_app_environment_id = each.value.container_app_environment_id == "" ? azurerm_container_app_environment.container_app_env.id : each.value.container_app_environment_id
+  container_app_environment_id = each.value.container_app_environment_id == "" ? local.container_app_environment.id : each.value.container_app_environment_id
   resource_group_name          = each.value.resource_group_name == "" ? local.resource_group.name : each.value.resource_group_name
   revision_mode                = each.value.revision_mode
 

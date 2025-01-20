@@ -11,6 +11,13 @@ data "azurerm_resource_group" "existing_resource_group" {
   name = local.existing_resource_group
 }
 
+data "azurerm_container_app_environment" "existing_container_app_environment" {
+  count = local.existing_container_app_environment.name == "" ? 0 : 1
+
+  name                = local.existing_container_app_environment.name
+  resource_group_name = local.existing_container_app_environment.resource_group
+}
+
 data "azurerm_subscription" "current" {}
 
 data "azurerm_logic_app_workflow" "existing_logic_app_workflow" {

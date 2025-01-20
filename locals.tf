@@ -237,7 +237,6 @@ locals {
     key_vault_secret_id = azurerm_key_vault_secret.secret_app_setting[name].versionless_id
     name                = secret["name"]
   } } : {}
-
   container_app_env_vars = { for i, v in concat(
     local.enable_app_insights_integration ? [
       {
@@ -291,6 +290,10 @@ locals {
   enable_init_container  = var.enable_init_container
   init_container_image   = var.init_container_image
   init_container_command = var.init_container_command
+
+  # Container App Environment
+  existing_container_app_environment = var.existing_container_app_environment
+  container_app_environment          = local.existing_container_app_environment.name == "" ? azurerm_container_app_environment.container_app_env[0] : data.azurerm_container_app_environment.existing_container_app_environment[0]
 
   # Container App / Identity
   enable_container_app_uami = anytrue([
