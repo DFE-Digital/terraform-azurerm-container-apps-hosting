@@ -98,7 +98,7 @@ resource "azurerm_network_security_rule" "container_apps_infra_allow_frontdoor_i
   source_port_range          = "*"
   destination_port_range     = "443"
   source_address_prefix      = "AzureFrontDoor.Backend"
-  destination_address_prefix = "${azurerm_container_app_environment.container_app_env.static_ip_address}/32"
+  destination_address_prefix = "${local.container_app_environment.static_ip_address}/32"
 }
 
 resource "azurerm_network_security_rule" "container_apps_infra_allow_ips_inbound" {
@@ -115,7 +115,7 @@ resource "azurerm_network_security_rule" "container_apps_infra_allow_ips_inbound
   source_port_range          = "*"
   destination_port_range     = "443"
   source_address_prefixes    = local.container_apps_allow_ips_inbound
-  destination_address_prefix = "${azurerm_container_app_environment.container_app_env.static_ip_address}/32"
+  destination_address_prefix = "${local.container_app_environment.static_ip_address}/32"
 }
 
 resource "azurerm_subnet_network_security_group_association" "container_apps_infra" {

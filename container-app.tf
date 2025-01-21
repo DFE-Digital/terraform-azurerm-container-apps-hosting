@@ -1,4 +1,6 @@
 resource "azurerm_container_app_environment" "container_app_env" {
+  count = local.existing_container_app_environment.name == "" ? 1 : 0
+
   name                           = "${local.resource_prefix}containerapp"
   location                       = local.resource_group.location
   resource_group_name            = local.resource_group.name
@@ -10,8 +12,10 @@ resource "azurerm_container_app_environment" "container_app_env" {
 }
 
 resource "azurerm_monitor_diagnostic_setting" "container_app_env" {
+  count = local.existing_container_app_environment.name == "" ? 1 : 0
+
   name                       = "${local.resource_prefix}-containerapp-diag"
-  target_resource_id         = azurerm_container_app_environment.container_app_env.id
+  target_resource_id         = local.container_app_environment.id
   log_analytics_workspace_id = azurerm_log_analytics_workspace.container_app.id
   eventhub_name              = local.enable_event_hub ? azurerm_eventhub.container_app[0].name : null
 
@@ -30,7 +34,7 @@ resource "azurerm_container_app_environment_storage" "container_app_env" {
   count = local.enable_container_app_file_share ? 1 : 0
 
   name                         = "h${local.resource_prefix_sha_short}-storage"
-  container_app_environment_id = azurerm_container_app_environment.container_app_env.id
+  container_app_environment_id = local.container_app_environment.id
   account_name                 = azurerm_storage_account.container_app[0].name
   share_name                   = azurerm_storage_share.container_app[0].name
   access_key                   = azurerm_storage_account.container_app[0].primary_access_key
@@ -44,7 +48,7 @@ resource "azurerm_container_app" "container_apps" {
   ))
 
   name                         = each.value == "worker" ? "${local.container_app_name}-worker" : local.container_app_name
-  container_app_environment_id = azurerm_container_app_environment.container_app_env.id
+  container_app_environment_id = local.container_app_environment.id
   resource_group_name          = local.resource_group.name
   revision_mode                = "Single"
 
