@@ -922,6 +922,11 @@ variable "monitor_endpoint_healthcheck" {
   default     = "/"
 }
 
+variable "monitor_http_availability_fqdn" {
+  description = "Specify a FQDN to monitor for HTTP Availability. Leave unset to dynamically calculate the correct FQDN"
+  type        = string
+  default     = ""
+}
 variable "alarm_for_delete_events" {
   description = "Should Alert Rules be created for Administrative 'Delete' actions?"
   type        = bool
