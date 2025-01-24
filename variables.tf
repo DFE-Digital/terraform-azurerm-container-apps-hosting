@@ -1279,3 +1279,9 @@ variable "linux_function_apps" {
   }))
   default = {}
 }
+
+variable "monitor_http_availability_verb" {
+  description = "Which HTTP verb to use for the HTTP Availability check"
+  type        = string
+  default     = "HEAD"
+}
