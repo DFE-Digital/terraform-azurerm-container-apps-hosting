@@ -489,9 +489,10 @@ locals {
   monitor_http_availability_fqdn = var.monitor_http_availability_fqdn == "" ? local.enable_cdn_frontdoor ? (
     length(local.cdn_frontdoor_custom_domains) >= 1 ? local.cdn_frontdoor_custom_domains[0] : azurerm_cdn_frontdoor_endpoint.endpoint[0].host_name
   ) : local.container_fqdn : var.monitor_http_availability_fqdn
-  monitor_http_availability_url = "https://${local.monitor_http_availability_fqdn}${local.monitor_endpoint_healthcheck}"
-  monitor_default_container     = { "default" = azurerm_container_app.container_apps["main"] }
-  monitor_worker_container      = local.enable_worker_container ? { "worker" = azurerm_container_app.container_apps["worker"] } : {}
+  monitor_http_availability_url  = "https://${local.monitor_http_availability_fqdn}${local.monitor_endpoint_healthcheck}"
+  monitor_http_availability_verb = var.monitor_http_availability_verb
+  monitor_default_container      = { "default" = azurerm_container_app.container_apps["main"] }
+  monitor_worker_container       = local.enable_worker_container ? { "worker" = azurerm_container_app.container_apps["worker"] } : {}
   monitor_containers = merge(
     local.monitor_default_container,
     local.monitor_worker_container,
