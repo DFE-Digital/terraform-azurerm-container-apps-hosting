@@ -505,6 +505,9 @@ locals {
     resource_id  = local.logic_app_workflow_id
     callback_url = local.logic_app_workflow_callback_url
   }
+  enable_monitoring_traces                  = var.enable_monitoring_traces
+  enable_monitoring_traces_include_warnings = var.enable_monitoring_traces_include_warnings
+
   # Azure Monitor / Alarm thresholds
   alarm_cpu_threshold_percentage    = var.alarm_cpu_threshold_percentage
   alarm_memory_threshold_percentage = var.alarm_memory_threshold_percentage

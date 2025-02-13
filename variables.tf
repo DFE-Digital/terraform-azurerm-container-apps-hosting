@@ -1285,3 +1285,15 @@ variable "monitor_http_availability_verb" {
   type        = string
   default     = "HEAD"
 }
+
+variable "enable_monitoring_traces" {
+  description = "Monitor App Insights traces for error messages"
+  type        = bool
+  default     = false
+}
+
+variable "enable_monitoring_traces_include_warnings" {
+  description = "Extend the App Insights trace monitor to include warning messages (warning: could be noisy!)"
+  type        = bool
+  default     = false
+}
