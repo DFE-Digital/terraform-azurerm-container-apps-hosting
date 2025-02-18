@@ -464,7 +464,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "traces" {
   resource_group_name  = local.resource_group.name
   location             = local.resource_group.location
   evaluation_frequency = "PT5M"
-  window_duration      = "PT5M"
+  window_duration      = "PT15M"
   scopes               = [azurerm_application_insights.main[0].id]
   severity             = 2 # Warning
   description          = "Action will be triggered when ${local.enable_monitoring_traces_include_warnings ? "warnings or " : ""}errors are detected in App Insights traces"
