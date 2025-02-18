@@ -484,7 +484,8 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "traces" {
             severityLevel == 2, "Warning",
             "Unknown" // Default case
         )
-        | project operation_Id, timestamp, host, operation_Name, message, severity
+        | join requests on $left.operation_Id == $right.operation_Id
+        | project operation_Id, timestamp, host, operation_Name, message, severity, url, resultCode
         | order by timestamp desc
       QUERY
 
@@ -518,6 +519,18 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "traces" {
 
     dimension {
       name     = "severity"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "url"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "resultCode"
       operator = "Include"
       values   = ["*"]
     }
