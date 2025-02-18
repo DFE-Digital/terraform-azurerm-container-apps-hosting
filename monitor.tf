@@ -477,13 +477,14 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "traces" {
             (isnotempty(customDimensions.StatusCode) and customDimensions.StatusCode >= 500)
         | where isnotempty(operation_Name)
         | where severityLevel >= ${local.enable_monitoring_traces_include_warnings ? 2 : 3}
+        | extend host = tostring(split(cloud_RoleInstance, '--')[0])
         | extend severity = case(
             severityLevel == 4, "Fatal",
             severityLevel == 3, "Error",
             severityLevel == 2, "Warning",
             "Unknown" // Default case
         )
-        | project timestamp, operation_Name, message, severity
+        | project operation_Id, timestamp, host, operation_Name, message, severity
         | order by timestamp desc
       QUERY
 
@@ -493,6 +494,18 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "traces" {
 
     dimension {
       name     = "operation_Name"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "operation_Id"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "host"
       operator = "Include"
       values   = ["*"]
     }
