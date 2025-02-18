@@ -396,7 +396,6 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "exceptions" {
     query = <<-QUERY
       requests
         | where toint(resultCode) >= 500
-        | where timestamp > ago(5m)
         | join exceptions on operation_Id
         | project timestamp, itemId, name, url, type, outerMessage, appName,
             linkToAppInsights = strcat(
@@ -477,7 +476,6 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "traces" {
             isempty(customDimensions.StatusCode) or
             (isnotempty(customDimensions.StatusCode) and customDimensions.StatusCode >= 500)
         | where isnotempty(operation_Name)
-        | where timestamp > ago(5m)
         | where severityLevel >= ${local.enable_monitoring_traces_include_warnings ? 2 : 3}
         | extend severity = case(
             severityLevel == 4, "Fatal",
