@@ -396,7 +396,6 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "exceptions" {
     query = <<-QUERY
       requests
         | where toint(resultCode) >= 500
-        | where timestamp > ago(5m)
         | join exceptions on operation_Id
         | project timestamp, itemId, name, url, type, outerMessage, appName,
             linkToAppInsights = strcat(
@@ -439,6 +438,104 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "exceptions" {
 
     dimension {
       name     = "linkToAppInsights"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    failing_periods {
+      minimum_failing_periods_to_trigger_alert = 1
+      number_of_evaluation_periods             = 1
+    }
+  }
+
+  auto_mitigation_enabled = false
+
+  action {
+    action_groups = [azurerm_monitor_action_group.main[0].id]
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_monitor_scheduled_query_rules_alert_v2" "traces" {
+  count = local.enable_monitoring && local.enable_monitoring_traces && local.enable_app_insights_integration ? 1 : 0
+
+  name                 = "Error Count - ${azurerm_application_insights.main[0].name}"
+  resource_group_name  = local.resource_group.name
+  location             = local.resource_group.location
+  evaluation_frequency = "PT5M"
+  window_duration      = "PT15M"
+  scopes               = [azurerm_application_insights.main[0].id]
+  severity             = 2 # Warning
+  description          = "Action will be triggered when ${local.enable_monitoring_traces_include_warnings ? "warnings or " : ""}errors are detected in App Insights traces"
+
+  criteria {
+    query = <<-QUERY
+      traces
+        | where
+            isempty(customDimensions.StatusCode) or
+            (isnotempty(customDimensions.StatusCode) and customDimensions.StatusCode >= 500)
+        | where isnotempty(operation_Name)
+        | where severityLevel >= ${local.enable_monitoring_traces_include_warnings ? 2 : 3}
+        | extend linkToAppInsights = strcat(
+              "https://portal.azure.com/#blade/AppInsightsExtension/DetailsV2Blade/DataModel/",
+              url_encode(strcat('{"eventId":"', itemId, '","timestamp":"', timestamp, '"}')),
+              "/ComponentId/",
+              url_encode(strcat('{"Name":"', split(appName, "/", 8)[0], '","ResourceGroup":"', split(appName, "/", 4)[0], '","SubscriptionId":"', split(appName, "/", 2)[0], '"}'))
+            )
+        | extend severity = case(
+            severityLevel == 4, "Fatal",
+            severityLevel == 3, "Error",
+            severityLevel == 2, "Warning",
+            "Unknown" // Default case
+        )
+        | join requests on $left.operation_Id == $right.operation_Id
+        | project operation_Id, timestamp, operation_Name, message, severity, url, resultCode, linkToAppInsights
+        | order by timestamp desc
+      QUERY
+
+    time_aggregation_method = "Count"
+    threshold               = 1
+    operator                = "GreaterThanOrEqual"
+
+    dimension {
+      name     = "operation_Name"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "operation_Id"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "linkToAppInsights"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "message"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "severity"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "url"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "resultCode"
       operator = "Include"
       values   = ["*"]
     }
