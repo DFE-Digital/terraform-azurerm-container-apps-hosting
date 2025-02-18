@@ -477,7 +477,12 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "traces" {
             (isnotempty(customDimensions.StatusCode) and customDimensions.StatusCode >= 500)
         | where isnotempty(operation_Name)
         | where severityLevel >= ${local.enable_monitoring_traces_include_warnings ? 2 : 3}
-        | extend host = tostring(split(cloud_RoleInstance, '--')[0])
+        | extend linkToAppInsights = strcat(
+              "https://portal.azure.com/#blade/AppInsightsExtension/DetailsV2Blade/DataModel/",
+              url_encode(strcat('{"eventId":"', itemId, '","timestamp":"', timestamp, '"}')),
+              "/ComponentId/",
+              url_encode(strcat('{"Name":"', split(appName, "/", 8)[0], '","ResourceGroup":"', split(appName, "/", 4)[0], '","SubscriptionId":"', split(appName, "/", 2)[0], '"}'))
+            )
         | extend severity = case(
             severityLevel == 4, "Fatal",
             severityLevel == 3, "Error",
@@ -485,7 +490,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "traces" {
             "Unknown" // Default case
         )
         | join requests on $left.operation_Id == $right.operation_Id
-        | project operation_Id, timestamp, host, operation_Name, message, severity, url, resultCode
+        | project operation_Id, timestamp, operation_Name, message, severity, url, resultCode, linkToAppInsights
         | order by timestamp desc
       QUERY
 
@@ -506,7 +511,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "traces" {
     }
 
     dimension {
-      name     = "host"
+      name     = "linkToAppInsights"
       operator = "Include"
       values   = ["*"]
     }
