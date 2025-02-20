@@ -394,50 +394,71 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "exceptions" {
 
   criteria {
     query = <<-QUERY
-      requests
-        | where toint(resultCode) >= 500
-        | join exceptions on operation_Id
-        | project timestamp, itemId, name, url, type, outerMessage, appName,
-            linkToAppInsights = strcat(
-              "https://portal.azure.com/#blade/AppInsightsExtension/DetailsV2Blade/DataModel/",
-              url_encode(strcat('{"eventId":"', itemId, '","timestamp":"', timestamp, '"}')),
-              "/ComponentId/",
-              url_encode(strcat('{"Name":"', split(appName, "/", 8)[0], '","ResourceGroup":"', split(appName, "/", 4)[0], '","SubscriptionId":"', split(appName, "/", 2)[0], '"}'))
-            )
+      exceptions
+        | where isnotempty(operation_Name)
+        | join requests on $left.operation_Id == $right.operation_Id
+        | where toint(severityLevel) >= 2
+        | extend severity = case(
+            severityLevel == 4, "Fatal",
+            severityLevel == 3, "Error",
+            severityLevel == 2, "Warning",
+            "Unknown" // Default case
+        )
+        | extend message = strcat(type, ": ", outerMessage)
+        | extend linkToAppInsights = strcat(
+            "https://portal.azure.com/#blade/AppInsightsExtension/DetailsV2Blade/DataModel/",
+            url_encode(strcat('{"eventId":"', itemId, '","timestamp":"', timestamp, '"}')),
+            "/ComponentId/",
+            url_encode(strcat('{"Name":"', split(appName, "/", 8)[0], '","ResourceGroup":"', split(appName, "/", 4)[0], '","SubscriptionId":"', split(appName, "/", 2)[0], '"}'))
+        )
+        | project operation_Id, timestamp, operation_Name, message, severity, url, resultCode, linkToAppInsights
         | order by timestamp desc
-        | project-away timestamp, itemId, appName
       QUERY
 
     time_aggregation_method = "Count"
     threshold               = 1
     operator                = "GreaterThanOrEqual"
 
+    // Keep dimensions ordered by 'name' as that is how they will be presented
+    // in the Common Alert Schema
     dimension {
-      name     = "name"
+      name     = "linkToAppInsights"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "message"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "operation_Id"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "operation_Name"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "resultCode"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "severity"
       operator = "Include"
       values   = ["*"]
     }
 
     dimension {
       name     = "url"
-      operator = "Include"
-      values   = ["*"]
-    }
-
-    dimension {
-      name     = "type"
-      operator = "Include"
-      values   = ["*"]
-    }
-
-    dimension {
-      name     = "outerMessage"
-      operator = "Include"
-      values   = ["*"]
-    }
-
-    dimension {
-      name     = "linkToAppInsights"
       operator = "Include"
       values   = ["*"]
     }
@@ -498,18 +519,8 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "traces" {
     threshold               = 1
     operator                = "GreaterThanOrEqual"
 
-    dimension {
-      name     = "operation_Name"
-      operator = "Include"
-      values   = ["*"]
-    }
-
-    dimension {
-      name     = "operation_Id"
-      operator = "Include"
-      values   = ["*"]
-    }
-
+    // Keep dimensions ordered by 'name' as that is how they will be presented
+    // in the Common Alert Schema
     dimension {
       name     = "linkToAppInsights"
       operator = "Include"
@@ -523,6 +534,24 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "traces" {
     }
 
     dimension {
+      name     = "operation_Id"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "operation_Name"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
+      name     = "resultCode"
+      operator = "Include"
+      values   = ["*"]
+    }
+
+    dimension {
       name     = "severity"
       operator = "Include"
       values   = ["*"]
@@ -530,12 +559,6 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "traces" {
 
     dimension {
       name     = "url"
-      operator = "Include"
-      values   = ["*"]
-    }
-
-    dimension {
-      name     = "resultCode"
       operator = "Include"
       values   = ["*"]
     }
