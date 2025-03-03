@@ -11,7 +11,7 @@ credential = DefaultAzureCredential()
 client = LogsQueryClient(credential)
 
 response_headers = { "Content-Type": "application/json" }
-query = """ availabilityResults | project location, success, timestamp | order by timestamp desc | take 3"""
+query = """ availabilityResults | project location, tobool(success), timestamp | order by timestamp desc | take 3"""
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 
@@ -50,7 +50,11 @@ def http_trigger(req: func.HttpRequest) -> func.HttpResponse:
 
             for table in data:
                 for row in table.rows:
-                    list.append(struct, {"location": row[0], "success": bool(row[1])})
+                    struct.append({
+                        "location": row[0],
+                        "success": bool(row[1]),
+                        "timestamp": str(row[2])
+                    })
 
             logging.info(struct)
 
