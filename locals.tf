@@ -516,18 +516,14 @@ locals {
   alarm_for_delete_events           = var.alarm_for_delete_events
 
   # Network Watcher
-  enable_network_watcher                         = var.enable_network_watcher
-  existing_network_watcher_name                  = var.existing_network_watcher_name
-  existing_network_watcher_resource_group_name   = var.existing_network_watcher_resource_group_name
-  network_watcher_name                           = local.enable_network_watcher ? azurerm_network_watcher.default[0].name : local.existing_network_watcher_name
-  network_watcher_resource_group_name            = local.network_watcher_name != "" ? local.existing_network_watcher_resource_group_name : local.resource_group.name
-  network_watcher_flow_log_retention             = var.network_watcher_flow_log_retention
-  enable_network_watcher_traffic_analytics       = var.enable_network_watcher_traffic_analytics
-  network_watcher_traffic_analytics_interval     = var.network_watcher_traffic_analytics_interval
-  network_security_group_container_apps_infra_id = local.launch_in_vnet ? { "container_apps_infra" = azurerm_network_security_group.container_apps_infra[0].id } : {}
-  network_security_group_ids = merge(
-    local.network_security_group_container_apps_infra_id,
-  )
+  enable_network_watcher                                        = var.enable_network_watcher
+  existing_network_watcher_name                                 = var.existing_network_watcher_name
+  existing_network_watcher_resource_group_name                  = var.existing_network_watcher_resource_group_name
+  network_watcher_name                                          = local.enable_network_watcher ? azurerm_network_watcher.default[0].name : local.existing_network_watcher_name
+  network_watcher_resource_group_name                           = local.network_watcher_name != "" ? local.existing_network_watcher_resource_group_name : local.resource_group.name
+  network_watcher_flow_log_retention                            = var.network_watcher_flow_log_retention
+  enable_network_watcher_traffic_analytics                      = var.enable_network_watcher_traffic_analytics
+  network_watcher_traffic_analytics_interval                    = var.network_watcher_traffic_analytics_interval
   network_watcher_nsg_storage_access_key_rotation_reminder_days = var.network_watcher_nsg_storage_access_key_rotation_reminder_days != 0 ? var.network_watcher_nsg_storage_access_key_rotation_reminder_days : local.storage_account_access_key_rotation_reminder_days
 
   # App Configuration

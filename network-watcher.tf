@@ -70,15 +70,15 @@ resource "azurerm_log_analytics_workspace" "default_network_watcher_nsg_flow_log
 }
 
 resource "azurerm_network_watcher_flow_log" "default_network_watcher_nsg" {
-  for_each = local.network_watcher_name != "" ? local.network_security_group_ids : {}
+  count = local.network_watcher_name != "" ? 1 : 0
 
   network_watcher_name = local.network_watcher_name
   resource_group_name  = local.network_watcher_resource_group_name
-  name                 = "${local.resource_prefix}nsg${element(split("/", each.value), length(split("/", each.value)) - 1)}"
+  name                 = "${local.resource_prefix}nsg${local.virtual_network.name}"
 
-  network_security_group_id = each.value
-  storage_account_id        = azurerm_storage_account.default_network_watcher_nsg_flow_logs[0].id
-  enabled                   = true
+  target_resource_id = local.virtual_network.id
+  storage_account_id = azurerm_storage_account.default_network_watcher_nsg_flow_logs[0].id
+  enabled            = true
 
   retention_policy {
     enabled = local.network_watcher_flow_log_retention == 0 ? false : true
