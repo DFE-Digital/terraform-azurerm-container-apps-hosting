@@ -202,6 +202,12 @@ variable "mssql_version" {
   default     = "12.0"
 }
 
+variable "mssql_maintenance_configuration_name" {
+  description = "The name of the Public Maintenance Configuration window to apply to the SQL database"
+  type        = string
+  default     = ""
+}
+
 variable "enable_mssql_vulnerability_assessment" {
   description = "Vulnerability assessment can discover, track, and help you remediate potential database vulnerabilities"
   type        = bool
