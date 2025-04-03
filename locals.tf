@@ -144,6 +144,7 @@ locals {
   enable_mssql_vulnerability_assessment           = var.enable_mssql_vulnerability_assessment
   mssql_security_storage_firewall_ipv4_allow_list = var.mssql_security_storage_firewall_ipv4_allow_list
   mssql_managed_identity_assign_role              = var.mssql_managed_identity_assign_role
+  mssql_maintenance_configuration_name            = var.mssql_maintenance_configuration_name
 
   # Postgres Server
   enable_postgresql_database             = var.enable_postgresql_database

@@ -140,11 +140,12 @@ resource "azurerm_mssql_server_extended_auditing_policy" "default" {
 resource "azurerm_mssql_database" "default" {
   count = local.enable_mssql_database ? 1 : 0
 
-  name        = local.mssql_database_name
-  server_id   = azurerm_mssql_server.default[0].id
-  collation   = "SQL_Latin1_General_CP1_CI_AS"
-  sku_name    = local.mssql_sku_name
-  max_size_gb = local.mssql_max_size_gb
+  name                           = local.mssql_database_name
+  server_id                      = azurerm_mssql_server.default[0].id
+  collation                      = "SQL_Latin1_General_CP1_CI_AS"
+  sku_name                       = local.mssql_sku_name
+  max_size_gb                    = local.mssql_max_size_gb
+  maintenance_configuration_name = local.mssql_maintenance_configuration_name != "" ? local.mssql_maintenance_configuration_name : "SQL_Default"
 
   threat_detection_policy {
     state                = "Enabled"
