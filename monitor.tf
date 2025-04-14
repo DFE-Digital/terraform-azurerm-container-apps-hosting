@@ -100,7 +100,7 @@ resource "azurerm_monitor_metric_alert" "count" {
   name                = "Container App Replica Count - ${each.value.name}"
   resource_group_name = local.resource_group.name
   scopes              = [each.value.id]
-  description         = "Container App ${each.value.name} average replica count is less than the expected average"
+  description         = "Container App ${each.value.name} replica count is less than the expected average"
   window_size         = "PT5M"
   frequency           = "PT1M"
   severity            = 1 # Error
