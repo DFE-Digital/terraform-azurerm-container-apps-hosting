@@ -99,14 +99,15 @@ resource "azurerm_monitor_diagnostic_setting" "mssql_security_storage" {
 resource "azurerm_mssql_server" "default" {
   count = local.enable_mssql_database ? 1 : 0
 
-  name                          = local.resource_prefix
-  resource_group_name           = local.resource_group.name
-  location                      = local.resource_group.location
-  version                       = local.mssql_version
-  administrator_login           = local.mssql_server_admin_password != "" ? "${local.resource_prefix}-admin" : null
-  administrator_login_password  = local.mssql_server_admin_password != "" ? local.mssql_server_admin_password : null
-  public_network_access_enabled = local.mssql_server_public_access_enabled
-  minimum_tls_version           = "1.2"
+  name                                     = local.resource_prefix
+  resource_group_name                      = local.resource_group.name
+  location                                 = local.resource_group.location
+  version                                  = local.mssql_version
+  administrator_login                      = local.mssql_server_admin_password != "" ? "${local.resource_prefix}-admin" : null
+  administrator_login_password             = local.mssql_server_admin_password != "" ? local.mssql_server_admin_password : null
+  express_vulnerability_assessment_enabled = local.enable_mssql_vulnerability_assessment
+  public_network_access_enabled            = local.mssql_server_public_access_enabled
+  minimum_tls_version                      = "1.2"
 
   dynamic "azuread_administrator" {
     for_each = local.mssql_azuread_admin_username != "" ? [1] : []
@@ -171,29 +172,6 @@ resource "azurerm_mssql_firewall_rule" "default_mssql" {
   server_id        = azurerm_mssql_server.default[0].id
   start_ip_address = each.value.start_ip_range
   end_ip_address   = lookup(each.value, "end_ip_range", "") != "" ? each.value.end_ip_range : each.value.start_ip_range
-}
-
-# "Express Configuration" for SQL Server vulnerability assessments is not yet
-# supported in the azurerm provider. The "azurerm_mssql_server_vulnerability_assessment"
-# resource only supports the classic configuration which requires a storage account.
-# Instead, we can use AzApi to enable the "Express" (modern) option which does not rely
-# on a storage account.
-# GitHub issue: https://github.com/hashicorp/terraform-provider-azurerm/issues/19971
-resource "azapi_update_resource" "mssql_vulnerability_assessment" {
-  count = local.enable_mssql_database ? 1 : 0
-
-  type      = "Microsoft.Sql/servers/sqlVulnerabilityAssessments@2023-05-01-preview"
-  name      = azurerm_mssql_server.default[0].name
-  parent_id = azurerm_mssql_server.default[0].id
-  body = jsonencode({
-    properties = {
-      state = local.enable_mssql_vulnerability_assessment ? "Enabled" : "Disabled"
-    }
-  })
-
-  depends_on = [
-    azurerm_mssql_server.default[0]
-  ]
 }
 
 resource "azapi_update_resource" "mssql_threat_protection" {
