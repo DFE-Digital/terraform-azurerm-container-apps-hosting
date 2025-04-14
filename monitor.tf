@@ -100,17 +100,17 @@ resource "azurerm_monitor_metric_alert" "count" {
   name                = "Container App Replica Count - ${each.value.name}"
   resource_group_name = local.resource_group.name
   scopes              = [each.value.id]
-  description         = "Container App ${each.value.name} has less than ${each.value.template[0].min_replicas} replicas"
+  description         = "Container App ${each.value.name} average replica count is less than the expected average"
   window_size         = "PT5M"
   frequency           = "PT1M"
   severity            = 1 # Error
 
-  criteria {
-    metric_namespace = "microsoft.app/containerapps"
-    metric_name      = "Replicas"
-    aggregation      = "Average"
-    operator         = "LessThan"
-    threshold        = each.value.template[0].min_replicas
+  dynamic_criteria {
+    metric_namespace  = "microsoft.app/containerapps"
+    metric_name       = "Replicas"
+    aggregation       = "Average"
+    operator          = "LessThan"
+    alert_sensitivity = "Medium"
   }
 
   action {
