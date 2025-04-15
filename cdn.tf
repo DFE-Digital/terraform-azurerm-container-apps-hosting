@@ -276,13 +276,14 @@ resource "azurerm_cdn_frontdoor_rule" "vdp_thanks_txt" {
 resource "azurerm_cdn_frontdoor_firewall_policy" "waf" {
   count = local.cdn_frontdoor_enable_waf ? 1 : 0
 
-  name                              = "${replace(local.resource_prefix, "-", "")}waf"
-  resource_group_name               = local.resource_group.name
-  sku_name                          = azurerm_cdn_frontdoor_profile.cdn[0].sku_name
-  enabled                           = true
-  mode                              = local.cdn_frontdoor_waf_mode
-  custom_block_response_status_code = 403
-  custom_block_response_body        = filebase64("${path.module}/html/waf-response.html")
+  name                                      = "${replace(local.resource_prefix, "-", "")}waf"
+  resource_group_name                       = local.resource_group.name
+  sku_name                                  = azurerm_cdn_frontdoor_profile.cdn[0].sku_name
+  enabled                                   = true
+  mode                                      = local.cdn_frontdoor_waf_mode
+  custom_block_response_status_code         = 403
+  custom_block_response_body                = filebase64("${path.module}/html/waf-response.html")
+  js_challenge_cookie_expiration_in_minutes = lower(local.cdn_frontdoor_sku) == "premium" ? 30 : null
 
   dynamic "custom_rule" {
     for_each = local.cdn_frontdoor_enable_rate_limiting ? [0] : []
