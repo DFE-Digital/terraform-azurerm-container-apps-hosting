@@ -11,7 +11,7 @@ resource "azurerm_virtual_network" "default" {
 }
 
 resource "azurerm_route_table" "default" {
-  count = local.launch_in_vnet ? 1 : 0
+  count = local.launch_in_vnet && local.existing_virtual_network == "" ? 1 : 0
 
   name                          = "${local.resource_prefix}default"
   location                      = local.resource_group.location
@@ -140,7 +140,7 @@ resource "azurerm_subnet" "mssql_private_endpoint_subnet" {
 }
 
 resource "azurerm_subnet_route_table_association" "mssql_private_endpoint_subnet" {
-  count = local.enable_private_endpoint_mssql ? 1 : 0
+  count = local.enable_private_endpoint_mssql && local.existing_virtual_network == "" ? 1 : 0
 
   subnet_id      = azurerm_subnet.mssql_private_endpoint_subnet[0].id
   route_table_id = azurerm_route_table.default[0].id
@@ -190,7 +190,7 @@ resource "azurerm_subnet" "redis_cache_subnet" {
 }
 
 resource "azurerm_subnet_route_table_association" "redis_cache_subnet" {
-  count = local.enable_private_endpoint_redis ? 1 : 0
+  count = local.enable_private_endpoint_redis && local.existing_virtual_network == "" ? 1 : 0
 
   subnet_id      = azurerm_subnet.redis_cache_subnet[0].id
   route_table_id = azurerm_route_table.default[0].id
@@ -251,7 +251,7 @@ resource "azurerm_subnet" "postgresql_subnet" {
 }
 
 resource "azurerm_subnet_route_table_association" "postgresql_subnet" {
-  count = local.enable_private_endpoint_postgres ? 1 : 0
+  count = local.enable_private_endpoint_postgres && local.existing_virtual_network == "" ? 1 : 0
 
   subnet_id      = azurerm_subnet.postgresql_subnet[0].id
   route_table_id = azurerm_route_table.default[0].id
@@ -301,7 +301,7 @@ resource "azurerm_subnet" "registry_private_endpoint_subnet" {
 }
 
 resource "azurerm_subnet_route_table_association" "registry_private_endpoint_subnet" {
-  count = local.enable_private_endpoint_registry ? 1 : 0
+  count = local.enable_private_endpoint_registry && local.existing_virtual_network == "" ? 1 : 0
 
   subnet_id      = azurerm_subnet.registry_private_endpoint_subnet[0].id
   route_table_id = azurerm_route_table.default[0].id
@@ -351,7 +351,7 @@ resource "azurerm_subnet" "storage_private_endpoint_subnet" {
 }
 
 resource "azurerm_subnet_route_table_association" "storage_private_endpoint_subnet" {
-  count = local.enable_private_endpoint_storage ? 1 : 0
+  count = local.enable_private_endpoint_storage && local.existing_virtual_network == "" ? 1 : 0
 
   subnet_id      = azurerm_subnet.storage_private_endpoint_subnet[0].id
   route_table_id = azurerm_route_table.default[0].id
@@ -432,7 +432,7 @@ resource "azurerm_subnet" "app_configuration_private_endpoint_subnet" {
 }
 
 resource "azurerm_subnet_route_table_association" "app_configuration_private_endpoint_subnet" {
-  count = local.enable_private_endpoint_app_configuration ? 1 : 0
+  count = local.enable_private_endpoint_app_configuration && local.existing_virtual_network == "" ? 1 : 0
 
   subnet_id      = azurerm_subnet.app_configuration_private_endpoint_subnet[0].id
   route_table_id = azurerm_route_table.default[0].id
