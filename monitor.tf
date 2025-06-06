@@ -823,7 +823,7 @@ resource "azurerm_monitor_activity_log_alert" "delete_frontdoor_cdn" {
 }
 
 resource "azurerm_monitor_activity_log_alert" "delete_vnet" {
-  count = local.enable_monitoring && local.alarm_for_delete_events && local.launch_in_vnet ? 1 : 0
+  count = local.enable_monitoring && local.alarm_for_delete_events && local.launch_in_vnet && local.existing_virtual_network == "" ? 1 : 0
 
   name                = "Resource Deletion - Virtual Network - ${local.virtual_network.name}"
   resource_group_name = local.resource_group.name
