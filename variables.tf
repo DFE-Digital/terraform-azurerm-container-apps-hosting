@@ -1303,3 +1303,45 @@ variable "enable_monitoring_traces_include_warnings" {
   type        = bool
   default     = false
 }
+
+variable "container_apps_infra_subnet_cidr" {
+  description = "Specify a subnet prefix to use for the container_apps_infra subnet"
+  type        = string
+  default     = ""
+}
+
+variable "mssql_private_endpoint_subnet_cidr" {
+  description = "Specify a subnet prefix to use for the mssql_private_endpoint subnet"
+  type        = string
+  default     = ""
+}
+
+variable "registry_subnet_cidr" {
+  description = "Specify a subnet prefix to use for the registry subnet"
+  type        = string
+  default     = ""
+}
+
+variable "redis_cache_subnet_cidr" {
+  description = "Specify a subnet prefix to use for the redis_cache subnet"
+  type        = string
+  default     = ""
+}
+
+variable "postgresql_subnet_cidr" {
+  description = "Specify a subnet prefix to use for the postgresql subnet"
+  type        = string
+  default     = ""
+}
+
+variable "storage_subnet_cidr" {
+  description = "Specify a subnet prefix to use for the storage subnet"
+  type        = string
+  default     = ""
+}
+
+variable "app_configuration_subnet_cidr" {
+  description = "Specify a subnet prefix to use for the app_configuration subnet"
+  type        = string
+  default     = ""
+}
