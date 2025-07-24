@@ -9,6 +9,17 @@ resource "azurerm_container_app_environment" "container_app_env" {
   internal_load_balancer_enabled = local.launch_in_vnet ? local.container_app_environment_internal_load_balancer_enabled : false
   logs_destination               = "log-analytics"
 
+  dynamic "workload_profile" {
+    for_each = local.container_app_environment_workload_profile_type != "Consumption" ? [1] : []
+
+    content {
+      name                  = local.container_app_environment_workload_profile_type
+      workload_profile_type = local.container_app_environment_workload_profile_type
+      minimum_count         = local.container_app_environment_min_host_count
+      maximum_count         = local.container_app_environment_max_host_count
+    }
+  }
+
   tags = local.tags
 }
 
@@ -52,6 +63,7 @@ resource "azurerm_container_app" "container_apps" {
   container_app_environment_id = local.container_app_environment.id
   resource_group_name          = local.resource_group.name
   revision_mode                = "Single"
+  workload_profile_name        = local.container_app_environment_workload_profile_type != "Consumption" ? local.container_app_environment_workload_profile_type : null
 
   dynamic "ingress" {
     for_each = each.value == "main" ? [1] : []
