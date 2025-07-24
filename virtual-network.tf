@@ -17,7 +17,18 @@ resource "azurerm_route_table" "default" {
   location                      = local.resource_group.location
   resource_group_name           = local.resource_group.name
   bgp_route_propagation_enabled = true
-  tags                          = local.tags
+
+  dynamic "route" {
+    for_each = local.virtual_network_deny_all_egress ? [1] : []
+
+    content {
+      name           = "deny-all-egress"
+      address_prefix = "0.0.0.0/0"
+      next_hop_type  = "None"
+    }
+  }
+
+  tags = local.tags
 }
 
 # Container App Networking
@@ -29,8 +40,18 @@ resource "azurerm_subnet" "container_apps_infra_subnet" {
   virtual_network_name = local.virtual_network.name
   resource_group_name  = local.resource_group.name
   address_prefixes     = [local.container_apps_infra_subnet_cidr]
+  service_endpoints    = local.container_apps_infra_subnet_service_endpoints
 
-  service_endpoints = local.container_apps_infra_subnet_service_endpoints
+  delegation {
+    name = "AzureContainerAppEnvironments"
+
+    service_delegation {
+      name = "Microsoft.App/environments"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action"
+      ]
+    }
+  }
 }
 
 resource "azurerm_subnet_route_table_association" "container_apps_infra_subnet" {
@@ -50,6 +71,23 @@ resource "azurerm_network_security_group" "container_apps_infra" {
   resource_group_name = local.resource_group.name
 
   tags = local.tags
+}
+
+resource "azurerm_network_security_rule" "allow_vnet_outbound" {
+  count = local.launch_in_vnet ? 1 : 0
+
+  network_security_group_name = azurerm_network_security_group.container_apps_infra[0].name
+  resource_group_name         = local.resource_group.name
+
+  name                       = "AllowVnetOutbound"
+  priority                   = 100
+  direction                  = "Outbound"
+  access                     = "Allow"
+  protocol                   = "*"
+  source_port_range          = "*"
+  destination_port_range     = "*"
+  source_address_prefix      = "VirtualNetwork"
+  destination_address_prefix = "VirtualNetwork"
 }
 
 resource "azurerm_network_security_rule" "container_apps_infra_allow_frontdoor_inbound_only" {

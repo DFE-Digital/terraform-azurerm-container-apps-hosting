@@ -1345,3 +1345,27 @@ variable "app_configuration_subnet_cidr" {
   type        = string
   default     = ""
 }
+
+variable "virtual_network_deny_all_egress" {
+  description = "Should all outbound traffic across the default Virtual Network be denied?"
+  type        = bool
+  default     = false
+}
+
+variable "container_app_environment_workload_profile_type" {
+  description = "Specify the type of workflow profile this Container App environment requires. Defaults to PAYG (Consumption)"
+  type        = string
+  default     = "Consumption"
+}
+
+variable "container_app_environment_min_host_count" {
+  description = "The minimum number of hosts in the Container App environment cluster. Not applicable if using Consumption profile type"
+  type        = number
+  default     = 1
+}
+
+variable "container_app_environment_max_host_count" {
+  description = "The maximum number of hosts in the Container App environment cluster. Not applicable if using Consumption profile type"
+  type        = number
+  default     = 1
+}
