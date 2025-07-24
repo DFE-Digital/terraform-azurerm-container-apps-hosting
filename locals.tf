@@ -24,6 +24,7 @@ locals {
   launch_in_vnet                                           = var.launch_in_vnet
   existing_virtual_network                                 = var.existing_virtual_network
   virtual_network                                          = local.existing_virtual_network == "" ? azurerm_virtual_network.default[0] : data.azurerm_virtual_network.existing_virtual_network[0]
+  virtual_network_deny_all_egress                          = var.virtual_network_deny_all_egress
   virtual_network_address_space                            = var.virtual_network_address_space
   virtual_network_address_space_mask                       = element(split("/", local.virtual_network_address_space), 1)
   container_apps_infra_subnet_cidr                         = var.container_apps_infra_subnet_cidr == "" ? cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 0) : var.container_apps_infra_subnet_cidr

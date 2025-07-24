@@ -17,7 +17,18 @@ resource "azurerm_route_table" "default" {
   location                      = local.resource_group.location
   resource_group_name           = local.resource_group.name
   bgp_route_propagation_enabled = true
-  tags                          = local.tags
+
+  dynamic "route" {
+    for_each = local.virtual_network_deny_all_egress ? [1] : []
+
+    content {
+      name           = "deny-all-egress"
+      address_prefix = "0.0.0.0/0"
+      next_hop_type  = "None"
+    }
+  }
+
+  tags = local.tags
 }
 
 # Container App Networking

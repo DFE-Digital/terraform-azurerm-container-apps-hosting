@@ -935,6 +935,7 @@ module "azure_container_apps_hosting" {
 | <a name="input_storage_subnet_cidr"></a> [storage\_subnet\_cidr](#input\_storage\_subnet\_cidr) | Specify a subnet prefix to use for the storage subnet | `string` | `""` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to be applied to all resources | `map(string)` | `{}` | no |
 | <a name="input_virtual_network_address_space"></a> [virtual\_network\_address\_space](#input\_virtual\_network\_address\_space) | Virtual Network address space CIDR | `string` | `"172.16.0.0/12"` | no |
+| <a name="input_virtual_network_deny_all_egress"></a> [virtual\_network\_deny\_all\_egress](#input\_virtual\_network\_deny\_all\_egress) | Should all outbound traffic across the default Virtual Network be denied? | `bool` | `false` | no |
 | <a name="input_worker_container_command"></a> [worker\_container\_command](#input\_worker\_container\_command) | Container command for the Worker container. `enable_worker_container` must be set to true for this to have any effect. | `list(string)` | `[]` | no |
 | <a name="input_worker_container_max_replicas"></a> [worker\_container\_max\_replicas](#input\_worker\_container\_max\_replicas) | Worker ontainer max replicas | `number` | `2` | no |
 | <a name="input_worker_container_min_replicas"></a> [worker\_container\_min\_replicas](#input\_worker\_container\_min\_replicas) | Worker container min replicas | `number` | `1` | no |
