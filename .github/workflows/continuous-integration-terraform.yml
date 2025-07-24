@@ -2,7 +2,7 @@ name: Continuous integration
 
 on:
   push:
-    branches: main
+    branches: [ main ]
   pull_request:
 
 jobs:
@@ -24,19 +24,19 @@ jobs:
           fi
 
       - name: Run a Terraform init
-        uses: docker://hashicorp/terraform:1.11.4
+        uses: docker://hashicorp/terraform:1.12.2
         with:
           entrypoint: terraform
           args: init
 
       - name: Run a Terraform validate
-        uses: docker://hashicorp/terraform:1.11.4
+        uses: docker://hashicorp/terraform:1.12.2
         with:
           entrypoint: terraform
           args: validate
 
       - name: Run a Terraform format check
-        uses: docker://hashicorp/terraform:1.11.4
+        uses: docker://hashicorp/terraform:1.12.2
         with:
           entrypoint: terraform
           args: fmt -check=true -diff=true
