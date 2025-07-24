@@ -1345,3 +1345,9 @@ variable "app_configuration_subnet_cidr" {
   type        = string
   default     = ""
 }
+
+variable "virtual_network_deny_all_egress" {
+  description = "Should all outbound traffic across the default Virtual Network be denied?"
+  type        = bool
+  default     = false
+}
