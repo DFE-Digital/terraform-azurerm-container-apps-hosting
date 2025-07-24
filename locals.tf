@@ -187,6 +187,10 @@ locals {
   redis_config = merge(local.redis_config_defaults, var.redis_config)
 
   # Container App
+  container_app_environment_workload_profile_type = var.container_app_environment_workload_profile_type
+  container_app_environment_min_host_count        = var.container_app_environment_min_host_count
+  container_app_environment_max_host_count        = var.container_app_environment_max_host_count
+
   container_cpu                          = var.container_cpu
   container_memory                       = var.container_memory
   container_min_replicas                 = var.container_min_replicas
