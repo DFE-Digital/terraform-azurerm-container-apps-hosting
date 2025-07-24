@@ -73,6 +73,23 @@ resource "azurerm_network_security_group" "container_apps_infra" {
   tags = local.tags
 }
 
+resource "azurerm_network_security_rule" "allow_vnet_outbound" {
+  count = local.launch_in_vnet ? 1 : 0
+
+  network_security_group_name = azurerm_network_security_group.container_apps_infra[0].name
+  resource_group_name         = local.resource_group.name
+
+  name                       = "AllowVnetOutbound"
+  priority                   = 100
+  direction                  = "Outbound"
+  access                     = "Allow"
+  protocol                   = "*"
+  source_port_range          = "*"
+  destination_port_range     = "*"
+  source_address_prefix      = "VirtualNetwork"
+  destination_address_prefix = "VirtualNetwork"
+}
+
 resource "azurerm_network_security_rule" "container_apps_infra_allow_frontdoor_inbound_only" {
   count = local.launch_in_vnet && local.restrict_container_apps_to_cdn_inbound_only ? 1 : 0
 
