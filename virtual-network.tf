@@ -107,6 +107,25 @@ resource "azurerm_network_security_rule" "container_apps_infra_allow_frontdoor_i
   destination_address_prefix = "${local.container_app_environment.static_ip_address}/32"
 }
 
+resource "azurerm_network_security_rule" "container_apps_infra_allow_appgateway_inbound_only" {
+  count = local.launch_in_vnet && local.restrict_container_apps_to_agw_inbound_only && local.container_apps_allow_agw_ip != "" ? 1 : 0
+
+  network_security_group_name = azurerm_network_security_group.container_apps_infra[0].name
+  resource_group_name         = local.resource_group.name
+
+  name        = "AllowAzureAppGatewayInbound"
+  description = "Allow Azure App Gateway to access Azure Container Apps."
+
+  priority                   = 130
+  direction                  = "Inbound"
+  access                     = "Allow"
+  protocol                   = "Tcp"
+  source_port_range          = "*"
+  destination_port_ranges    = ["443", "80", "65200-65535"]
+  source_address_prefix      = "${local.container_apps_allow_agw_ip}/32"
+  destination_address_prefix = "${local.container_app_environment.static_ip_address}/32"
+}
+
 resource "azurerm_network_security_rule" "container_apps_infra_allow_ips_inbound" {
   count = local.launch_in_vnet && length(local.container_apps_allow_ips_inbound) != 0 ? 1 : 0
 
@@ -116,7 +135,7 @@ resource "azurerm_network_security_rule" "container_apps_infra_allow_ips_inbound
   name        = "AllowClientIpsInbound"
   description = "Allow your Client IPs to access Azure Container Apps. Use port 80 for HTTP and 443 for HTTPS."
 
-  priority                   = 130
+  priority                   = 140
   direction                  = "Inbound"
   access                     = "Allow"
   protocol                   = "Tcp"
