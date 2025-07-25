@@ -59,6 +59,20 @@ data "archive_file" "azure_function" {
   source_dir  = "${path.module}/functions/src/${each.key}/"
 }
 
+data "azurerm_application_gateway" "existing_agw" {
+  count = local.launch_in_vnet && local.restrict_container_apps_to_agw_inbound_only && local.container_apps_allow_agw_resource.name != "" ? 1 : 0
+
+  name                = local.container_apps_allow_agw_resource.name
+  resource_group_name = local.container_apps_allow_agw_resource.resource_group_name
+}
+
+data "azurerm_public_ip" "existing_agw_ip" {
+  count = local.container_apps_allow_agw_pip_resource_id != null ? 1 : 0
+
+  name                = element(local.container_apps_allow_agw_pip_resource_id, 8)
+  resource_group_name = element(local.container_apps_allow_agw_pip_resource_id, 4)
+}
+
 resource "terraform_data" "function_app_package_sha" {
   for_each = local.linux_function_health_insights_api
 

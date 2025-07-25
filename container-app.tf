@@ -69,8 +69,10 @@ resource "azurerm_container_app" "container_apps" {
     for_each = each.value == "main" ? [1] : []
 
     content {
-      external_enabled = true
-      target_port      = local.container_port
+      external_enabled           = true
+      target_port                = local.container_port
+      allow_insecure_connections = false
+
       traffic_weight {
         percentage      = 100
         latest_revision = true
