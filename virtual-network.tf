@@ -163,7 +163,7 @@ resource "azurerm_subnet_route_table_association" "mssql_private_endpoint_subnet
 resource "azurerm_private_dns_zone" "mssql_private_link" {
   count = local.enable_private_endpoint_mssql ? 1 : 0
 
-  name                = "${local.resource_prefix}.database.windows.net"
+  name                = "privatelink.database.windows.net"
   resource_group_name = local.resource_group.name
   tags                = local.tags
 }
@@ -176,17 +176,6 @@ resource "azurerm_private_dns_zone_virtual_network_link" "mssql_private_link" {
   private_dns_zone_name = azurerm_private_dns_zone.mssql_private_link[0].name
   virtual_network_id    = local.virtual_network.id
   tags                  = local.tags
-}
-
-resource "azurerm_private_dns_a_record" "mssql_private_endpoint" {
-  count = local.enable_private_endpoint_mssql ? 1 : 0
-
-  name                = "@"
-  zone_name           = azurerm_private_dns_zone.mssql_private_link[0].name
-  resource_group_name = local.resource_group.name
-  ttl                 = 300
-  records             = [azurerm_private_endpoint.default["mssql"].private_service_connection[0].private_ip_address]
-  tags                = local.tags
 }
 
 # Redis Networking
@@ -213,7 +202,7 @@ resource "azurerm_subnet_route_table_association" "redis_cache_subnet" {
 resource "azurerm_private_dns_zone" "redis_cache_private_link" {
   count = local.enable_private_endpoint_redis ? 1 : 0
 
-  name                = "${azurerm_redis_cache.default[0].name}.redis.cache.windows.net"
+  name                = "privatelink.redis.cache.windows.net"
   resource_group_name = local.resource_group.name
   tags                = local.tags
 }
@@ -226,17 +215,6 @@ resource "azurerm_private_dns_zone_virtual_network_link" "redis_cache_private_li
   private_dns_zone_name = azurerm_private_dns_zone.redis_cache_private_link[0].name
   virtual_network_id    = local.virtual_network.id
   tags                  = local.tags
-}
-
-resource "azurerm_private_dns_a_record" "redis_cache_private_endpoint" {
-  count = local.enable_private_endpoint_redis ? 1 : 0
-
-  name                = "@"
-  zone_name           = azurerm_private_dns_zone.redis_cache_private_link[0].name
-  resource_group_name = local.resource_group.name
-  ttl                 = 300
-  records             = [azurerm_private_endpoint.default["rediscache"].private_service_connection[0].private_ip_address]
-  tags                = local.tags
 }
 
 # PostgreSQL Server Networking
@@ -274,7 +252,7 @@ resource "azurerm_subnet_route_table_association" "postgresql_subnet" {
 resource "azurerm_private_dns_zone" "postgresql_private_link" {
   count = local.enable_private_endpoint_postgres ? 1 : 0
 
-  name                = "${local.resource_prefix}.postgres.database.azure.com"
+  name                = "privatelink.postgres.database.azure.com"
   resource_group_name = local.resource_group.name
   tags                = local.tags
 }
@@ -287,17 +265,6 @@ resource "azurerm_private_dns_zone_virtual_network_link" "postgresql_private_lin
   private_dns_zone_name = azurerm_private_dns_zone.postgresql_private_link[0].name
   virtual_network_id    = local.virtual_network.id
   tags                  = local.tags
-}
-
-resource "azurerm_private_dns_a_record" "postgresql_private_link" {
-  count = local.enable_private_endpoint_postgres ? 1 : 0
-
-  name                = "@"
-  zone_name           = azurerm_private_dns_zone.postgresql_private_link[0].name
-  resource_group_name = local.resource_group.name
-  ttl                 = 300
-  records             = [azurerm_private_endpoint.default["postgres"].private_service_connection[0].private_ip_address]
-  tags                = local.tags
 }
 
 # Container Registry Networking
@@ -324,7 +291,7 @@ resource "azurerm_subnet_route_table_association" "registry_private_endpoint_sub
 resource "azurerm_private_dns_zone" "registry_private_link" {
   count = local.enable_private_endpoint_registry ? 1 : 0
 
-  name                = "${azurerm_container_registry.acr[0].name}.azurecr.io"
+  name                = "privatelink.azurecr.io"
   resource_group_name = local.resource_group.name
   tags                = local.tags
 }
@@ -337,17 +304,6 @@ resource "azurerm_private_dns_zone_virtual_network_link" "registry_private_link"
   private_dns_zone_name = azurerm_private_dns_zone.registry_private_link[0].name
   virtual_network_id    = local.virtual_network.id
   tags                  = local.tags
-}
-
-resource "azurerm_private_dns_a_record" "registry_private_link" {
-  count = local.enable_private_endpoint_registry ? 1 : 0
-
-  name                = "@"
-  zone_name           = azurerm_private_dns_zone.registry_private_link[0].name
-  resource_group_name = local.resource_group.name
-  ttl                 = 300
-  records             = [azurerm_private_endpoint.default["registry"].private_service_connection[0].private_ip_address]
-  tags                = local.tags
 }
 
 # Storage Account Networking
@@ -374,7 +330,7 @@ resource "azurerm_subnet_route_table_association" "storage_private_endpoint_subn
 resource "azurerm_private_dns_zone" "storage_private_link_blob" {
   count = local.enable_private_endpoint_storage && local.enable_container_app_blob_storage ? 1 : 0
 
-  name                = "${azurerm_storage_account.container_app[0].name}.blob.core.windows.net"
+  name                = "privatelink.blob.core.windows.net"
   resource_group_name = local.resource_group.name
   tags                = local.tags
 }
@@ -389,23 +345,12 @@ resource "azurerm_private_dns_zone_virtual_network_link" "storage_private_link_b
   tags                  = local.tags
 }
 
-resource "azurerm_private_dns_a_record" "storage_private_link_blob" {
-  count = local.enable_private_endpoint_storage && local.enable_container_app_blob_storage ? 1 : 0
-
-  name                = "@"
-  zone_name           = azurerm_private_dns_zone.storage_private_link_blob[0].name
-  resource_group_name = local.resource_group.name
-  ttl                 = 300
-  records             = [azurerm_private_endpoint.default["blob"].private_service_connection[0].private_ip_address]
-  tags                = local.tags
-}
-
 # Storage Account Networking / Private Endpoint / File
 
 resource "azurerm_private_dns_zone" "storage_private_link_file" {
   count = local.enable_private_endpoint_storage && local.enable_container_app_file_share ? 1 : 0
 
-  name                = "${azurerm_storage_account.container_app[0].name}.file.core.windows.net"
+  name                = "privatelink.file.core.windows.net"
   resource_group_name = local.resource_group.name
   tags                = local.tags
 }
@@ -418,17 +363,6 @@ resource "azurerm_private_dns_zone_virtual_network_link" "storage_private_link_f
   private_dns_zone_name = azurerm_private_dns_zone.storage_private_link_file[0].name
   virtual_network_id    = local.virtual_network.id
   tags                  = local.tags
-}
-
-resource "azurerm_private_dns_a_record" "storage_private_link_file" {
-  count = local.enable_private_endpoint_storage && local.enable_container_app_file_share ? 1 : 0
-
-  name                = "@"
-  zone_name           = azurerm_private_dns_zone.storage_private_link_file[0].name
-  resource_group_name = local.resource_group.name
-  ttl                 = 300
-  records             = [azurerm_private_endpoint.default["file"].private_service_connection[0].private_ip_address]
-  tags                = local.tags
 }
 
 # App Configuration Networking
@@ -455,7 +389,7 @@ resource "azurerm_subnet_route_table_association" "app_configuration_private_end
 resource "azurerm_private_dns_zone" "app_configuration_private_link" {
   count = local.enable_private_endpoint_app_configuration ? 1 : 0
 
-  name                = "${azurerm_app_configuration.default[0].name}.privatelink.azconfig.io"
+  name                = "privatelink.azconfig.io"
   resource_group_name = local.resource_group.name
   tags                = local.tags
 }
@@ -468,15 +402,4 @@ resource "azurerm_private_dns_zone_virtual_network_link" "app_configuration_priv
   private_dns_zone_name = azurerm_private_dns_zone.app_configuration_private_link[0].name
   virtual_network_id    = local.virtual_network.id
   tags                  = local.tags
-}
-
-resource "azurerm_private_dns_a_record" "app_configuration_private_link" {
-  count = local.enable_private_endpoint_app_configuration ? 1 : 0
-
-  name                = "@"
-  zone_name           = azurerm_private_dns_zone.app_configuration_private_link[0].name
-  resource_group_name = local.resource_group.name
-  ttl                 = 300
-  records             = [azurerm_private_endpoint.default["appconfig"].private_service_connection[0].private_ip_address]
-  tags                = local.tags
 }

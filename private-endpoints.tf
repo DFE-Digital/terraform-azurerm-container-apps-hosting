@@ -13,5 +13,10 @@ resource "azurerm_private_endpoint" "default" {
     is_manual_connection           = lookup(each.value, "is_manual_connection", false)
   }
 
+  private_dns_zone_group {
+    name                 = "default"
+    private_dns_zone_ids = [each.value.private_zone_id]
+  }
+
   tags = local.tags
 }

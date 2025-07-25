@@ -49,7 +49,8 @@ locals {
       resource_group : local.resource_group,
       subnet_id : azurerm_subnet.redis_cache_subnet[0].id,
       resource_id : azurerm_redis_cache.default[0].id,
-      subresource_names : ["redisCache"]
+      subresource_names : ["redisCache"],
+      private_zone_id : azurerm_private_dns_zone.redis_cache_private_link[0].id,
     }
   } : {}
   enable_private_endpoint_mssql = local.enable_mssql_database ? (
@@ -60,7 +61,8 @@ locals {
       resource_group : local.resource_group,
       subnet_id : azurerm_subnet.mssql_private_endpoint_subnet[0].id,
       resource_id : azurerm_mssql_server.default[0].id,
-      subresource_names : ["sqlServer"]
+      subresource_names : ["sqlServer"],
+      private_zone_id : azurerm_private_dns_zone.mssql_private_link[0].id,
     }
   } : {}
   enable_private_endpoint_postgres = local.enable_postgresql_database && local.launch_in_vnet && local.postgresql_network_connectivity_method == "private" ? true : false
@@ -69,7 +71,8 @@ locals {
       resource_group : local.resource_group,
       subnet_id : azurerm_subnet.postgresql_subnet[0].id,
       resource_id : azurerm_postgresql_flexible_server.default[0].id,
-      subresource_names : ["postgresqlServer"]
+      subresource_names : ["postgresqlServer"],
+      private_zone_id : azurerm_private_dns_zone.postgresql_private_link[0].id,
     }
   } : {}
   enable_private_endpoint_registry = local.registry_sku == "Premium" ? true : false
@@ -78,6 +81,7 @@ locals {
       resource_group : local.resource_group,
       subnet_id : azurerm_subnet.registry_private_endpoint_subnet[0].id,
       resource_id : azurerm_container_registry.acr[0].id,
+      private_zone_id : azurerm_private_dns_zone.registry_private_link[0].id,
     }
   } : {}
   enable_private_endpoint_storage = local.enable_storage_account ? true : false
@@ -86,7 +90,8 @@ locals {
       resource_group : local.resource_group,
       subnet_id : azurerm_subnet.storage_private_endpoint_subnet[0].id,
       resource_id : azurerm_storage_account.container_app[0].id,
-      subresource_names : ["blob"]
+      subresource_names : ["blob"],
+      private_zone_id : azurerm_private_dns_zone.storage_private_link_blob[0].id,
     }
   } : {}
   private_endpoint_storage_file = local.enable_container_app_file_share ? {
@@ -95,6 +100,7 @@ locals {
       subnet_id : azurerm_subnet.storage_private_endpoint_subnet[0].id,
       resource_id : azurerm_storage_account.container_app[0].id,
       subresource_names : ["file"],
+      private_zone_id : azurerm_private_dns_zone.storage_private_link_file[0].id,
     }
   } : {}
   enable_private_endpoint_app_configuration = local.enable_app_configuration && local.app_configuration_sku != "free" ? true : false
@@ -103,6 +109,7 @@ locals {
       resource_group : local.resource_group,
       subnet_id : azurerm_subnet.app_configuration_private_endpoint_subnet[0].id,
       resource_id : azurerm_app_configuration.default[0].id,
+      private_zone_id : azurerm_private_dns_zone.app_configuration_private_link[0].id,
     }
   } : {}
   private_endpoints = merge(
