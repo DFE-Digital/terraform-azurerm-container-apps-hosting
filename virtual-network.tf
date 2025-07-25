@@ -73,21 +73,23 @@ resource "azurerm_network_security_group" "container_apps_infra" {
   tags = local.tags
 }
 
-resource "azurerm_network_security_rule" "allow_vnet_outbound" {
+resource "azurerm_network_security_rule" "allow_subnet_internal" {
   count = local.launch_in_vnet ? 1 : 0
 
   network_security_group_name = azurerm_network_security_group.container_apps_infra[0].name
   resource_group_name         = local.resource_group.name
 
-  name                       = "AllowVnetOutbound"
-  priority                   = 100
-  direction                  = "Outbound"
-  access                     = "Allow"
-  protocol                   = "*"
-  source_port_range          = "*"
-  destination_port_range     = "*"
-  source_address_prefix      = "VirtualNetwork"
-  destination_address_prefix = "VirtualNetwork"
+  name        = "AllowSubnetInbound"
+  description = "Required to allow the container app envoy sidecar to connect to envoy service."
+
+  priority                     = 100
+  direction                    = "Inbound"
+  access                       = "Allow"
+  protocol                     = "Tcp"
+  source_port_range            = "*"
+  destination_port_range       = "*"
+  source_address_prefixes      = azurerm_subnet.container_apps_infra_subnet[0].address_prefixes
+  destination_address_prefixes = azurerm_subnet.container_apps_infra_subnet[0].address_prefixes
 }
 
 resource "azurerm_network_security_rule" "container_apps_infra_allow_frontdoor_inbound_only" {
@@ -96,13 +98,15 @@ resource "azurerm_network_security_rule" "container_apps_infra_allow_frontdoor_i
   network_security_group_name = azurerm_network_security_group.container_apps_infra[0].name
   resource_group_name         = local.resource_group.name
 
-  name                       = "AllowFrontdoor"
-  priority                   = 100
+  name        = "AllowAzureFrontDoorInbound"
+  description = "Allow Azure Front Door to access Azure Container Apps."
+
+  priority                   = 120
   direction                  = "Inbound"
   access                     = "Allow"
-  protocol                   = "*"
+  protocol                   = "Tcp"
   source_port_range          = "*"
-  destination_port_range     = "443"
+  destination_port_ranges    = ["443", "80"]
   source_address_prefix      = "AzureFrontDoor.Backend"
   destination_address_prefix = "${local.container_app_environment.static_ip_address}/32"
 }
@@ -113,13 +117,15 @@ resource "azurerm_network_security_rule" "container_apps_infra_allow_ips_inbound
   network_security_group_name = azurerm_network_security_group.container_apps_infra[0].name
   resource_group_name         = local.resource_group.name
 
-  name                       = "AllowIpsInbound"
-  priority                   = 200
+  name        = "AllowClientIpsInbound"
+  description = "Allow your Client IPs to access Azure Container Apps. Use port 80 for HTTP and 443 for HTTPS."
+
+  priority                   = 130
   direction                  = "Inbound"
   access                     = "Allow"
-  protocol                   = "*"
+  protocol                   = "Tcp"
   source_port_range          = "*"
-  destination_port_range     = "443"
+  destination_port_ranges    = ["443", "80"]
   source_address_prefixes    = local.container_apps_allow_ips_inbound
   destination_address_prefix = "${local.container_app_environment.static_ip_address}/32"
 }
