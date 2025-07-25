@@ -154,6 +154,47 @@ resource "azurerm_subnet_route_table_association" "mssql_private_endpoint_subnet
   route_table_id = azurerm_route_table.default[0].id
 }
 
+# SQL Server Networking / Security
+
+resource "azurerm_network_security_group" "mssql_infra" {
+  count = local.enable_mssql_database ? (
+    local.launch_in_vnet ? 1 : 0
+  ) : 0
+
+  name                = "${local.resource_prefix}mssqlnsg"
+  location            = local.resource_group.location
+  resource_group_name = local.resource_group.name
+
+  tags = local.tags
+}
+
+resource "azurerm_network_security_rule" "allow_mssql_inbound" {
+  count = local.enable_mssql_database ? (
+    local.launch_in_vnet ? 1 : 0
+  ) : 0
+
+  name                         = "AllowInboundMSSQLFromContainerApp"
+  priority                     = 100
+  direction                    = "Inbound"
+  access                       = "Allow"
+  protocol                     = "Tcp"
+  source_port_range            = "*"
+  destination_port_range       = "1433"
+  source_address_prefixes      = azurerm_subnet.container_apps_infra_subnet[0].address_prefixes
+  destination_address_prefixes = azurerm_subnet.mssql_private_endpoint_subnet[0].address_prefixes
+  network_security_group_name  = azurerm_network_security_group.mssql_infra[0].name
+  resource_group_name          = local.resource_group.name
+}
+
+resource "azurerm_subnet_network_security_group_association" "mssql_infra" {
+  count = local.enable_mssql_database ? (
+    local.launch_in_vnet ? 1 : 0
+  ) : 0
+
+  subnet_id                 = azurerm_subnet.mssql_private_endpoint_subnet[0].id
+  network_security_group_id = azurerm_network_security_group.mssql_infra[0].id
+}
+
 # SQL Server Networking / Private Endpoint
 
 resource "azurerm_private_dns_zone" "mssql_private_link" {
@@ -202,6 +243,41 @@ resource "azurerm_subnet_route_table_association" "redis_cache_subnet" {
 
   subnet_id      = azurerm_subnet.redis_cache_subnet[0].id
   route_table_id = azurerm_route_table.default[0].id
+}
+
+# Redis Networking / Security
+
+resource "azurerm_network_security_group" "redis_infra" {
+  count = local.enable_private_endpoint_redis ? 1 : 0
+
+  name                = "${local.resource_prefix}redisnsg"
+  location            = local.resource_group.location
+  resource_group_name = local.resource_group.name
+
+  tags = local.tags
+}
+
+resource "azurerm_network_security_rule" "allow_redis_inbound" {
+  count = local.enable_private_endpoint_redis ? 1 : 0
+
+  name                         = "AllowInboundRedisFromContainerApp"
+  priority                     = 100
+  direction                    = "Inbound"
+  access                       = "Allow"
+  protocol                     = "Tcp"
+  source_port_range            = "*"
+  destination_port_range       = "6379-6380"
+  source_address_prefixes      = azurerm_subnet.container_apps_infra_subnet[0].address_prefixes
+  destination_address_prefixes = azurerm_subnet.redis_cache_subnet[0].address_prefixes
+  network_security_group_name  = azurerm_network_security_group.redis_infra[0].name
+  resource_group_name          = local.resource_group.name
+}
+
+resource "azurerm_subnet_network_security_group_association" "redis_infra" {
+  count = local.enable_private_endpoint_redis ? 1 : 0
+
+  subnet_id                 = azurerm_subnet.redis_cache_subnet[0].id
+  network_security_group_id = azurerm_network_security_group.redis_infra[0].id
 }
 
 # Redis Networking / Private Endpoint
@@ -265,6 +341,41 @@ resource "azurerm_subnet_route_table_association" "postgresql_subnet" {
   route_table_id = azurerm_route_table.default[0].id
 }
 
+# PostgreSQL Server Networking / Security
+
+resource "azurerm_network_security_group" "postgresql_infra" {
+  count = local.enable_private_endpoint_postgres ? 1 : 0
+
+  name                = "${local.resource_prefix}postgresqlnsg"
+  location            = local.resource_group.location
+  resource_group_name = local.resource_group.name
+
+  tags = local.tags
+}
+
+resource "azurerm_network_security_rule" "allow_postgresql_inbound" {
+  count = local.enable_private_endpoint_postgres ? 1 : 0
+
+  name                         = "AllowInboundPostgresSQLFromContainerApp"
+  priority                     = 100
+  direction                    = "Inbound"
+  access                       = "Allow"
+  protocol                     = "Tcp"
+  source_port_range            = "*"
+  destination_port_range       = "5432"
+  source_address_prefixes      = azurerm_subnet.container_apps_infra_subnet[0].address_prefixes
+  destination_address_prefixes = azurerm_subnet.postgresql_subnet[0].address_prefixes
+  network_security_group_name  = azurerm_network_security_group.postgresql_infra[0].name
+  resource_group_name          = local.resource_group.name
+}
+
+resource "azurerm_subnet_network_security_group_association" "postgresql_infra" {
+  count = local.enable_private_endpoint_postgres ? 1 : 0
+
+  subnet_id                 = azurerm_subnet.postgresql_subnet[0].id
+  network_security_group_id = azurerm_network_security_group.postgresql_infra[0].id
+}
+
 # PostgreSQL Server Networking / Private Endpoint
 
 resource "azurerm_private_dns_zone" "postgresql_private_link" {
@@ -315,6 +426,41 @@ resource "azurerm_subnet_route_table_association" "registry_private_endpoint_sub
   route_table_id = azurerm_route_table.default[0].id
 }
 
+# Container Registry Networking / Security
+
+resource "azurerm_network_security_group" "registry_infra" {
+  count = local.enable_private_endpoint_registry ? 1 : 0
+
+  name                = "${local.resource_prefix}registrynsg"
+  location            = local.resource_group.location
+  resource_group_name = local.resource_group.name
+
+  tags = local.tags
+}
+
+resource "azurerm_network_security_rule" "allow_registry_inbound" {
+  count = local.enable_private_endpoint_registry ? 1 : 0
+
+  name                         = "AllowInboundACRFromContainerApp"
+  priority                     = 100
+  direction                    = "Inbound"
+  access                       = "Allow"
+  protocol                     = "Tcp"
+  source_port_range            = "*"
+  destination_port_range       = "443"
+  source_address_prefixes      = azurerm_subnet.container_apps_infra_subnet[0].address_prefixes
+  destination_address_prefixes = azurerm_subnet.registry_private_endpoint_subnet[0].address_prefixes
+  network_security_group_name  = azurerm_network_security_group.registry_infra[0].name
+  resource_group_name          = local.resource_group.name
+}
+
+resource "azurerm_subnet_network_security_group_association" "registry_infra" {
+  count = local.enable_private_endpoint_registry ? 1 : 0
+
+  subnet_id                 = azurerm_subnet.registry_private_endpoint_subnet[0].id
+  network_security_group_id = azurerm_network_security_group.registry_infra[0].id
+}
+
 # Container Registry Networking / Private Endpoint
 
 resource "azurerm_private_dns_zone" "registry_private_link" {
@@ -363,6 +509,42 @@ resource "azurerm_subnet_route_table_association" "storage_private_endpoint_subn
 
   subnet_id      = azurerm_subnet.storage_private_endpoint_subnet[0].id
   route_table_id = azurerm_route_table.default[0].id
+}
+
+# Storage Account Networking / Security
+
+resource "azurerm_network_security_group" "storage_infra" {
+  count = local.enable_private_endpoint_storage ? 1 : 0
+
+  name                = "${local.resource_prefix}storagensg"
+  location            = local.resource_group.location
+  resource_group_name = local.resource_group.name
+
+  tags = local.tags
+}
+
+resource "azurerm_network_security_rule" "allow_storage_inbound" {
+  count = local.enable_private_endpoint_storage && local.existing_virtual_network == "" ? 1 : 0
+
+  name                         = "AllowInboundStorageFromContainerApp"
+  priority                     = 100
+  direction                    = "Inbound"
+  access                       = "Allow"
+  protocol                     = "Tcp"
+  source_port_range            = "*"
+  destination_port_ranges      = ["443", "445"]
+  source_address_prefixes      = azurerm_subnet.container_apps_infra_subnet[0].address_prefixes
+  destination_address_prefixes = azurerm_subnet.storage_private_endpoint_subnet[0].address_prefixes
+  network_security_group_name  = azurerm_network_security_group.storage_infra[0].name
+  resource_group_name          = local.resource_group.name
+}
+
+
+resource "azurerm_subnet_network_security_group_association" "storage_infra" {
+  count = local.enable_private_endpoint_storage ? 1 : 0
+
+  subnet_id                 = azurerm_subnet.storage_private_endpoint_subnet[0].id
+  network_security_group_id = azurerm_network_security_group.storage_infra[0].id
 }
 
 # Storage Account Networking / Private Endpoint / Blob
@@ -444,6 +626,41 @@ resource "azurerm_subnet_route_table_association" "app_configuration_private_end
 
   subnet_id      = azurerm_subnet.app_configuration_private_endpoint_subnet[0].id
   route_table_id = azurerm_route_table.default[0].id
+}
+
+# App Configuration Networking / Security
+
+resource "azurerm_network_security_group" "app_configuration_infra" {
+  count = local.enable_private_endpoint_app_configuration ? 1 : 0
+
+  name                = "${local.resource_prefix}appconfigurationnsg"
+  location            = local.resource_group.location
+  resource_group_name = local.resource_group.name
+
+  tags = local.tags
+}
+
+resource "azurerm_network_security_rule" "allow_app_configuration_inbound" {
+  count = local.enable_private_endpoint_app_configuration ? 1 : 0
+
+  name                         = "AllowInboundAppConfigurationFromContainerApp"
+  priority                     = 100
+  direction                    = "Inbound"
+  access                       = "Allow"
+  protocol                     = "Tcp"
+  source_port_range            = "*"
+  destination_port_range       = "443"
+  source_address_prefixes      = azurerm_subnet.container_apps_infra_subnet[0].address_prefixes
+  destination_address_prefixes = azurerm_subnet.app_configuration_private_endpoint_subnet[0].address_prefixes
+  network_security_group_name  = azurerm_network_security_group.app_configuration_infra[0].name
+  resource_group_name          = local.resource_group.name
+}
+
+resource "azurerm_subnet_network_security_group_association" "app_configuration_infra" {
+  count = local.enable_private_endpoint_app_configuration ? 1 : 0
+
+  subnet_id                 = azurerm_subnet.app_configuration_private_endpoint_subnet[0].id
+  network_security_group_id = azurerm_network_security_group.app_configuration_infra[0].id
 }
 
 # App Configuration Networking / Private Endpoint
