@@ -18,14 +18,10 @@ resource "azurerm_route_table" "default" {
   resource_group_name           = local.resource_group.name
   bgp_route_propagation_enabled = true
 
-  dynamic "route" {
-    for_each = local.virtual_network_deny_all_egress ? [1] : []
-
-    content {
-      name           = "deny-all-egress"
-      address_prefix = "0.0.0.0/0"
-      next_hop_type  = "None"
-    }
+  route {
+    name           = "egress"
+    address_prefix = "0.0.0.0/0"
+    next_hop_type  = local.virtual_network_deny_all_egress ? "None" : "Internet"
   }
 
   tags = local.tags
