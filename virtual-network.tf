@@ -11,7 +11,7 @@ resource "azurerm_virtual_network" "default" {
 }
 
 resource "azurerm_route_table" "default" {
-  count = local.launch_in_vnet && local.existing_virtual_network == "" ? 1 : 0
+  count = local.launch_in_vnet && local.existing_virtual_network == "" && local.container_app_environment_workload_profile_type != "Consumption" ? 1 : 0
 
   name                          = "${local.resource_prefix}default"
   location                      = local.resource_group.location
@@ -38,20 +38,24 @@ resource "azurerm_subnet" "container_apps_infra_subnet" {
   address_prefixes     = [local.container_apps_infra_subnet_cidr]
   service_endpoints    = local.container_apps_infra_subnet_service_endpoints
 
-  delegation {
-    name = "AzureContainerAppEnvironments"
+  dynamic "delegation" {
+    for_each = local.container_app_environment_workload_profile_type != "Consumption" ? [1] : []
 
-    service_delegation {
-      name = "Microsoft.App/environments"
-      actions = [
-        "Microsoft.Network/virtualNetworks/subnets/join/action"
-      ]
+    content {
+      name = "AzureContainerAppEnvironments"
+
+      service_delegation {
+        name = "Microsoft.App/environments"
+        actions = [
+          "Microsoft.Network/virtualNetworks/subnets/join/action"
+        ]
+      }
     }
   }
 }
 
 resource "azurerm_subnet_route_table_association" "container_apps_infra_subnet" {
-  count = local.launch_in_vnet && local.existing_virtual_network == "" ? 1 : 0
+  count = local.launch_in_vnet && local.existing_virtual_network == "" && local.container_app_environment_workload_profile_type != "Consumption" ? 1 : 0
 
   subnet_id      = azurerm_subnet.container_apps_infra_subnet[0].id
   route_table_id = azurerm_route_table.default[0].id
