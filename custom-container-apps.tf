@@ -5,6 +5,7 @@ resource "azurerm_container_app" "custom_container_apps" {
   container_app_environment_id = each.value.container_app_environment_id == "" ? local.container_app_environment.id : each.value.container_app_environment_id
   resource_group_name          = each.value.resource_group_name == "" ? local.resource_group.name : each.value.resource_group_name
   revision_mode                = each.value.revision_mode
+  workload_profile_name        = each.value.container_app_environment_id == "" && local.container_app_environment_workload_profile_type != "Consumption" ? local.container_app_environment_workload_profile_type : null
 
   dynamic "ingress" {
     for_each = each.value.ingress != null ? [1] : []

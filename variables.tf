@@ -1351,3 +1351,39 @@ variable "virtual_network_deny_all_egress" {
   type        = bool
   default     = false
 }
+
+variable "container_app_environment_workload_profile_type" {
+  description = "Specify the type of workflow profile this Container App environment requires. Defaults to PAYG (Consumption)"
+  type        = string
+  default     = "Consumption"
+}
+
+variable "container_app_environment_min_host_count" {
+  description = "The minimum number of hosts in the Container App environment cluster. Not applicable if using Consumption profile type"
+  type        = number
+  default     = 1
+}
+
+variable "container_app_environment_max_host_count" {
+  description = "The maximum number of hosts in the Container App environment cluster. Not applicable if using Consumption profile type"
+  type        = number
+  default     = 1
+}
+
+variable "restrict_container_apps_to_agw_inbound_only" {
+  description = "Restricts access to the Container Apps by creating a network security group rule that only allows a specified App Gateway inbound, and attaches it to the subnet of the container app environment."
+  type        = bool
+  default     = false
+}
+
+variable "container_apps_allow_agw_resource" {
+  description = "Resource name and resource group of your App Gateway V2 resource"
+  type = object({
+    name                = string
+    resource_group_name = string
+  })
+  default = {
+    name                = ""
+    resource_group_name = ""
+  }
+}
