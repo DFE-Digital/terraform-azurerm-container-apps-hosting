@@ -977,6 +977,7 @@ module "azure_container_apps_hosting" {
 | <a name="output_azurerm_log_analytics_workspace_container_app"></a> [azurerm\_log\_analytics\_workspace\_container\_app](#output\_azurerm\_log\_analytics\_workspace\_container\_app) | Container App Log Analytics Workspace |
 | <a name="output_azurerm_resource_group_default"></a> [azurerm\_resource\_group\_default](#output\_azurerm\_resource\_group\_default) | Default Azure Resource Group |
 | <a name="output_cdn_frontdoor_dns_records"></a> [cdn\_frontdoor\_dns\_records](#output\_cdn\_frontdoor\_dns\_records) | Azure Front Door DNS Records that must be created manually |
+| <a name="output_container_app_environment_ingress_ip"></a> [container\_app\_environment\_ingress\_ip](#output\_container\_app\_environment\_ingress\_ip) | Ingress IP address assigned to the Container App environment |
 | <a name="output_container_app_managed_identity"></a> [container\_app\_managed\_identity](#output\_container\_app\_managed\_identity) | User-Assigned Managed Identity assigned to the Container App |
 | <a name="output_container_fqdn"></a> [container\_fqdn](#output\_container\_fqdn) | FQDN for the Container App |
 | <a name="output_networking"></a> [networking](#output\_networking) | IDs for various VNet resources if created |
