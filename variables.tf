@@ -1381,9 +1381,11 @@ variable "container_apps_allow_agw_resource" {
   type = object({
     name                = string
     resource_group_name = string
+    vnet_name           = optional(string, "")
   })
   default = {
     name                = ""
     resource_group_name = ""
+    vnet_name           = ""
   }
 }

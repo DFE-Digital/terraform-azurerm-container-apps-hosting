@@ -457,7 +457,7 @@ locals {
   restrict_container_apps_to_agw_inbound_only     = var.restrict_container_apps_to_agw_inbound_only
   container_apps_allow_agw_resource               = var.container_apps_allow_agw_resource
   container_apps_allow_agw_pip_resource_id        = length(data.azurerm_application_gateway.existing_agw) > 0 ? split("/", data.azurerm_application_gateway.existing_agw[0].frontend_ip_configuration[0].public_ip_address_id) : null
-  container_apps_allow_agw_ip                     = length(data.azurerm_application_gateway.existing_agw) > 0 ? data.azurerm_public_ip.existing_agw_ip[0].ip_address : null
+  container_apps_allow_agw_ip                     = length(data.azurerm_application_gateway.existing_agw) > 0 ? data.azurerm_public_ip.existing_agw_ip[0].ip_address : ""
   container_apps_allow_ips_inbound                = var.container_apps_allow_ips_inbound
   cdn_frontdoor_host_redirects                    = var.cdn_frontdoor_host_redirects
   cdn_frontdoor_host_add_response_headers         = var.cdn_frontdoor_host_add_response_headers

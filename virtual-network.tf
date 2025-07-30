@@ -130,6 +130,53 @@ resource "azurerm_network_security_rule" "container_apps_infra_allow_appgateway_
   destination_address_prefix = "${local.container_app_environment.static_ip_address}/32"
 }
 
+resource "azurerm_virtual_network_peering" "peered_vnet_app_gateway" {
+  count = local.restrict_container_apps_to_agw_inbound_only && local.container_apps_allow_agw_resource.vnet_name != "" ? 1 : 0
+
+  name                      = "Vnet-${local.virtual_network.name}-To-Vnet-${data.azurerm_virtual_network.existing_agw_vnet[0].name}"
+  resource_group_name       = local.resource_group.name
+  virtual_network_name      = local.virtual_network.name
+  remote_virtual_network_id = data.azurerm_virtual_network.existing_agw_vnet[0].id
+}
+
+resource "azurerm_private_dns_zone" "container_app_environment" {
+  count = local.restrict_container_apps_to_agw_inbound_only && local.container_apps_allow_agw_resource.vnet_name != "" ? 1 : 0
+
+  name                = replace(local.container_fqdn, "${local.environment}${local.project_name}-${local.image_name}.", "")
+  resource_group_name = local.resource_group.name
+  tags                = local.tags
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "container_app_environment_agw_link" {
+  count = local.restrict_container_apps_to_agw_inbound_only && local.container_apps_allow_agw_resource.vnet_name != "" ? 1 : 0
+
+  name                  = "${local.resource_prefix}containerappsprivatelink"
+  resource_group_name   = local.resource_group.name
+  private_dns_zone_name = azurerm_private_dns_zone.container_app_environment[0].name
+  virtual_network_id    = data.azurerm_virtual_network.existing_agw_vnet[0].id
+  tags                  = local.tags
+}
+
+resource "azurerm_private_dns_a_record" "container_app_environment_root" {
+  count = local.restrict_container_apps_to_agw_inbound_only && local.container_apps_allow_agw_resource.vnet_name != "" ? 1 : 0
+
+  name                = "@"
+  zone_name           = azurerm_private_dns_zone.container_app_environment[0].name
+  resource_group_name = local.resource_group.name
+  ttl                 = 300
+  records             = [local.container_app_environment.static_ip_address]
+}
+
+resource "azurerm_private_dns_a_record" "container_app_environment_wildcard" {
+  count = local.restrict_container_apps_to_agw_inbound_only && local.container_apps_allow_agw_resource.vnet_name != "" ? 1 : 0
+
+  name                = "*"
+  zone_name           = azurerm_private_dns_zone.container_app_environment[0].name
+  resource_group_name = local.resource_group.name
+  ttl                 = 300
+  records             = [local.container_app_environment.static_ip_address]
+}
+
 resource "azurerm_network_security_rule" "container_apps_infra_allow_ips_inbound" {
   count = local.launch_in_vnet && length(local.container_apps_allow_ips_inbound) != 0 ? 1 : 0
 

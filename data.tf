@@ -66,6 +66,13 @@ data "azurerm_application_gateway" "existing_agw" {
   resource_group_name = local.container_apps_allow_agw_resource.resource_group_name
 }
 
+data "azurerm_virtual_network" "existing_agw_vnet" {
+  count = local.launch_in_vnet && local.restrict_container_apps_to_agw_inbound_only && local.container_apps_allow_agw_resource.vnet_name != "" ? 1 : 0
+
+  name                = local.container_apps_allow_agw_resource.vnet_name
+  resource_group_name = local.container_apps_allow_agw_resource.resource_group_name
+}
+
 data "azurerm_public_ip" "existing_agw_ip" {
   count = local.container_apps_allow_agw_pip_resource_id != null ? 1 : 0
 
