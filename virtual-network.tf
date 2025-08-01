@@ -52,6 +52,10 @@ resource "azurerm_subnet" "container_apps_infra_subnet" {
       }
     }
   }
+
+  depends_on = [
+    local.virtual_network
+  ]
 }
 
 resource "azurerm_subnet_route_table_association" "container_apps_infra_subnet" {
@@ -215,6 +219,10 @@ resource "azurerm_subnet" "mssql_private_endpoint_subnet" {
   resource_group_name               = local.resource_group.name
   address_prefixes                  = [local.mssql_private_endpoint_subnet_cidr]
   private_endpoint_network_policies = "Enabled"
+
+  depends_on = [
+    local.virtual_network
+  ]
 }
 
 resource "azurerm_subnet_route_table_association" "mssql_private_endpoint_subnet" {
@@ -306,6 +314,10 @@ resource "azurerm_subnet" "redis_cache_subnet" {
   resource_group_name               = local.resource_group.name
   address_prefixes                  = [local.redis_cache_subnet_cidr]
   private_endpoint_network_policies = "Enabled"
+
+  depends_on = [
+    local.virtual_network
+  ]
 }
 
 resource "azurerm_subnet_route_table_association" "redis_cache_subnet" {
@@ -402,6 +414,10 @@ resource "azurerm_subnet" "postgresql_subnet" {
       ]
     }
   }
+
+  depends_on = [
+    local.virtual_network
+  ]
 }
 
 resource "azurerm_subnet_route_table_association" "postgresql_subnet" {
@@ -487,6 +503,10 @@ resource "azurerm_subnet" "registry_private_endpoint_subnet" {
   resource_group_name               = local.resource_group.name
   address_prefixes                  = [local.registry_subnet_cidr]
   private_endpoint_network_policies = "Enabled"
+
+  depends_on = [
+    local.virtual_network
+  ]
 }
 
 resource "azurerm_subnet_route_table_association" "registry_private_endpoint_subnet" {
@@ -572,6 +592,10 @@ resource "azurerm_subnet" "storage_private_endpoint_subnet" {
   resource_group_name               = local.resource_group.name
   address_prefixes                  = [local.storage_subnet_cidr]
   private_endpoint_network_policies = "Enabled"
+
+  depends_on = [
+    local.virtual_network
+  ]
 }
 
 resource "azurerm_subnet_route_table_association" "storage_private_endpoint_subnet" {
@@ -689,6 +713,10 @@ resource "azurerm_subnet" "app_configuration_private_endpoint_subnet" {
   resource_group_name               = local.resource_group.name
   address_prefixes                  = [local.app_configuration_subnet_cidr]
   private_endpoint_network_policies = "Enabled"
+
+  depends_on = [
+    local.virtual_network
+  ]
 }
 
 resource "azurerm_subnet_route_table_association" "app_configuration_private_endpoint_subnet" {

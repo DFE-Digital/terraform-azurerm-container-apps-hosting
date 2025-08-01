@@ -21,19 +21,24 @@ locals {
   key_vault_access_ipv4                     = var.key_vault_access_ipv4
 
   # Networking
-  launch_in_vnet                                           = var.launch_in_vnet
-  existing_virtual_network                                 = var.existing_virtual_network
-  virtual_network                                          = local.existing_virtual_network == "" ? azurerm_virtual_network.default[0] : data.azurerm_virtual_network.existing_virtual_network[0]
-  virtual_network_deny_all_egress                          = var.virtual_network_deny_all_egress
-  virtual_network_address_space                            = var.virtual_network_address_space
-  virtual_network_address_space_mask                       = element(split("/", local.virtual_network_address_space), 1)
-  container_apps_infra_subnet_cidr                         = var.container_apps_infra_subnet_cidr == "" ? cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 0) : var.container_apps_infra_subnet_cidr
-  mssql_private_endpoint_subnet_cidr                       = var.mssql_private_endpoint_subnet_cidr == "" ? cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 1) : var.mssql_private_endpoint_subnet_cidr
-  registry_subnet_cidr                                     = var.registry_subnet_cidr == "" ? cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 3) : var.registry_subnet_cidr
-  redis_cache_subnet_cidr                                  = var.redis_cache_subnet_cidr == "" ? cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 4) : var.redis_cache_subnet_cidr
-  postgresql_subnet_cidr                                   = var.postgresql_subnet_cidr == "" ? cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 5) : var.postgresql_subnet_cidr
-  storage_subnet_cidr                                      = var.storage_subnet_cidr == "" ? cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 6) : var.storage_subnet_cidr
-  app_configuration_subnet_cidr                            = var.app_configuration_subnet_cidr == "" ? cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 7) : var.app_configuration_subnet_cidr
+  launch_in_vnet                     = var.launch_in_vnet
+  existing_virtual_network           = var.existing_virtual_network
+  virtual_network                    = local.existing_virtual_network == "" ? azurerm_virtual_network.default[0] : data.azurerm_virtual_network.existing_virtual_network[0]
+  virtual_network_deny_all_egress    = var.virtual_network_deny_all_egress
+  virtual_network_address_space      = var.virtual_network_address_space
+  virtual_network_address_space_mask = element(split("/", local.virtual_network_address_space), 1)
+  # Networking / Subnetting
+  container_apps_infra_subnet_cidr        = var.container_apps_infra_subnet_cidr == "" ? cidrsubnet(local.virtual_network_address_space, 23 - local.virtual_network_address_space_mask, 0) : var.container_apps_infra_subnet_cidr
+  container_apps_infra_address_space_mask = element(split("/", local.container_apps_infra_subnet_cidr), 1)
+
+  remaining_subnet_cidr              = cidrsubnet(local.virtual_network_address_space, 1, 1)
+  mssql_private_endpoint_subnet_cidr = var.mssql_private_endpoint_subnet_cidr == "" ? cidrsubnet(local.remaining_subnet_cidr, 27 - local.container_apps_infra_address_space_mask, 0) : var.mssql_private_endpoint_subnet_cidr
+  registry_subnet_cidr               = var.registry_subnet_cidr == "" ? cidrsubnet(local.remaining_subnet_cidr, 27 - local.container_apps_infra_address_space_mask, 1) : var.registry_subnet_cidr
+  redis_cache_subnet_cidr            = var.redis_cache_subnet_cidr == "" ? cidrsubnet(local.remaining_subnet_cidr, 27 - local.container_apps_infra_address_space_mask, 2) : var.redis_cache_subnet_cidr
+  storage_subnet_cidr                = var.storage_subnet_cidr == "" ? cidrsubnet(local.remaining_subnet_cidr, 27 - local.container_apps_infra_address_space_mask, 3) : var.storage_subnet_cidr
+  app_configuration_subnet_cidr      = var.app_configuration_subnet_cidr == "" ? cidrsubnet(local.remaining_subnet_cidr, 27 - local.container_apps_infra_address_space_mask, 4) : var.app_configuration_subnet_cidr
+  postgresql_subnet_cidr             = var.postgresql_subnet_cidr == "" ? cidrsubnet(local.remaining_subnet_cidr, 27 - local.container_apps_infra_address_space_mask, 5) : var.postgresql_subnet_cidr
+
   container_app_environment_internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
   container_apps_infra_subnet_service_endpoints = distinct(concat(
     local.launch_in_vnet && local.enable_storage_account ? ["Microsoft.Storage"] : [],
