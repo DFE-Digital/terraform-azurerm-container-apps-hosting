@@ -364,6 +364,18 @@ variable "redis_config" {
   default = {}
 }
 
+variable "enable_signalr" {
+  description = "Creates a serverless Azure SignalR service"
+  type        = bool
+  default     = false
+}
+
+variable "signalr_sku" {
+  description = "SignalR SKU name"
+  type        = string
+  default     = "Free_F1"
+}
+
 variable "image_name" {
   description = "Image name"
   type        = string

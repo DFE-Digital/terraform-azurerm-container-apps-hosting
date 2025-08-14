@@ -198,6 +198,10 @@ locals {
   }
   redis_config = merge(local.redis_config_defaults, var.redis_config)
 
+  # SignalR
+  enable_signalr = var.enable_signalr
+  signalr_sku    = var.signalr_sku
+
   # Container App
   container_app_environment_workload_profile_type = var.container_app_environment_workload_profile_type
   container_app_environment_min_host_count        = var.container_app_environment_min_host_count
@@ -243,6 +247,12 @@ locals {
         value = azurerm_app_configuration.default[0].endpoint
       }
     ] : [],
+    local.enable_signalr ? [
+      {
+        name  = "connectionstrings--azuresignalr",
+        value = azurerm_signalr_service.default[0].primary_connection_string
+      }
+    ] : [],
     local.container_app_blob_storage_sas_secret,
     [for env_name, env_value in nonsensitive(local.container_secret_environment_variables) : {
       name  = lower(replace(env_name, "_", "-"))
@@ -283,6 +293,12 @@ locals {
       {
         "name" : "ConnectionStrings__AppConfig",
         "secretRef" : "connectionstrings--appconfig"
+      }
+    ] : [],
+    local.enable_signalr ? [
+      {
+        "name" : "ConnectionStrings__AzureSignalR",
+        "secretRef" : "connectionstrings--azuresignalr"
       }
     ] : [],
     local.enable_container_app_uami ? [
