@@ -10,5 +10,5 @@ resource "azurerm_signalr_service" "default" {
     capacity = 1
   }
 
-  service_mode = "Serverless"
+  service_mode = local.signalr_service_mode
 }

@@ -199,8 +199,9 @@ locals {
   redis_config = merge(local.redis_config_defaults, var.redis_config)
 
   # SignalR
-  enable_signalr = var.enable_signalr
-  signalr_sku    = var.signalr_sku
+  enable_signalr       = var.enable_signalr
+  signalr_sku          = var.signalr_sku
+  signalr_service_mode = var.signalr_service_mode
 
   # Container App
   container_app_environment_workload_profile_type = var.container_app_environment_workload_profile_type
