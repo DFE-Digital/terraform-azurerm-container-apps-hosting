@@ -376,6 +376,12 @@ variable "signalr_sku" {
   default     = "Free_F1"
 }
 
+variable "signalr_service_mode" {
+  description = "SignalR service mode"
+  type        = string
+  default     = "Default"
+}
+
 variable "image_name" {
   description = "Image name"
   type        = string
