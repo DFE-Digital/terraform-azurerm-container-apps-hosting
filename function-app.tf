@@ -98,7 +98,9 @@ resource "azurerm_linux_function_app" "function_apps" {
 
   app_settings = merge(each.value.app_settings, {
     "AZURE_CLIENT_ID" = azurerm_user_assigned_identity.function_apps[each.key].client_id
-  })
+    },
+    each.value["enable_service_bus"] ? { "SERVICEBUS_CONNECTION" = azurerm_servicebus_namespace_authorization_rule.function_apps[each.key].primary_connection_string } : {}
+  )
 
   site_config {
     always_on                              = false

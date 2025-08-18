@@ -1300,6 +1300,7 @@ variable "linux_function_apps" {
     webdeploy_publish_basic_authentication_enabled = optional(bool, false)
     ipv4_access                                    = optional(list(string), [])
     minimum_tls_version                            = optional(string, "1.3")
+    enable_service_bus                             = optional(bool, false)
   }))
   default = {}
 }
