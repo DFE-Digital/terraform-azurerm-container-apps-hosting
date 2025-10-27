@@ -121,11 +121,30 @@ resource "azurerm_function_app_flex_consumption" "function_apps" {
     "AZURE_CLIENT_ID" = azurerm_user_assigned_identity.function_apps[each.key].client_id
     },
     each.value["enable_service_bus"] ? {
-      "SERVICEBUS_CONNECTION"   = azurerm_servicebus_namespace_authorization_rule.function_apps[each.key].primary_connection_string
       "SERVICEBUS_TOPIC_NAME"   = azurerm_servicebus_topic.function_apps[each.key].name
       "SERVICEBUS_SUBSCRIPTION" = azurerm_servicebus_subscription.function_apps[each.key].name
     } : {}
   )
+
+  dynamic "connection_string" {
+    for_each = each.value["enable_service_bus"] ? [1] : []
+
+    content {
+      name  = "ServiceBus"
+      type  = "ServiceBus"
+      value = azurerm_servicebus_namespace_authorization_rule.function_apps[each.key].primary_connection_string
+    }
+  }
+
+  dynamic "connection_string" {
+    for_each = each.value["connection_strings"]
+
+    content {
+      name  = connection_string.key
+      type  = connection_string.value["type"]
+      value = connection_string.value["value"]
+    }
+  }
 
   site_config {
     application_insights_connection_string = local.enable_app_insights_integration ? azurerm_application_insights.function_apps[each.key].connection_string : null
