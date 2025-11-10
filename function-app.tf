@@ -116,6 +116,7 @@ resource "azurerm_function_app_flex_consumption" "function_apps" {
   service_plan_id                                = azurerm_service_plan.function_apps_flex[0].id
   webdeploy_publish_basic_authentication_enabled = each.value.webdeploy_publish_basic_authentication_enabled
   https_only                                     = true
+  virtual_network_subnet_id                      = local.launch_in_vnet ? azurerm_subnet.function_app_subnet[0].id : null
 
   app_settings = merge(each.value.app_settings, {
     "AZURE_CLIENT_ID" = azurerm_user_assigned_identity.function_apps[each.key].client_id

@@ -1369,6 +1369,12 @@ variable "app_configuration_subnet_cidr" {
   default     = ""
 }
 
+variable "function_app_subnet_cidr" {
+  description = "Specify a subnet prefix to use for the function app subnet"
+  type        = string
+  default     = ""
+}
+
 variable "virtual_network_deny_all_egress" {
   description = "Should all outbound traffic across the default Virtual Network be denied?"
   type        = bool
