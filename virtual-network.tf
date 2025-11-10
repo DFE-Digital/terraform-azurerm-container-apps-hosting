@@ -791,3 +791,69 @@ resource "azurerm_private_dns_a_record" "app_configuration_private_link" {
   records             = [azurerm_private_endpoint.default["appconfig"].private_service_connection[0].private_ip_address]
   tags                = local.tags
 }
+
+# Function apps
+
+resource "azurerm_subnet" "function_app_subnet" {
+  count = length(local.linux_function_apps) > 0 ? 1 : 0
+
+  name                              = "${local.resource_prefix}functionapp"
+  virtual_network_name              = local.virtual_network.name
+  resource_group_name               = local.resource_group.name
+  address_prefixes                  = [local.function_app_subnet_cidr]
+  private_endpoint_network_policies = "Enabled"
+
+  delegation {
+    name = "env"
+    service_delegation {
+      name = "Microsoft.App/environments"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+      ]
+    }
+  }
+
+  depends_on = [
+    local.virtual_network
+  ]
+}
+
+resource "azurerm_subnet_route_table_association" "function_app_subnet" {
+  count = length(local.linux_function_apps) > 0 && local.existing_virtual_network == "" && local.container_app_environment_workload_profile_type != "Consumption" ? 1 : 0
+
+  subnet_id      = azurerm_subnet.function_app_subnet[0].id
+  route_table_id = azurerm_route_table.default[0].id
+}
+
+resource "azurerm_network_security_group" "function_app_infra" {
+  count = length(local.linux_function_apps) > 0 ? 1 : 0
+
+  name                = "${local.resource_prefix}functionappnsg"
+  location            = local.resource_group.location
+  resource_group_name = local.resource_group.name
+
+  tags = local.tags
+}
+
+resource "azurerm_network_security_rule" "allow_https_inbound" {
+  count = length(local.linux_function_apps) > 0 ? 1 : 0
+
+  name                         = "AllowInboundHttpsFromContainerApp"
+  priority                     = 100
+  direction                    = "Inbound"
+  access                       = "Allow"
+  protocol                     = "Tcp"
+  source_port_range            = "*"
+  destination_port_range       = "443"
+  source_address_prefixes      = azurerm_subnet.container_apps_infra_subnet[0].address_prefixes
+  destination_address_prefixes = azurerm_subnet.function_app_subnet[0].address_prefixes
+  network_security_group_name  = azurerm_network_security_group.function_app_infra[0].name
+  resource_group_name          = local.resource_group.name
+}
+
+resource "azurerm_subnet_network_security_group_association" "function_app_infra" {
+  count = length(local.linux_function_apps) > 0 ? 1 : 0
+
+  subnet_id                 = azurerm_subnet.function_app_subnet[0].id
+  network_security_group_id = azurerm_network_security_group.function_app_infra[0].id
+}

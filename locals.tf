@@ -38,6 +38,7 @@ locals {
   storage_subnet_cidr                = var.storage_subnet_cidr == "" ? cidrsubnet(local.remaining_subnet_cidr, 27 - local.container_apps_infra_address_space_mask, 3) : var.storage_subnet_cidr
   app_configuration_subnet_cidr      = var.app_configuration_subnet_cidr == "" ? cidrsubnet(local.remaining_subnet_cidr, 27 - local.container_apps_infra_address_space_mask, 4) : var.app_configuration_subnet_cidr
   postgresql_subnet_cidr             = var.postgresql_subnet_cidr == "" ? cidrsubnet(local.remaining_subnet_cidr, 27 - local.container_apps_infra_address_space_mask, 5) : var.postgresql_subnet_cidr
+  function_app_subnet_cidr           = var.function_app_subnet_cidr == "" ? cidrsubnet(local.remaining_subnet_cidr, 27 - local.container_apps_infra_address_space_mask, 6) : var.function_app_subnet_cidr
 
   container_app_environment_internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
   container_apps_infra_subnet_service_endpoints = distinct(concat(
