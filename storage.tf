@@ -70,7 +70,7 @@ resource "azurerm_storage_account_network_rules" "container_app" {
   storage_account_id         = azurerm_storage_account.container_app[0].id
   default_action             = "Deny"
   bypass                     = ["AzureServices"]
-  virtual_network_subnet_ids = [azurerm_subnet.container_apps_infra_subnet[0].id]
+  virtual_network_subnet_ids = local.launch_in_vnet ? [azurerm_subnet.container_apps_infra_subnet[0].id] : null
   ip_rules                   = local.storage_account_ipv4_allow_list
 }
 
