@@ -10,5 +10,12 @@ resource "azurerm_signalr_service" "default" {
     capacity = 1
   }
 
+  live_trace {
+    connectivity_logs_enabled = true
+    enabled                   = false
+    http_request_logs_enabled = true
+    messaging_logs_enabled    = true
+  }
+
   service_mode = local.signalr_service_mode
 }
