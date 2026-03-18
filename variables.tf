@@ -1418,3 +1418,8 @@ variable "container_apps_allow_agw_resource" {
     vnet_name           = ""
   }
 }
+variable "force_new_revision" {
+  type        = bool
+  default     = true
+  description = "Force the container app to always generate a new revision"
+}

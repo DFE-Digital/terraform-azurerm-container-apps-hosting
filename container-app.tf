@@ -110,6 +110,8 @@ resource "azurerm_container_app" "container_apps" {
   }
 
   template {
+    revision_suffix = local.force_new_revision ? local.container_app_env_vars_fingerprint : null
+
     dynamic "init_container" {
       for_each = each.value == "main" && local.enable_init_container ? [1] : []
 

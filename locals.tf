@@ -321,6 +321,13 @@ locals {
         secretRef = lower(replace(env_name, "_", "-"))
       }
   ]) : v.name => v }
+
+  # Container App / Environment Variables Fingerprint
+  # This fingerprint ensures a new revision is created when secrets change
+  force_new_revision                 = var.force_new_revision
+  merge_secrets_and_timestamp        = merge(local.container_app_env_vars, { revision_timestamp = formatdate("YYYY-MM-DD", timestamp()) })
+  container_app_env_vars_fingerprint = substr(sha256(jsonencode(local.merge_secrets_and_timestamp)), 0, 12)
+
   # Container App / Init Containers
   enable_init_container  = var.enable_init_container
   init_container_image   = var.init_container_image
