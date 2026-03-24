@@ -8,8 +8,3 @@ jobs:
     steps:
       - name: Clone repo
         uses: actions/checkout@v4
-      - name: tfsec
-        uses: aquasecurity/tfsec-pr-commenter-action@v1.3.1
-        with:
-          github_token: ${{ github.token }}
-          working_directory: ''
