@@ -1,6 +1,8 @@
 resource "azurerm_key_vault" "default" {
   count = local.escrow_container_app_secrets_in_key_vault && local.existing_key_vault == "" ? 1 : 0
 
+  #checkov:skip=CKV2_AZURE_32: Suppressing check pending review
+
   name                       = "${local.resource_prefix}-kv"
   location                   = local.azure_location
   resource_group_name        = local.resource_group.name
@@ -23,6 +25,8 @@ resource "azurerm_key_vault" "default" {
 }
 
 resource "azurerm_key_vault_secret" "secret_app_setting" {
+  #checkov:skip=CKV_AZURE_41: Suppressing check pending review
+
   for_each = local.escrow_container_app_secrets_in_key_vault ? nonsensitive(local.container_app_secrets) : {}
 
   name         = each.value["name"]

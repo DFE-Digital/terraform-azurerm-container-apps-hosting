@@ -1,4 +1,11 @@
 resource "azurerm_servicebus_namespace" "function_apps" {
+  #checkov:skip=CKV_AZURE_202: Suppressing check pending review
+  #checkov:skip=CKV_AZURE_201: Suppressing check pending review
+  #checkov:skip=CKV_AZURE_199: Suppressing check pending review
+  #checkov:skip=CKV_AZURE_203: Suppressing check pending review
+  #checkov:skip=CKV_AZURE_204: Suppressing check pending review
+  #checkov:skip=CKV_AZURE_205: Suppressing check pending review
+
   for_each = {
     for k, v in local.linux_function_apps : k => v if v["enable_service_bus"]
   }

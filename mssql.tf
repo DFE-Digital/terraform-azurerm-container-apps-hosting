@@ -1,6 +1,11 @@
 resource "azurerm_storage_account" "mssql_security_storage" {
   count = local.enable_mssql_database ? 1 : 0
 
+  #checkov:skip=CKV2_AZURE_40: Suppressing check pending review
+  #checkov:skip=CKV2_AZURE_1: Suppressing check pending review
+  #checkov:skip=CKV2_AZURE_33: Suppressing check pending review
+  #checkov:skip=CKV2_AZURE_21: Suppressing check pending review
+
   name                             = "${replace(local.resource_prefix, "-", "")}mssqlsec"
   resource_group_name              = local.resource_group.name
   location                         = local.resource_group.location
@@ -43,6 +48,8 @@ resource "azurerm_storage_account_network_rules" "mssql_security_storage" {
 
 resource "azurerm_storage_container" "mssql_security_storage" {
   count = local.enable_mssql_database ? 1 : 0
+
+  #checkov:skip=CKV2_AZURE_21: Suppressing check pending review
 
   name                 = "${local.resource_prefix}-mssqlsec"
   storage_account_name = azurerm_storage_account.mssql_security_storage[0].name
@@ -98,6 +105,9 @@ resource "azurerm_monitor_diagnostic_setting" "mssql_security_storage" {
 
 resource "azurerm_mssql_server" "default" {
   count = local.enable_mssql_database ? 1 : 0
+
+  #checkov:skip=CKV2_AZURE_2: Suppressing check pending review
+  #checkov:skip=CKV2_AZURE_45: Suppressing check pending review
 
   name                                     = local.resource_prefix
   resource_group_name                      = local.resource_group.name

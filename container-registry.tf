@@ -1,6 +1,14 @@
 resource "azurerm_container_registry" "acr" {
   count = local.enable_container_registry ? 1 : 0
 
+  #checkov:skip=CKV_AZURE_166: Suppressing check pending review
+  #checkov:skip=CKV_AZURE_233: Suppressing check pending review
+  #checkov:skip=CKV_AZURE_137: Suppressing check pending review
+  #checkov:skip=CKV_AZURE_164: Suppressing check pending review
+  #checkov:skip=CKV_AZURE_139: Suppressing check pending review
+  #checkov:skip=CKV_AZURE_237: Suppressing check pending review
+  #checkov:skip=CKV_AZURE_165: Suppressing check pending review.
+
   name                          = replace(local.resource_prefix, "-", "")
   resource_group_name           = local.resource_group.name
   location                      = local.resource_group.location

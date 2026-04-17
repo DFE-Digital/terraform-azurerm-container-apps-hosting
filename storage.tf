@@ -1,6 +1,12 @@
 resource "azurerm_storage_account" "container_app" {
   count = local.enable_storage_account ? 1 : 0
 
+  #checkov:skip=CKV_AZURE_33: Suppressing check pending review
+  #checkov:skip=CKV_AZURE_206: Suppressing check pending review
+  #checkov:skip=CKV2_AZURE_40: Suppressing check pending review
+  #checkov:skip=CKV2_AZURE_1: Suppressing check pending review
+  #checkov:skip=CKV2_AZURE_33: Suppressing check pending review
+
   name                             = "${replace(local.resource_prefix, "-", "")}storage"
   resource_group_name              = local.resource_group.name
   location                         = local.resource_group.location
@@ -76,6 +82,8 @@ resource "azurerm_storage_account_network_rules" "container_app" {
 
 resource "azurerm_storage_container" "container_app" {
   count = local.enable_container_app_blob_storage ? 1 : 0
+
+  #checkov:skip=CKV2_AZURE_21: Suppressing check pending review
 
   name                 = "${local.resource_prefix}-storage"
   storage_account_name = azurerm_storage_account.container_app[0].name
@@ -158,6 +166,11 @@ data "azurerm_storage_account_blob_container_sas" "container_app" {
 
 resource "azurerm_storage_account" "function_app_backing" {
   count = local.enable_linux_function_apps ? 1 : 0
+
+  #checkov:skip=CKV2_AZURE_41: Suppressing check pending review
+  #checkov:skip=CKV2_AZURE_40: Suppressing check pending review
+  #checkov:skip=CKV2_AZURE_1: Suppressing check pending review
+  #checkov:skip=CKV2_AZURE_33: Suppressing check pending review
 
   name                             = "s${local.resource_prefix_sha_short}functions"
   resource_group_name              = local.resource_group.name

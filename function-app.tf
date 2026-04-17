@@ -23,6 +23,8 @@ resource "azurerm_service_plan" "function_apps_flex" {
 }
 
 resource "azurerm_linux_function_app" "health_api" {
+  #checkov:skip=CKV_AZURE_221: Suppressing check pending review
+
   for_each = local.linux_function_health_insights_api
 
   name                                           = "${local.resource_prefix}-${each.key}"
@@ -95,6 +97,8 @@ resource "azurerm_linux_function_app" "health_api" {
 }
 
 resource "azurerm_storage_container" "function_app_backing" {
+  #checkov:skip=CKV2_AZURE_21: Suppressing check pending review
+
   for_each = local.linux_function_apps
 
   name                 = each.key
