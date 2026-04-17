@@ -1,0 +1,20 @@
+name: Checkov Terraform
+
+on:
+  push:
+    branches: main
+  pull_request:
+
+jobs:
+  checkov-terraform:
+    name: Checkov Terraform
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v5
+
+      - name: Test Terraform with Checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: .
+          framework: terraform
