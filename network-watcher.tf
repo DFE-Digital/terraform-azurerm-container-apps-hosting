@@ -14,7 +14,6 @@ resource "azurerm_storage_account" "default_network_watcher_nsg_flow_logs" {
   #checkov:skip=CKV_AZURE_59: Suppressing check pending review
   #checkov:skip=CKV_AZURE_33: Suppressing check pending review
   #checkov:skip=CKV_AZURE_206: Suppressing check pending review
-  #checkov:skip=CKV2_AZURE_41: Suppressing check pending review
   #checkov:skip=CKV2_AZURE_40: Suppressing check pending review
   #checkov:skip=CKV2_AZURE_1: Suppressing check pending review
   #checkov:skip=CKV2_AZURE_33: Suppressing check pending review
