@@ -23,8 +23,6 @@ resource "azurerm_service_plan" "function_apps_flex" {
 }
 
 resource "azurerm_linux_function_app" "health_api" {
-  #checkov:skip=CKV_AZURE_221: Suppressing check pending review
-
   for_each = local.linux_function_health_insights_api
 
   name                                           = "${local.resource_prefix}-${each.key}"
@@ -38,6 +36,7 @@ resource "azurerm_linux_function_app" "health_api" {
   https_only                                     = true
   key_vault_reference_identity_id                = azurerm_user_assigned_identity.function_apps[each.key].id
   zip_deploy_file                                = data.archive_file.azure_function[each.key].output_path
+  public_network_access_enabled                  = false
 
   app_settings = merge(each.value.app_settings, {
     "AZURE_CLIENT_ID" = azurerm_user_assigned_identity.function_apps[each.key].client_id
@@ -97,7 +96,7 @@ resource "azurerm_linux_function_app" "health_api" {
 }
 
 resource "azurerm_storage_container" "function_app_backing" {
-  #checkov:skip=CKV2_AZURE_21: Suppressing check pending review
+  #checkov:skip=CKV2_AZURE_21: Ensure Storage logging is enabled for Blob service for read requests
 
   for_each = local.linux_function_apps
 

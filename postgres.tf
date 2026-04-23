@@ -1,7 +1,7 @@
 resource "azurerm_postgresql_flexible_server" "default" {
   count = local.enable_postgresql_database ? 1 : 0
 
-  #checkov:skip=CKV2_AZURE_57: Suppressing check pending review
+  #checkov:skip=CKV2_AZURE_57: Ensure PostgreSQL Flexible Server is configured with private endpoint
 
   name                   = "${local.resource_prefix}-pg-flexserv"
   resource_group_name    = local.resource_group.name

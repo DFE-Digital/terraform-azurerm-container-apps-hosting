@@ -1,10 +1,7 @@
 resource "azurerm_servicebus_namespace" "function_apps" {
-  #checkov:skip=CKV_AZURE_202: Suppressing check pending review
-  #checkov:skip=CKV_AZURE_201: Suppressing check pending review
-  #checkov:skip=CKV_AZURE_199: Suppressing check pending review
-  #checkov:skip=CKV_AZURE_203: Suppressing check pending review
-  #checkov:skip=CKV_AZURE_204: Suppressing check pending review
-  #checkov:skip=CKV_AZURE_205: Suppressing check pending review
+  #checkov:skip=CKV_AZURE_202: Ensure that Managed identity provider is enabled for Azure Service Bus
+  #checkov:skip=CKV_AZURE_201: Ensure that Azure Service Bus uses a customer-managed key to encrypt data
+  #checkov:skip=CKV_AZURE_199: Ensure that Azure Service Bus uses double encryption
 
   for_each = {
     for k, v in local.linux_function_apps : k => v if v["enable_service_bus"]
@@ -14,6 +11,9 @@ resource "azurerm_servicebus_namespace" "function_apps" {
   location            = local.resource_group.location
   resource_group_name = local.resource_group.name
   sku                 = "Standard"
+  local_auth_enabled  = false
+  public_network_access_enabled = false
+  minimum_tls_version = "1.2"
 }
 
 resource "azurerm_servicebus_namespace_authorization_rule" "function_apps" {
