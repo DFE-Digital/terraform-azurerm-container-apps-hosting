@@ -13,8 +13,9 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v5
 
-      - name: Test Terraform with Checkov
-        uses: bridgecrewio/checkov-action@v12
+      - name: Terraform Validate
+        uses: DFE-Digital/terraform-linting-actions/.github/actions/validate@v1.2.1
         with:
-          directory: .
-          framework: terraform
+          terraform_version: '1.12.2'
+          tflint_version: 'v0.44.1'
+          entrypoint: '.'

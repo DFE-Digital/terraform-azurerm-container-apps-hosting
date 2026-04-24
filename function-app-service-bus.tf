@@ -7,13 +7,13 @@ resource "azurerm_servicebus_namespace" "function_apps" {
     for k, v in local.linux_function_apps : k => v if v["enable_service_bus"]
   }
 
-  name                = "${local.environment}${each.key}-function-app"
-  location            = local.resource_group.location
-  resource_group_name = local.resource_group.name
-  sku                 = "Standard"
-  local_auth_enabled  = false
+  name                          = "${local.environment}${each.key}-function-app"
+  location                      = local.resource_group.location
+  resource_group_name           = local.resource_group.name
+  sku                           = "Standard"
+  local_auth_enabled            = false
   public_network_access_enabled = false
-  minimum_tls_version = "1.2"
+  minimum_tls_version           = "1.2"
 }
 
 resource "azurerm_servicebus_namespace_authorization_rule" "function_apps" {
