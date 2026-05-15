@@ -9,7 +9,7 @@ resource "azurerm_storage_account" "mssql_security_storage" {
   min_tls_version                  = "TLS1_2"
   tags                             = local.tags
   https_traffic_only_enabled       = true
-  public_network_access_enabled    = local.enable_mssql_vulnerability_assessment ? true : false
+  public_network_access_enabled    = local.enable_mssql_security_storage_blob_access ? true : false
   shared_access_key_enabled        = local.mssql_security_storage_shared_access_key_enabled
   allow_nested_items_to_be_public  = false
   cross_tenant_replication_enabled = local.mssql_security_storage_cross_tenant_replication_enabled
@@ -32,10 +32,10 @@ resource "azurerm_storage_account_network_rules" "mssql_security_storage" {
   count = local.enable_mssql_database ? 1 : 0
 
   storage_account_id = azurerm_storage_account.mssql_security_storage[0].id
-  # If Vulnerability Assessment is enabled, then there is not currently a way to
-  # store reports in a Storage Account that is protected by a Firewall.
+  # If Vulnerability Assessment or Extended Auditing is enabled, then there is not
+  # currently a way to store reports in a Storage Account that is protected by a Firewall.
   # Inbound traffic must be permitted to the Storage Account
-  default_action             = local.enable_mssql_vulnerability_assessment ? "Allow" : "Deny"
+  default_action             = local.enable_mssql_security_storage_blob_access ? "Allow" : "Deny"
   bypass                     = ["AzureServices"]
   virtual_network_subnet_ids = []
   ip_rules                   = local.mssql_security_storage_firewall_ipv4_allow_list
@@ -131,11 +131,19 @@ resource "azurerm_mssql_server" "default" {
 }
 
 resource "azurerm_mssql_server_extended_auditing_policy" "default" {
-  count = local.enable_mssql_database ? 1 : 0
+  count = local.enable_mssql_database && local.enable_mssql_extended_auditing_policy ? 1 : 0
 
-  server_id         = azurerm_mssql_server.default[0].id
-  storage_endpoint  = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
-  retention_in_days = 90
+  server_id                               = azurerm_mssql_server.default[0].id
+  storage_endpoint                        = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
+  storage_account_access_key              = local.mssql_security_storage_shared_access_key_enabled ? azurerm_storage_account.mssql_security_storage[0].primary_access_key : null
+  storage_account_access_key_is_secondary = local.mssql_security_storage_shared_access_key_enabled ? false : null
+  retention_in_days                       = 90
+
+  depends_on = [
+    azurerm_role_assignment.mssql_storageblobdatacontributor,
+    azurerm_storage_account_network_rules.mssql_security_storage,
+    azurerm_storage_container.mssql_security_storage,
+  ]
 }
 
 resource "azurerm_mssql_database" "default" {
@@ -158,11 +166,19 @@ resource "azurerm_mssql_database" "default" {
 }
 
 resource "azurerm_mssql_database_extended_auditing_policy" "default" {
-  count = local.enable_mssql_database ? 1 : 0
+  count = local.enable_mssql_database && local.enable_mssql_extended_auditing_policy ? 1 : 0
 
-  database_id       = azurerm_mssql_database.default[0].id
-  storage_endpoint  = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
-  retention_in_days = 90
+  database_id                             = azurerm_mssql_database.default[0].id
+  storage_endpoint                        = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
+  storage_account_access_key              = local.mssql_security_storage_shared_access_key_enabled ? azurerm_storage_account.mssql_security_storage[0].primary_access_key : null
+  storage_account_access_key_is_secondary = local.mssql_security_storage_shared_access_key_enabled ? false : null
+  retention_in_days                       = 90
+
+  depends_on = [
+    azurerm_role_assignment.mssql_storageblobdatacontributor,
+    azurerm_storage_account_network_rules.mssql_security_storage,
+    azurerm_storage_container.mssql_security_storage,
+  ]
 }
 
 resource "azurerm_mssql_firewall_rule" "default_mssql" {
