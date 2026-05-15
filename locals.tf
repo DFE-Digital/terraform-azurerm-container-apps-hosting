@@ -155,6 +155,8 @@ locals {
   mssql_version                                   = var.mssql_version
   mssql_server_public_access_enabled              = var.mssql_server_public_access_enabled
   enable_mssql_vulnerability_assessment           = var.enable_mssql_vulnerability_assessment
+  enable_mssql_extended_auditing_policy           = var.enable_mssql_extended_auditing_policy
+  enable_mssql_security_storage_blob_access       = local.enable_mssql_vulnerability_assessment || local.enable_mssql_extended_auditing_policy
   mssql_security_storage_firewall_ipv4_allow_list = var.mssql_security_storage_firewall_ipv4_allow_list
   mssql_managed_identity_assign_role              = var.mssql_managed_identity_assign_role
   mssql_maintenance_configuration_name            = var.mssql_maintenance_configuration_name

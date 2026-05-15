@@ -214,6 +214,12 @@ variable "enable_mssql_vulnerability_assessment" {
   default     = true
 }
 
+variable "enable_mssql_extended_auditing_policy" {
+  description = "Create extended auditing policies for the MSSQL server and database"
+  type        = bool
+  default     = true
+}
+
 variable "mssql_security_storage_firewall_ipv4_allow_list" {
   description = "Additional IP addresses to add to the Storage Account that holds the Vulnerability Assessments"
   type        = list(string)
