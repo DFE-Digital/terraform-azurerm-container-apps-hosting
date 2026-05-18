@@ -23,6 +23,11 @@ output "azurerm_container_registry" {
   description = "Container Registry"
 }
 
+output "azurerm_virtual_network" {
+  value       = local.virtual_network
+  description = "Virtual Network"
+}
+
 output "cdn_frontdoor_dns_records" {
   value = local.cdn_frontdoor_custom_domains_create_dns_records == false ? concat([
     for domain in local.cdn_frontdoor_custom_domain_dns_names : {
