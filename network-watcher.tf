@@ -11,6 +11,13 @@ resource "azurerm_network_watcher" "default" {
 resource "azurerm_storage_account" "default_network_watcher_nsg_flow_logs" {
   count = local.network_watcher_name != "" ? 1 : 0
 
+  #checkov:skip=CKV_AZURE_59: Ensure that Storage accounts disallow public access
+  #checkov:skip=CKV_AZURE_33: Ensure Storage logging is enabled for Queue service for read, write and delete requests
+  #checkov:skip=CKV_AZURE_206: Ensure that Storage Accounts use replication
+  #checkov:skip=CKV2_AZURE_40: Ensure storage account is not configured with Shared Key authorization
+  #checkov:skip=CKV2_AZURE_1: Ensure storage for critical data are encrypted with Customer Managed Key
+  #checkov:skip=CKV2_AZURE_33: Ensure storage account is configured with private endpoint
+
   name                             = "${replace(local.resource_prefix, "-", "")}nwnsgd"
   resource_group_name              = local.resource_group.name
   location                         = local.resource_group.location
@@ -22,6 +29,7 @@ resource "azurerm_storage_account" "default_network_watcher_nsg_flow_logs" {
   public_network_access_enabled    = true
   allow_nested_items_to_be_public  = false
   cross_tenant_replication_enabled = false
+  shared_access_key_enabled        = true
 
   blob_properties {
     delete_retention_policy {

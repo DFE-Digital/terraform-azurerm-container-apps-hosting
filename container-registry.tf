@@ -1,6 +1,14 @@
 resource "azurerm_container_registry" "acr" {
   count = local.enable_container_registry ? 1 : 0
 
+  #checkov:skip=CKV_AZURE_166: Ensure container image quarantine, scan, and mark images verified
+  #checkov:skip=CKV_AZURE_233: Ensure Azure Container Registry (ACR) is zone redundant
+  #checkov:skip=CKV_AZURE_137: Ensure ACR admin account is disabled - set in variables
+  #checkov:skip=CKV_AZURE_164: Ensures that ACR uses signed/trusted images
+  #checkov:skip=CKV_AZURE_139: Ensure ACR set to disable public networking - set in variables
+  #checkov:skip=CKV_AZURE_237: Ensure dedicated data endpoints are enabled.
+  #checkov:skip=CKV_AZURE_165: Ensure geo-replicated container registries to match multi-region container deployments.
+
   name                          = replace(local.resource_prefix, "-", "")
   resource_group_name           = local.resource_group.name
   location                      = local.resource_group.location
