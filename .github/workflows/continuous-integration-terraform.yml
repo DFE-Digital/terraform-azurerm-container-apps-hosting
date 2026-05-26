@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Terraform Validate
         uses: DFE-Digital/terraform-linting-actions/.github/actions/validate@v1.2.1
