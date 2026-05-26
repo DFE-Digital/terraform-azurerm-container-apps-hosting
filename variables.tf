@@ -181,6 +181,16 @@ variable "mssql_database_name" {
   default     = ""
 }
 
+variable "mssql_extra_databases" {
+  description = "A map of extra database configurations (key is used as database name)"
+  type = map(object({
+    sku_name : optional(string, "Basic"),
+    max_size_gb : optional(number, 2),
+    enable_extended_auditing_policy : optional(bool, true)
+  }))
+  default = {}
+}
+
 variable "mssql_firewall_ipv4_allow_list" {
   description = "A list of IPv4 Addresses that require remote access to the MSSQL Server"
   type = map(object({

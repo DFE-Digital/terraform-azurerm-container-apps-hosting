@@ -165,10 +165,47 @@ resource "azurerm_mssql_database" "default" {
   tags = local.tags
 }
 
+resource "azurerm_mssql_database" "extra" {
+  for_each = local.enable_mssql_database ? local.mssql_extra_databases : {}
+
+  name                           = each.key
+  server_id                      = azurerm_mssql_server.default[0].id
+  collation                      = "SQL_Latin1_General_CP1_CI_AS"
+  sku_name                       = each.value["sku_name"]
+  max_size_gb                    = each.value["max_size_gb"]
+  maintenance_configuration_name = local.mssql_maintenance_configuration_name != "" ? local.mssql_maintenance_configuration_name : "SQL_Default"
+
+  threat_detection_policy {
+    state                = "Enabled"
+    email_account_admins = "Enabled"
+    retention_days       = 90
+  }
+
+  tags = local.tags
+}
+
 resource "azurerm_mssql_database_extended_auditing_policy" "default" {
   count = local.enable_mssql_database && local.enable_mssql_extended_auditing_policy ? 1 : 0
 
   database_id                             = azurerm_mssql_database.default[0].id
+  storage_endpoint                        = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
+  storage_account_access_key              = local.mssql_security_storage_shared_access_key_enabled ? azurerm_storage_account.mssql_security_storage[0].primary_access_key : null
+  storage_account_access_key_is_secondary = local.mssql_security_storage_shared_access_key_enabled ? false : null
+  retention_in_days                       = 90
+
+  depends_on = [
+    azurerm_role_assignment.mssql_storageblobdatacontributor,
+    azurerm_storage_account_network_rules.mssql_security_storage,
+    azurerm_storage_container.mssql_security_storage,
+  ]
+}
+
+resource "azurerm_mssql_database_extended_auditing_policy" "extra" {
+  for_each = local.enable_mssql_database && local.enable_mssql_extended_auditing_policy ? {
+    for k, v in local.mssql_extra_databases : k => v if v["enable_extended_auditing_policy"]
+  } : {}
+
+  database_id                             = azurerm_mssql_database.extra[each.key].id
   storage_endpoint                        = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
   storage_account_access_key              = local.mssql_security_storage_shared_access_key_enabled ? azurerm_storage_account.mssql_security_storage[0].primary_access_key : null
   storage_account_access_key_is_secondary = local.mssql_security_storage_shared_access_key_enabled ? false : null
