@@ -165,6 +165,19 @@ resource "azurerm_mssql_database" "default" {
   tags = local.tags
 }
 
+resource "azurerm_monitor_diagnostic_setting" "default_sql_audit" {
+  count = local.enable_mssql_database ? 1 : 0
+
+  name                           = "sql-audit-to-log-analytics-${local.mssql_database_name}"
+  target_resource_id             = azurerm_mssql_database.default[0].id
+  log_analytics_workspace_id     = azurerm_log_analytics_workspace.container_app.id
+  log_analytics_destination_type = "Dedicated"
+
+  enabled_log {
+    category = "SQLSecurityAuditEvents"
+  }
+}
+
 resource "azurerm_mssql_database" "extra" {
   for_each = local.enable_mssql_database ? local.mssql_extra_databases : {}
 
@@ -184,8 +197,23 @@ resource "azurerm_mssql_database" "extra" {
   tags = local.tags
 }
 
+resource "azurerm_monitor_diagnostic_setting" "extra_sql_audit" {
+  for_each = local.enable_mssql_database ? local.mssql_extra_databases : {}
+
+  name                           = "sql-audit-to-log-analytics-${each.key}"
+  target_resource_id             = azurerm_mssql_database.default[each.key].id
+  log_analytics_workspace_id     = azurerm_log_analytics_workspace.container_app.id
+  log_analytics_destination_type = "Dedicated"
+
+  enabled_log {
+    category = "SQLSecurityAuditEvents"
+  }
+}
+
 resource "azurerm_mssql_database_extended_auditing_policy" "default" {
   count = local.enable_mssql_database && local.enable_mssql_extended_auditing_policy ? 1 : 0
+
+  log_monitoring_enabled = true
 
   database_id                             = azurerm_mssql_database.default[0].id
   storage_endpoint                        = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
@@ -204,6 +232,8 @@ resource "azurerm_mssql_database_extended_auditing_policy" "extra" {
   for_each = local.enable_mssql_database && local.enable_mssql_extended_auditing_policy ? {
     for k, v in local.mssql_extra_databases : k => v if v["enable_extended_auditing_policy"]
   } : {}
+
+  log_monitoring_enabled = true
 
   database_id                             = azurerm_mssql_database.extra[each.key].id
   storage_endpoint                        = azurerm_storage_account.mssql_security_storage[0].primary_blob_endpoint
