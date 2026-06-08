@@ -201,7 +201,7 @@ resource "azurerm_monitor_diagnostic_setting" "extra_sql_audit" {
   for_each = local.enable_mssql_database ? local.mssql_extra_databases : {}
 
   name                           = "sql-audit-to-log-analytics-${each.key}"
-  target_resource_id             = azurerm_mssql_database.default[each.key].id
+  target_resource_id             = azurerm_mssql_database.extra[each.key].id
   log_analytics_workspace_id     = azurerm_log_analytics_workspace.container_app.id
   log_analytics_destination_type = "Dedicated"
 
