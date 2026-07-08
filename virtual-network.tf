@@ -38,18 +38,14 @@ resource "azurerm_subnet" "container_apps_infra_subnet" {
   address_prefixes     = [local.container_apps_infra_subnet_cidr]
   service_endpoints    = local.container_apps_infra_subnet_service_endpoints
 
-  dynamic "delegation" {
-    for_each = local.container_app_environment_workload_profile_type != "Consumption" ? [1] : []
+  delegation {
+    name = "AzureContainerAppEnvironments"
 
-    content {
-      name = "AzureContainerAppEnvironments"
-
-      service_delegation {
-        name = "Microsoft.App/environments"
-        actions = [
-          "Microsoft.Network/virtualNetworks/subnets/join/action"
-        ]
-      }
+    service_delegation {
+      name = "Microsoft.App/environments"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action"
+      ]
     }
   }
 
