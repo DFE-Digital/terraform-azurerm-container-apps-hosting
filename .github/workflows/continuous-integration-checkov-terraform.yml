@@ -1,0 +1,21 @@
+name: Checkov Terraform
+
+on:
+  push:
+    branches: main
+  pull_request:
+
+jobs:
+  checkov-terraform:
+    name: Checkov Terraform
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v5
+
+      - name: Terraform Validate
+        uses: DFE-Digital/terraform-linting-actions/.github/actions/validate@v1.2.1
+        with:
+          terraform_version: '1.12.2'
+          tflint_version: 'v0.44.1'
+          entrypoint: '.'

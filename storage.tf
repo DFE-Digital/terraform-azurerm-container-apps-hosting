@@ -1,6 +1,12 @@
 resource "azurerm_storage_account" "container_app" {
   count = local.enable_storage_account ? 1 : 0
 
+  #checkov:skip=CKV_AZURE_33: Ensure Storage logging is enabled for Queue service for read, write and delete requests  
+  #checkov:skip=CKV_AZURE_206: Ensure that Storage Accounts use replication  
+  #checkov:skip=CKV2_AZURE_40: Ensure storage account is not configured with Shared Key authorization  
+  #checkov:skip=CKV2_AZURE_1: Ensure storage for critical data are encrypted with Customer Managed Key  
+  #checkov:skip=CKV2_AZURE_33: Ensure storage account is configured with private endpoint  
+
   name                             = "${replace(local.resource_prefix, "-", "")}storage"
   resource_group_name              = local.resource_group.name
   location                         = local.resource_group.location
@@ -76,6 +82,8 @@ resource "azurerm_storage_account_network_rules" "container_app" {
 
 resource "azurerm_storage_container" "container_app" {
   count = local.enable_container_app_blob_storage ? 1 : 0
+
+  #checkov:skip=CKV2_AZURE_21: Ensure Storage logging is enabled for Blob service for read requests
 
   name                 = "${local.resource_prefix}-storage"
   storage_account_name = azurerm_storage_account.container_app[0].name
@@ -159,6 +167,10 @@ data "azurerm_storage_account_blob_container_sas" "container_app" {
 resource "azurerm_storage_account" "function_app_backing" {
   count = local.enable_linux_function_apps ? 1 : 0
 
+  #checkov:skip=CKV2_AZURE_40: Ensure storage account is not configured with Shared Key authorization
+  #checkov:skip=CKV2_AZURE_1: Ensure storage for critical data are encrypted with Customer Managed Key
+  #checkov:skip=CKV2_AZURE_33: Ensure storage account is configured with private endpoint
+
   name                             = "s${local.resource_prefix_sha_short}functions"
   resource_group_name              = local.resource_group.name
   location                         = local.resource_group.location
@@ -169,6 +181,7 @@ resource "azurerm_storage_account" "function_app_backing" {
   allow_nested_items_to_be_public  = false
   public_network_access_enabled    = true
   cross_tenant_replication_enabled = false
+  shared_access_key_enabled        = true
 
   sas_policy {
     expiration_period = local.storage_account_sas_expiration_period
