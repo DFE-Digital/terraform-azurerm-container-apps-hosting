@@ -20,6 +20,21 @@ resource "azurerm_container_app_environment" "container_app_env" {
     }
   }
 
+  dynamic "workload_profile" {
+    for_each = local.container_app_environment_workload_profile_type == "Consumption" ? [1] : []
+
+    content {
+      name                  = "Consumption"
+      workload_profile_type = "Consumption"
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [
+      workload_profile
+    ]
+  }
+
   tags = local.tags
 }
 
