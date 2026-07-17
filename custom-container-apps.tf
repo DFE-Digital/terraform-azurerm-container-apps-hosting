@@ -62,6 +62,40 @@ resource "azurerm_container_app" "custom_container_apps" {
   }
 
   template {
+    dynamic "init_container" {
+      for_each = each.value.enable_init_container ? [1] : []
+
+      content {
+        name    = "${each.key}-init"
+        image   = each.value.init_container_image
+        cpu     = each.value.cpu
+        memory  = "${each.value.memory}Gi"
+        command = each.value.init_container_command
+
+        dynamic "env" {
+          for_each = { for i, v in concat(
+            local.enable_app_insights_integration ? [
+              {
+                "name" : "ApplicationInsights__ConnectionString",
+                "secretRef" : "applicationinsights--connectionstring"
+              },
+              {
+                "name" : "ApplicationInsights__InstrumentationKey",
+                "secretRef" : "applicationinsights--instrumentationkey"
+              }
+            ] : [],
+            each.value.env,
+          ) : v.name => v }
+
+          content {
+            name        = env.value["name"]
+            secret_name = lookup(env.value, "secretRef", null)
+            value       = lookup(env.value, "value", null)
+          }
+        }
+      }
+    }
+
     container {
       name    = each.key
       image   = each.value.image
