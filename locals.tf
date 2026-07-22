@@ -144,6 +144,7 @@ locals {
 
   # SQL Server
   enable_mssql_database                           = var.enable_mssql_database
+  mssql_server_name_override                      = var.mssql_server_name_override
   mssql_server_admin_password                     = var.mssql_server_admin_password
   mssql_sku_name                                  = var.mssql_sku_name
   mssql_max_size_gb                               = var.mssql_max_size_gb

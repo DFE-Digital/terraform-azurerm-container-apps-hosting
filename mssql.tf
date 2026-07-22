@@ -99,7 +99,7 @@ resource "azurerm_monitor_diagnostic_setting" "mssql_security_storage" {
 resource "azurerm_mssql_server" "default" {
   count = local.enable_mssql_database ? 1 : 0
 
-  name                                     = local.resource_prefix
+  name                                     = local.mssql_server_name_override == "" ? local.resource_prefix : local.mssql_server_name_override
   resource_group_name                      = local.resource_group.name
   location                                 = local.resource_group.location
   version                                  = local.mssql_version
