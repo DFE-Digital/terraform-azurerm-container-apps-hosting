@@ -138,6 +138,12 @@ variable "enable_mssql_database" {
   default     = false
 }
 
+variable "mssql_server_name_override" {
+  description = "Provide a value to conditionally override the default mssql server name (which is set to the resource prefix by default)"
+  type        = string
+  default     = ""
+}
+
 variable "mssql_server_admin_password" {
   description = "The local administrator password for the MSSQL server"
   type        = string
