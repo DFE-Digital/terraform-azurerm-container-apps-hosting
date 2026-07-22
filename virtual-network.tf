@@ -274,7 +274,7 @@ resource "azurerm_subnet_network_security_group_association" "mssql_infra" {
 resource "azurerm_private_dns_zone" "mssql_private_link" {
   count = local.enable_private_endpoint_mssql ? 1 : 0
 
-  name                = "${local.resource_prefix}.database.windows.net"
+  name                = local.mssql_server_name_override == "" ? "${local.resource_prefix}.database.windows.net" : "${local.mssql_server_name_override}.database.windows.net"
   resource_group_name = local.resource_group.name
   tags                = local.tags
 }
@@ -282,7 +282,7 @@ resource "azurerm_private_dns_zone" "mssql_private_link" {
 resource "azurerm_private_dns_zone_virtual_network_link" "mssql_private_link" {
   count = local.enable_private_endpoint_mssql ? 1 : 0
 
-  name                  = "${local.resource_prefix}mssqlprivatelink"
+  name                  = local.mssql_server_name_override == "" ? "${local.resource_prefix}mssqlprivatelink" : "${local.mssql_server_name_override}mssqlprivatelink"
   resource_group_name   = local.resource_group.name
   private_dns_zone_name = azurerm_private_dns_zone.mssql_private_link[0].name
   virtual_network_id    = local.virtual_network.id
