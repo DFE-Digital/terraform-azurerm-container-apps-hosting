@@ -1145,8 +1145,11 @@ variable "custom_container_apps" {
       value     = optional(string, null)
       secretRef = optional(string, null)
     })), [])
-    min_replicas = number
-    max_replicas = number
+    min_replicas           = number
+    max_replicas           = number
+    enable_init_container  = optional(bool, false)
+    init_container_image   = optional(string, "")
+    init_container_command = optional(list(string), [])
   }))
   default = {}
 }
