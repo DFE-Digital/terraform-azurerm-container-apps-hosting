@@ -1,7 +1,7 @@
 resource "azurerm_storage_account" "container_app" {
   count = local.enable_storage_account ? 1 : 0
 
-  name                             = "${replace(local.resource_prefix, "-", "")}storage"
+  name                             = local.storage_account_name_override != "" ? "${replace(local.resource_prefix, "-", "")}storage" : local.storage_account_name_override
   resource_group_name              = local.resource_group.name
   location                         = local.resource_group.location
   account_tier                     = "Standard"
