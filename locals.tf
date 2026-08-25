@@ -403,7 +403,8 @@ locals {
   } : {}
 
   # Storage Account
-  enable_storage_account = local.enable_container_app_blob_storage || local.enable_container_app_file_share
+  enable_storage_account        = local.enable_container_app_blob_storage || local.enable_container_app_file_share
+  storage_account_name_override = var.storage_account_name_override
   storage_account_ipv4_allow_list = concat(
     var.storage_account_ipv4_allow_list,
     [azurerm_container_app.container_apps["main"].outbound_ip_addresses[0]]

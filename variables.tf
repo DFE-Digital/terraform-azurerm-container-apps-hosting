@@ -1099,6 +1099,12 @@ variable "storage_account_ipv4_allow_list" {
   default     = []
 }
 
+variable "storage_account_name_override" {
+  description = "Override the storage account name with a custom name"
+  type        = string
+  default     = ""
+}
+
 variable "custom_container_apps" {
   description = "Custom container apps, by default deployed within the container app environment managed by this module."
   type = map(object({
