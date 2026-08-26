@@ -1057,6 +1057,24 @@ variable "enable_container_app_file_share" {
   default     = false
 }
 
+variable "existing_file_share_name" {
+  description = "Existing file share name to mount rather than creating one"
+  type        = string
+  default     = ""
+}
+
+variable "existing_file_share_storage_account_name" {
+  description = "Storage account name of the existing file share"
+  type        = string
+  default     = ""
+}
+
+variable "existing_file_share_storage_account_resource_group" {
+  description = "Resource group of the existing file share's storage account"
+  type        = string
+  default     = ""
+}
+
 variable "storage_account_public_access_enabled" {
   description = "Should the Azure Storage Account have Public visibility?"
   type        = bool
