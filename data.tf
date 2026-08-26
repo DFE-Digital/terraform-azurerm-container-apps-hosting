@@ -85,3 +85,17 @@ resource "terraform_data" "function_app_package_sha" {
 
   input = filesha256(data.archive_file.azure_function[each.key].output_path)
 }
+
+data "azurerm_storage_account" "existing_file_share" {
+  count = local.existing_file_share_name != "" ? 1 : 0
+
+  name                = local.existing_file_share_storage_account_name
+  resource_group_name = local.existing_file_share_storage_account_resource_group
+}
+
+data "azurerm_storage_share" "existing_file_share" {
+  count = local.existing_file_share_name != "" ? 1 : 0
+
+  name               = local.existing_file_share_name
+  storage_account_id = data.azurerm_storage_account.existing_file_share[0].id
+}

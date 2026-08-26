@@ -82,7 +82,7 @@ resource "azurerm_storage_container" "container_app" {
 }
 
 resource "azurerm_storage_share" "container_app" {
-  count = local.enable_container_app_file_share ? 1 : 0
+  count = local.enable_container_app_file_share && local.existing_file_share_name == "" ? 1 : 0
 
   name                 = "${local.resource_prefix}-storage"
   storage_account_name = azurerm_storage_account.container_app[0].name
@@ -114,7 +114,7 @@ resource "azurerm_monitor_diagnostic_setting" "blobs" {
 }
 
 resource "azurerm_monitor_diagnostic_setting" "files" {
-  count = local.enable_container_app_file_share ? 1 : 0
+  count = local.enable_container_app_file_share && local.existing_file_share_name == "" ? 1 : 0
 
   name                       = "${local.resource_prefix}-storage-files-diag"
   target_resource_id         = "${azurerm_storage_account.container_app[0].id}/fileServices/default"

@@ -41,9 +41,9 @@ resource "azurerm_container_app_environment_storage" "container_app_env" {
 
   name                         = "h${local.resource_prefix_sha_short}-storage"
   container_app_environment_id = local.container_app_environment.id
-  account_name                 = azurerm_storage_account.container_app[0].name
-  share_name                   = azurerm_storage_share.container_app[0].name
-  access_key                   = azurerm_storage_account.container_app[0].primary_access_key
+  account_name                 = local.existing_file_share_name == "" ? azurerm_storage_account.container_app[0].name : data.azurerm_storage_account.existing_file_share[0].name
+  share_name                   = local.existing_file_share_name == "" ? azurerm_storage_share.container_app[0].name : data.azurerm_storage_share.existing_file_share[0].name
+  access_key                   = local.existing_file_share_name == "" ? azurerm_storage_account.container_app[0].primary_access_key : data.azurerm_storage_account.existing_file_share[0].primary_access_key
   access_mode                  = "ReadWrite"
 }
 
