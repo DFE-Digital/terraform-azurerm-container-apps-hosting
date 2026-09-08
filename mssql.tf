@@ -261,7 +261,7 @@ resource "azapi_update_resource" "mssql_threat_protection" {
   count = local.enable_mssql_database ? 1 : 0
 
   type      = "Microsoft.Sql/servers/advancedThreatProtectionSettings@2023-05-01-preview"
-  name      = azurerm_mssql_server.default[0].name
+  name      = "Default"
   parent_id = azurerm_mssql_server.default[0].id
   body = jsonencode({
     properties = {
