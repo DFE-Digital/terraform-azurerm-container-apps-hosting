@@ -997,6 +997,7 @@ module "azure_container_apps_hosting" {
 | <a name="input_storage_account_name_override"></a> [storage\_account\_name\_override](#input\_storage\_account\_name\_override) | Override the storage account name with a custom name | `string` | `""` | no |
 | <a name="input_storage_account_public_access_enabled"></a> [storage\_account\_public\_access\_enabled](#input\_storage\_account\_public\_access\_enabled) | Should the Azure Storage Account have Public visibility? | `bool` | `false` | no |
 | <a name="input_storage_account_sas_expiration_period"></a> [storage\_account\_sas\_expiration\_period](#input\_storage\_account\_sas\_expiration\_period) | The SAS expiration period in format of DD.HH:MM:SS | `string` | `"02.00:00:00"` | no |
+| <a name="input_storage_account_vnet_subnet_allow_list"></a> [storage\_account\_vnet\_subnet\_allow\_list](#input\_storage\_account\_vnet\_subnet\_allow\_list) | A list of VNet Subnet IDs to grant access to the Storage Account | `list(string)` | `[]` | no |
 | <a name="input_storage_subnet_cidr"></a> [storage\_subnet\_cidr](#input\_storage\_subnet\_cidr) | Specify a subnet prefix to use for the storage subnet | `string` | `""` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to be applied to all resources | `map(string)` | `{}` | no |
 | <a name="input_virtual_network_address_space"></a> [virtual\_network\_address\_space](#input\_virtual\_network\_address\_space) | Virtual Network address space CIDR | `string` | `"172.16.0.0/12"` | no |
