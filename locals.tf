@@ -409,6 +409,7 @@ locals {
     var.storage_account_ipv4_allow_list,
     [azurerm_container_app.container_apps["main"].outbound_ip_addresses[0]]
   )
+  storage_account_vnet_subnet_allow_list            = var.storage_account_vnet_subnet_allow_list
   storage_account_public_access_enabled             = var.storage_account_public_access_enabled
   storage_account_file_share_quota_gb               = var.storage_account_file_share_quota_gb
   storage_account_access_key_rotation_reminder_days = var.storage_account_access_key_rotation_reminder_days

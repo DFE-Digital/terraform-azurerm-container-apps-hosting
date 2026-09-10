@@ -1117,6 +1117,12 @@ variable "storage_account_ipv4_allow_list" {
   default     = []
 }
 
+variable "storage_account_vnet_subnet_allow_list" {
+  description = "A list of VNet Subnet IDs to grant access to the Storage Account"
+  type        = list(string)
+  default     = []
+}
+
 variable "storage_account_name_override" {
   description = "Override the storage account name with a custom name"
   type        = string
