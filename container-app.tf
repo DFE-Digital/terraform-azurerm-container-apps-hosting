@@ -49,7 +49,7 @@ resource "azurerm_container_app_environment_storage" "container_app_env" {
 
 resource "azurerm_container_app" "container_apps" {
   for_each = toset(concat(
-    ["main"],
+    local.enable_main_container ? ["main"] : [],
     local.enable_worker_container ? ["worker"] : [],
   ))
 
