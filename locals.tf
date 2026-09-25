@@ -176,12 +176,12 @@ locals {
   postgresql_charset                     = var.postgresql_charset
   postgresql_network_connectivity_method = var.postgresql_network_connectivity_method
   postgresql_firewall_ipv4_allow = merge(
-    {
+    local.enable_main_container ? {
       "container-app" = {
         start_ip_address = azurerm_container_app.container_apps["main"].outbound_ip_addresses[0]
         end_ip_address   = azurerm_container_app.container_apps["main"].outbound_ip_addresses[0]
       }
-    },
+    } : {},
     var.postgresql_firewall_ipv4_allow
   )
 
@@ -221,7 +221,7 @@ locals {
   container_command                      = var.container_command
   container_environment_variables        = var.container_environment_variables
   container_secret_environment_variables = var.container_secret_environment_variables
-  container_fqdn                         = azurerm_container_app.container_apps["main"].ingress[0].fqdn
+  container_fqdn                         = local.enable_main_container ? azurerm_container_app.container_apps["main"].ingress[0].fqdn : ""
   container_app_name_override            = var.container_app_name_override
   container_app_name                     = local.container_app_name_override == "" ? "${local.resource_prefix}-${local.image_name}" : local.container_app_name_override
   container_app_secrets = { for i, v in concat(
@@ -392,6 +392,7 @@ locals {
   container_scale_http_concurrency    = var.container_scale_http_concurrency
   # Container App / Sidecar
   enable_worker_container       = var.enable_worker_container
+  enable_main_container         = var.enable_main_container
   worker_container_command      = var.worker_container_command
   worker_container_min_replicas = var.worker_container_min_replicas
   worker_container_max_replicas = var.worker_container_max_replicas
@@ -407,7 +408,7 @@ locals {
   storage_account_name_override = var.storage_account_name_override
   storage_account_ipv4_allow_list = concat(
     var.storage_account_ipv4_allow_list,
-    [azurerm_container_app.container_apps["main"].outbound_ip_addresses[0]]
+    local.enable_main_container ? [azurerm_container_app.container_apps["main"].outbound_ip_addresses[0]] : []
   )
   storage_account_vnet_subnet_allow_list            = var.storage_account_vnet_subnet_allow_list
   storage_account_public_access_enabled             = var.storage_account_public_access_enabled
@@ -546,7 +547,7 @@ locals {
   ) : local.container_fqdn : var.monitor_http_availability_fqdn
   monitor_http_availability_url  = "https://${local.monitor_http_availability_fqdn}${local.monitor_endpoint_healthcheck}"
   monitor_http_availability_verb = var.monitor_http_availability_verb
-  monitor_default_container      = { "default" = azurerm_container_app.container_apps["main"] }
+  monitor_default_container      = local.enable_main_container ? { "default" = azurerm_container_app.container_apps["main"] } : {}
   monitor_worker_container       = local.enable_worker_container ? { "worker" = azurerm_container_app.container_apps["worker"] } : {}
   monitor_containers = merge(
     local.monitor_default_container,

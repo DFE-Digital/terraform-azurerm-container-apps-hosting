@@ -144,7 +144,7 @@ resource "azurerm_virtual_network_peering" "peered_vnet_app_gateway" {
 }
 
 resource "azurerm_private_dns_zone" "container_app_environment" {
-  count = local.restrict_container_apps_to_agw_inbound_only && local.container_apps_allow_agw_resource.vnet_name != "" ? 1 : 0
+  count = local.restrict_container_apps_to_agw_inbound_only && local.container_apps_allow_agw_resource.vnet_name != "" && local.enable_main_container ? 1 : 0
 
   name                = replace(local.container_fqdn, "${local.environment}${local.project_name}-${local.image_name}.", "")
   resource_group_name = local.resource_group.name

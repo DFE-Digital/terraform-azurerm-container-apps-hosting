@@ -518,6 +518,12 @@ variable "container_secret_environment_variables" {
   sensitive   = true
 }
 
+variable "enable_main_container" {
+  description = "Enable main container. This can be used in the rare case that the container is no longer required, but the container app environment is still being used"
+  type        = bool
+  default     = true
+}
+
 variable "enable_worker_container" {
   description = "Conditionally launch a worker container. This container uses the same image and environment variables as the default container app, but allows a different container command to be run. The worker container does not expose any ports."
   type        = bool
