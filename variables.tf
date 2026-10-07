@@ -138,6 +138,18 @@ variable "enable_mssql_database" {
   default     = false
 }
 
+variable "enable_mssql_audit_logs" {
+  description = "Enable MSSQL audit logs"
+  type        = bool
+  default     = true
+}
+
+variable "enable_mssql_security_audit_events" {
+  description = "Enable MSSQL Security Audit Event logs"
+  type        = bool
+  default     = true
+}
+
 variable "mssql_server_name_override" {
   description = "Provide a value to conditionally override the default mssql server name (which is set to the resource prefix by default)"
   type        = string

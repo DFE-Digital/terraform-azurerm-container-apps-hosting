@@ -144,6 +144,8 @@ locals {
 
   # SQL Server
   enable_mssql_database                           = var.enable_mssql_database
+  enable_mssql_audit_logs                         = var.enable_mssql_audit_logs
+  enable_mssql_security_audit_events              = var.enable_mssql_security_audit_events
   mssql_server_name_override                      = var.mssql_server_name_override
   mssql_server_admin_password                     = var.mssql_server_admin_password
   mssql_sku_name                                  = var.mssql_sku_name
