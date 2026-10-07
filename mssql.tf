@@ -80,8 +80,12 @@ resource "azurerm_monitor_diagnostic_setting" "mssql_security_storage" {
   log_analytics_workspace_id = azurerm_log_analytics_workspace.container_app.id
   eventhub_name              = local.enable_event_hub ? azurerm_eventhub.container_app[0].name : null
 
-  enabled_log {
-    category_group = "Audit"
+  dynamic "enabled_log" {
+    for_each = local.enable_mssql_audit_logs ? [1] : []
+
+    content {
+      category_group = "Audit"
+    }
   }
 
   # The below metrics are kept in to avoid a diff in the Terraform Plan output
@@ -173,8 +177,12 @@ resource "azurerm_monitor_diagnostic_setting" "default_sql_audit" {
   log_analytics_workspace_id     = azurerm_log_analytics_workspace.container_app.id
   log_analytics_destination_type = "Dedicated"
 
-  enabled_log {
-    category = "SQLSecurityAuditEvents"
+  dynamic "enabled_log" {
+    for_each = local.enable_mssql_security_audit_events ? [1] : []
+
+    content {
+      category = "SQLSecurityAuditEvents"
+    }
   }
 }
 
@@ -205,8 +213,12 @@ resource "azurerm_monitor_diagnostic_setting" "extra_sql_audit" {
   log_analytics_workspace_id     = azurerm_log_analytics_workspace.container_app.id
   log_analytics_destination_type = "Dedicated"
 
-  enabled_log {
-    category = "SQLSecurityAuditEvents"
+  dynamic "enabled_log" {
+    for_each = local.enable_mssql_security_audit_events ? [1] : []
+
+    content {
+      category = "SQLSecurityAuditEvents"
+    }
   }
 }
 
