@@ -73,19 +73,15 @@ resource "azurerm_storage_management_policy" "mssql_security_storage" {
 }
 
 resource "azurerm_monitor_diagnostic_setting" "mssql_security_storage" {
-  count = local.enable_mssql_database ? 1 : 0
+  count = local.enable_mssql_database && local.enable_mssql_audit_logs ? 1 : 0
 
   name                       = "${local.resource_prefix}-mssql-blob-diag"
   target_resource_id         = "${azurerm_storage_account.mssql_security_storage[0].id}/blobServices/default"
   log_analytics_workspace_id = azurerm_log_analytics_workspace.container_app.id
   eventhub_name              = local.enable_event_hub ? azurerm_eventhub.container_app[0].name : null
 
-  dynamic "enabled_log" {
-    for_each = local.enable_mssql_audit_logs ? [1] : []
-
-    content {
-      category_group = "Audit"
-    }
+  enabled_log {
+    category_group = "Audit"
   }
 
   # The below metrics are kept in to avoid a diff in the Terraform Plan output
@@ -170,19 +166,15 @@ resource "azurerm_mssql_database" "default" {
 }
 
 resource "azurerm_monitor_diagnostic_setting" "default_sql_audit" {
-  count = local.enable_mssql_database ? 1 : 0
+  count = local.enable_mssql_database && local.enable_mssql_security_audit_events ? 1 : 0
 
   name                           = "sql-audit-to-log-analytics-${local.mssql_database_name}"
   target_resource_id             = azurerm_mssql_database.default[0].id
   log_analytics_workspace_id     = azurerm_log_analytics_workspace.container_app.id
   log_analytics_destination_type = "Dedicated"
 
-  dynamic "enabled_log" {
-    for_each = local.enable_mssql_security_audit_events ? [1] : []
-
-    content {
-      category = "SQLSecurityAuditEvents"
-    }
+  enabled_log {
+    category = "SQLSecurityAuditEvents"
   }
 }
 
@@ -206,19 +198,15 @@ resource "azurerm_mssql_database" "extra" {
 }
 
 resource "azurerm_monitor_diagnostic_setting" "extra_sql_audit" {
-  for_each = local.enable_mssql_database ? local.mssql_extra_databases : {}
+  for_each = local.enable_mssql_database && local.enable_mssql_security_audit_events ? local.mssql_extra_databases : {}
 
   name                           = "sql-audit-to-log-analytics-${each.key}"
   target_resource_id             = azurerm_mssql_database.extra[each.key].id
   log_analytics_workspace_id     = azurerm_log_analytics_workspace.container_app.id
   log_analytics_destination_type = "Dedicated"
 
-  dynamic "enabled_log" {
-    for_each = local.enable_mssql_security_audit_events ? [1] : []
-
-    content {
-      category = "SQLSecurityAuditEvents"
-    }
+  enabled_log {
+    category = "SQLSecurityAuditEvents"
   }
 }
 
